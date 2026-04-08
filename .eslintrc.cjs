@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  ignorePatterns: ["**/dist/**", "**/.next/**", "**/node_modules/**", "**/coverage/**"],
+  ignorePatterns: ["**/dist/**", "**/.next/**", "**/node_modules/**", "**/coverage/**", "**/next-env.d.ts"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
@@ -46,4 +46,3 @@ module.exports = {
     },
   ],
 };
-

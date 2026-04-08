@@ -1,18 +1,24 @@
-import Link from "next/link";
-
 import { formatPlanPrice, studioPlans } from "@unitforge/billing";
 import { appConfig } from "@unitforge/config";
 import { productSurfaces, studioCapabilities } from "@unitforge/core";
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, buttonVariants, cn } from "@unitforge/ui";
+import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import Link from "next/link";
 
-const studioPlan = studioPlans[0];
 const sharedPackages = ["ui", "core", "db", "billing", "analytics", "config"] as const;
 
-if (!studioPlan) {
-  throw new Error("Studio plan configuration is missing.");
+function getStudioPlanOrThrow() {
+  const studioPlan = studioPlans[0];
+
+  if (!studioPlan) {
+    throw new Error("Studio plan configuration is missing.");
+  }
+
+  return studioPlan;
 }
 
 export default function LandingPage() {
+  const studioPlan = getStudioPlanOrThrow();
+
   return (
     <div className="pb-16">
       <section className="container py-20 sm:py-24">
@@ -32,8 +38,8 @@ export default function LandingPage() {
               <Link className={cn(buttonVariants({ size: "lg" }))} href="/app">
                 Open dashboard
               </Link>
-              <Link className={cn(buttonVariants({ size: "lg", variant: "outline" }))} href="/app/price-sheets">
-                Browse product areas
+              <Link className={cn(buttonVariants({ size: "lg", variant: "outline" }))} href="/pricing">
+                View pricing
               </Link>
             </div>
           </div>

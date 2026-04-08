@@ -62,6 +62,9 @@ importers:
       '@unitforge/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@unitforge/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@unitforge/ui':
         specifier: workspace:*
         version: link:../../packages/ui

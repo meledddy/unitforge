@@ -14,7 +14,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
     "baseUrl": ".",
     "paths": {
       "@unitforge/analytics": ["packages/analytics/src/index.ts"],
@@ -25,8 +24,8 @@
       "@unitforge/ui": ["packages/ui/src/index.ts"],
       "@unitforge/ui/*": ["packages/ui/src/*"],
       "@/components/*": ["apps/web/src/components/*"],
-      "@/env": ["apps/web/src/env.ts"]
+      "@/env": ["apps/web/src/env.ts"],
+      "@/server/*": ["apps/web/src/server/*"]
     }
   }
 }
-

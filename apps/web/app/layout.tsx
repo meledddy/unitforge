@@ -1,10 +1,9 @@
+import "./globals.css";
+
+import { appConfig } from "@unitforge/config";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
-
-import { appConfig } from "@unitforge/config";
-
-import "./globals.css";
 
 const sans = Manrope({
   subsets: ["latin"],
