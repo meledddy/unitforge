@@ -7,12 +7,12 @@
       }
     ],
     "jsx": "preserve",
-    "incremental": true
+    "incremental": false
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

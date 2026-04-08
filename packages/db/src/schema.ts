@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 import {
   index,
   integer,
-  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -21,7 +20,7 @@ const timestamps = {
 export const membershipRoleEnum = pgEnum("membership_role", ["owner", "admin", "member"]);
 export const subscriptionProviderEnum = pgEnum("subscription_provider", ["stripe", "manual"]);
 export const subscriptionStatusEnum = pgEnum("subscription_status", ["trialing", "active", "past_due", "canceled"]);
-export const priceSheetStatusEnum = pgEnum("price_sheet_status", ["draft", "published", "archived"]);
+export const priceSheetStatusEnum = pgEnum("price_sheet_status", ["draft", "published"]);
 
 export const users = pgTable(
   "users",
@@ -95,15 +94,18 @@ export const priceSheets = pgTable(
     workspaceId: uuid("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    version: integer("version").default(1).notNull(),
+    title: text("title").notNull(),
+    slug: varchar("slug", { length: 160 }).notNull(),
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+    locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
     status: priceSheetStatusEnum("status").default("draft").notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
     createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
   },
   (table) => ({
-    workspaceVersionIdx: uniqueIndex("price_sheets_workspace_version_idx").on(table.workspaceId, table.name, table.version),
+    slugIdx: uniqueIndex("price_sheets_slug_idx").on(table.slug),
+    workspaceTitleIdx: index("price_sheets_workspace_title_idx").on(table.workspaceId, table.title),
   }),
 );
 
@@ -114,11 +116,10 @@ export const priceSheetItems = pgTable(
     priceSheetId: uuid("price_sheet_id")
       .notNull()
       .references(() => priceSheets.id, { onDelete: "cascade" }),
-    sku: varchar("sku", { length: 128 }).notNull(),
     name: text("name").notNull(),
-    unit: varchar("unit", { length: 32 }).notNull(),
+    description: text("description"),
+    section: varchar("section", { length: 120 }),
     priceCents: integer("price_cents").notNull(),
-    minimumMargin: numeric("minimum_margin", { precision: 8, scale: 2 }),
     position: integer("position").default(0).notNull(),
     ...timestamps,
   },
@@ -196,4 +197,3 @@ export type NewMembership = typeof memberships.$inferInsert;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NewPriceSheet = typeof priceSheets.$inferInsert;
 export type NewPriceSheetItem = typeof priceSheetItems.$inferInsert;
-

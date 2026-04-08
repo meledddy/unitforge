@@ -25,6 +25,7 @@
       "@unitforge/ui/*": ["packages/ui/src/*"],
       "@/components/*": ["apps/web/src/components/*"],
       "@/env": ["apps/web/src/env.ts"],
+      "@/features/*": ["apps/web/src/features/*"],
       "@/server/*": ["apps/web/src/server/*"]
     }
   }

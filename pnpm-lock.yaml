@@ -68,6 +68,9 @@ importers:
       '@unitforge/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      drizzle-orm:
+        specifier: ^0.38.3
+        version: 0.38.4(@types/pg@8.20.0)(@types/react@19.2.14)(pg@8.20.0)(react@19.2.4)
       next:
         specifier: ^15.1.0
         version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -77,6 +80,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.4(react@19.2.4)
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
     devDependencies:
       autoprefixer:
         specifier: ^10.4.20
@@ -111,11 +117,14 @@ importers:
         version: 16.6.1
       drizzle-orm:
         specifier: ^0.38.3
-        version: 0.38.4(@types/react@19.2.14)(pg@8.20.0)(react@19.2.4)
+        version: 0.38.4(@types/pg@8.20.0)(@types/react@19.2.14)(pg@8.20.0)(react@19.2.4)
       pg:
         specifier: ^8.13.1
         version: 8.20.0
     devDependencies:
+      '@types/pg':
+        specifier: ^8.11.11
+        version: 8.20.0
       drizzle-kit:
         specifier: ^0.30.1
         version: 0.30.6
@@ -992,6 +1001,9 @@ packages:
 
   '@types/node@22.19.17':
     resolution: {integrity: sha512-wGdMcf+vPYM6jikpS/qhg6WiqSV/OhG+jeeHT/KlVqxYfD40iYJf9/AE1uQxVWFvU7MipKRkRv8NSHiCGgPr8Q==}
+
+  '@types/pg@8.20.0':
+    resolution: {integrity: sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -3401,6 +3413,12 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/pg@8.20.0':
+    dependencies:
+      '@types/node': 22.19.17
+      pg-protocol: 1.13.0
+      pg-types: 2.2.0
+
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
       '@types/react': 19.2.14
@@ -3864,8 +3882,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.4(@types/react@19.2.14)(pg@8.20.0)(react@19.2.4):
+  drizzle-orm@0.38.4(@types/pg@8.20.0)(@types/react@19.2.14)(pg@8.20.0)(react@19.2.4):
     optionalDependencies:
+      '@types/pg': 8.20.0
       '@types/react': 19.2.14
       pg: 8.20.0
       react: 19.2.4
