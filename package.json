@@ -1,0 +1,32 @@
+{
+  "name": "unitforge",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @unitforge/web dev",
+    "build": "pnpm --filter \"./packages/**\" build && pnpm --filter @unitforge/web build",
+    "lint": "pnpm --filter \"./packages/**\" lint && pnpm --filter @unitforge/web lint",
+    "typecheck": "pnpm --filter \"./packages/**\" typecheck && pnpm --filter @unitforge/web typecheck",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}

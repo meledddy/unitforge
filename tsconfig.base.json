@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@unitforge/analytics": ["packages/analytics/src/index.ts"],
+      "@unitforge/billing": ["packages/billing/src/index.ts"],
+      "@unitforge/config": ["packages/config/src/index.ts"],
+      "@unitforge/core": ["packages/core/src/index.ts"],
+      "@unitforge/db": ["packages/db/src/index.ts"],
+      "@unitforge/ui": ["packages/ui/src/index.ts"],
+      "@unitforge/ui/*": ["packages/ui/src/*"],
+      "@/components/*": ["apps/web/src/components/*"],
+      "@/env": ["apps/web/src/env.ts"]
+    }
+  }
+}
+
