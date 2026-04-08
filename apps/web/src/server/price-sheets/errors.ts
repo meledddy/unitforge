@@ -1,5 +1,3 @@
-import "server-only";
-
 export type PriceSheetServiceErrorCode =
   | "DATABASE_NOT_CONFIGURED"
   | "NOT_FOUND"

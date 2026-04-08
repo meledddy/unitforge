@@ -5,9 +5,10 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
-    "typecheck": "next typegen && tsc --project tsconfig.json --noEmit --incremental false"
+    "typecheck": "tsc --project tsconfig.typecheck.json --noEmit"
   },
   "dependencies": {
+    "@next/env": "^15.1.0",
     "@unitforge/analytics": "workspace:*",
     "@unitforge/billing": "workspace:*",
     "@unitforge/config": "workspace:*",

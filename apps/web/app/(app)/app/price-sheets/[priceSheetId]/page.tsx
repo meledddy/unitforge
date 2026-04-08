@@ -7,7 +7,6 @@ import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { getCurrentAppShellSession } from "@/server/current-session";
-import { isServerDbConfigured } from "@/server/db";
 import { deletePriceSheetAction, setPriceSheetStatusAction, updatePriceSheetAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, getWorkspacePriceSheetForEdit,isKnownPriceSheetError } from "@/server/price-sheets/service";
 
@@ -20,18 +19,6 @@ interface PriceSheetEditPageProps {
 }
 
 export default async function PriceSheetEditPage({ params }: PriceSheetEditPageProps) {
-  if (!isServerDbConfigured()) {
-    return (
-      <div className="space-y-8">
-        <PageHeader eyebrow="Edit" title="Price Sheet unavailable" description="Configure the database before editing Price Sheets." />
-        <PlaceholderPanel
-          title="Database setup required"
-          description="Add DATABASE_URL and apply the schema before editing Price Sheets."
-        />
-      </div>
-    );
-  }
-
   const session = await getCurrentAppShellSession();
   const { priceSheetId } = await params;
 

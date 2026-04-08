@@ -7,10 +7,14 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
+    "db:generate": "pnpm --filter @unitforge/db db:generate",
+    "db:migrate": "pnpm --filter @unitforge/db db:migrate",
+    "db:seed:mock-session": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/seed-mock-session.ts",
     "dev": "pnpm --filter @unitforge/web dev",
     "build": "pnpm --filter \"./packages/**\" build && pnpm --filter @unitforge/web build",
     "lint": "pnpm --filter \"./packages/**\" lint && pnpm --filter @unitforge/web lint",
     "typecheck": "pnpm --filter \"./packages/**\" typecheck && pnpm --filter @unitforge/web typecheck",
+    "verify:price-sheets": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-price-sheets.ts",
     "format": "prettier --check .",
     "format:write": "prettier --write ."
   },
@@ -26,6 +30,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
+    "tsx": "^4.20.3",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   }

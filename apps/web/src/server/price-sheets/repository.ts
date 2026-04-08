@@ -1,5 +1,3 @@
-import "server-only";
-
 import { priceSheetItems, priceSheets } from "@unitforge/db";
 import { and, asc, desc, eq } from "drizzle-orm";
 

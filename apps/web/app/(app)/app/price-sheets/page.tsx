@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { getCurrentAppShellSession } from "@/server/current-session";
-import { isServerDbConfigured } from "@/server/db";
 import { setPriceSheetStatusAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/price-sheets/service";
 
@@ -13,27 +12,6 @@ export const dynamic = "force-dynamic";
 
 export default async function PriceSheetsPage() {
   const session = await getCurrentAppShellSession();
-
-  if (!isServerDbConfigured()) {
-    return (
-      <div className="space-y-8">
-        <PageHeader
-          eyebrow="Product area"
-          title="Price sheets"
-          description="Price Sheets are ready in the codebase, but the database connection still needs to be configured."
-          actions={
-            <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/app/settings">
-              Open settings
-            </Link>
-          }
-        />
-        <PlaceholderPanel
-          title="Database setup required"
-          description="Add DATABASE_URL and apply the Drizzle schema before creating Price Sheets."
-        />
-      </div>
-    );
-  }
 
   try {
     const priceSheets = await listWorkspacePriceSheets(session);
@@ -123,7 +101,7 @@ export default async function PriceSheetsPage() {
         <PageHeader
           eyebrow="Product area"
           title="Price sheets"
-          description="The workspace shell is ready, but the Price Sheets data layer is not available yet."
+          description="The workspace shell is ready, but the Price Sheets data layer could not be reached."
         />
         <PlaceholderPanel title="Price Sheets unavailable" description={getPriceSheetErrorMessage(error)} />
       </div>

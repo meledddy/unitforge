@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
 import { formatPriceSheetAmount, toPriceSheetFormValues } from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";

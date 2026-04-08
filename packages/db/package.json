@@ -16,6 +16,8 @@
   "files": ["dist", "drizzle.config.ts"],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
     "lint": "eslint src drizzle.config.ts --ext .ts,.tsx --max-warnings=0",
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },

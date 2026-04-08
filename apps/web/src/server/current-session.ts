@@ -1,4 +1,9 @@
-import "server-only";
+import {
+  mockSessionMembership,
+  mockSessionSubscription,
+  mockSessionUser,
+  mockSessionWorkspace,
+} from "@unitforge/core";
 
 type MembershipRole = "owner" | "admin" | "member";
 type SubscriptionProvider = "stripe" | "manual";
@@ -28,23 +33,16 @@ export interface AppShellSession {
 
 const mockSession: AppShellSession = {
   currentUser: {
-    id: "0e53fe17-7af9-4c45-83df-a1a6d7231bf5",
-    email: "operator@unitforge.dev",
-    name: "Unitforge Operator",
+    ...mockSessionUser,
   },
   currentWorkspace: {
-    id: "f5ec1830-7b93-48cf-b157-fbafca907157",
-    name: "Unitforge Studio",
-    slug: "unitforge-studio",
+    ...mockSessionWorkspace,
   },
   membership: {
-    role: "owner",
+    ...mockSessionMembership,
   },
   subscription: {
-    plan: "studio",
-    provider: "stripe",
-    status: "trialing",
-    currentPeriodEnd: "2026-05-08T00:00:00.000Z",
+    ...mockSessionSubscription,
   },
 };
 

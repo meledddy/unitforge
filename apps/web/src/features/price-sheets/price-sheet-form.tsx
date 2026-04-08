@@ -1,12 +1,30 @@
 "use client";
 
-import { Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn,Input, Label, Select, Textarea } from "@unitforge/ui";
+import {
+  Button,
+  buttonVariants,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  cn,
+  Input,
+  Label,
+  Select,
+  Textarea,
+} from "@unitforge/ui";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import type { PriceSheetFormActionState } from "@/server/price-sheets/actions";
 
-import { getEmptyPriceSheetFormValues, getEmptyPriceSheetItemValues, type PriceSheetFormValues,slugifyPriceSheetValue } from "./validation";
+import {
+  getEmptyPriceSheetFormValues,
+  getEmptyPriceSheetItemValues,
+  type PriceSheetFormValues,
+  slugifyPriceSheetValue,
+} from "./validation";
 
 interface PriceSheetFormProps {
   mode: "create" | "edit";
@@ -26,6 +44,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
   const [state, formAction, isPending] = useActionState(action, initialFormState);
   const [values, setValues] = useState(initialValues);
   const [hasEditedSlug, setHasEditedSlug] = useState(Boolean(initialValues.slug));
+  const fieldErrorEntries = state.fieldErrors ? Object.entries(state.fieldErrors) : [];
 
   function updateTopLevelField(field: keyof Omit<PriceSheetFormValues, "items">, value: string) {
     setValues((currentValues) => ({
@@ -82,6 +101,37 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
     return state.fieldErrors?.[path];
   }
 
+  function getFieldErrorLabel(path: string) {
+    const itemMatch = path.match(/^items\.(\d+)\.(name|price|section|description)$/);
+
+    if (itemMatch) {
+      const fieldLabels: Record<string, string> = {
+        description: "description",
+        name: "name",
+        price: "price",
+        section: "category / section",
+      };
+      const itemIndex = Number(itemMatch[1]) + 1;
+      const fieldKey = itemMatch[2] as keyof typeof fieldLabels;
+
+      return `Item ${itemIndex} ${fieldLabels[fieldKey] ?? "field"}`;
+    }
+
+    const topLevelLabels: Record<string, string> = {
+      currency: "Currency",
+      items: "Items",
+      locale: "Locale",
+      slug: "Slug",
+      title: "Title",
+    };
+
+    return topLevelLabels[path] ?? "Form";
+  }
+
+  function getFieldClasses(path: string) {
+    return getFieldError(path) ? "border-destructive focus-visible:ring-destructive" : undefined;
+  }
+
   return (
     <form action={formAction} className="space-y-6">
       <input name="payload" type="hidden" value={JSON.stringify(values)} />
@@ -89,6 +139,19 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       {state.status === "error" && state.message ? (
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {state.message}
+        </div>
+      ) : null}
+
+      {fieldErrorEntries.length > 0 ? (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+          <p className="text-sm font-medium text-destructive">Validation errors</p>
+          <ul className="mt-2 space-y-1 text-sm text-destructive">
+            {fieldErrorEntries.map(([path, message]) => (
+              <li key={path}>
+                {getFieldErrorLabel(path)}: {message}
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 
@@ -100,19 +163,37 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
         <CardContent className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" value={values.title} onChange={(event) => updateTitle(event.target.value)} />
+            <Input
+              aria-invalid={Boolean(getFieldError("title"))}
+              className={getFieldClasses("title")}
+              id="title"
+              value={values.title}
+              onChange={(event) => updateTitle(event.target.value)}
+            />
             {getFieldError("title") ? <p className="text-sm text-destructive">{getFieldError("title")}</p> : null}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="slug">Slug</Label>
-            <Input id="slug" value={values.slug} onChange={(event) => updateSlug(event.target.value)} />
+            <Input
+              aria-invalid={Boolean(getFieldError("slug"))}
+              className={getFieldClasses("slug")}
+              id="slug"
+              value={values.slug}
+              onChange={(event) => updateSlug(event.target.value)}
+            />
             {getFieldError("slug") ? <p className="text-sm text-destructive">{getFieldError("slug")}</p> : null}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select id="status" value={values.status} onChange={(event) => updateTopLevelField("status", event.target.value)}>
+            <Select
+              aria-invalid={Boolean(getFieldError("status"))}
+              className={getFieldClasses("status")}
+              id="status"
+              value={values.status}
+              onChange={(event) => updateTopLevelField("status", event.target.value)}
+            >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </Select>
@@ -121,6 +202,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           <div className="space-y-2">
             <Label htmlFor="currency">Currency</Label>
             <Input
+              aria-invalid={Boolean(getFieldError("currency"))}
+              className={getFieldClasses("currency")}
               id="currency"
               maxLength={3}
               value={values.currency}
@@ -131,7 +214,13 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
           <div className="space-y-2">
             <Label htmlFor="locale">Locale</Label>
-            <Input id="locale" value={values.locale} onChange={(event) => updateTopLevelField("locale", event.target.value)} />
+            <Input
+              aria-invalid={Boolean(getFieldError("locale"))}
+              className={getFieldClasses("locale")}
+              id="locale"
+              value={values.locale}
+              onChange={(event) => updateTopLevelField("locale", event.target.value)}
+            />
             {getFieldError("locale") ? <p className="text-sm text-destructive">{getFieldError("locale")}</p> : null}
           </div>
         </CardContent>
@@ -166,6 +255,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 <div className="space-y-2">
                   <Label htmlFor={`item-name-${index}`}>Name</Label>
                   <Input
+                    aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
+                    className={getFieldClasses(`items.${index}.name`)}
                     id={`item-name-${index}`}
                     value={item.name}
                     onChange={(event) => updateItemField(index, "name", event.target.value)}
@@ -178,6 +269,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 <div className="space-y-2">
                   <Label htmlFor={`item-price-${index}`}>Price</Label>
                   <Input
+                    aria-invalid={Boolean(getFieldError(`items.${index}.price`))}
+                    className={getFieldClasses(`items.${index}.price`)}
                     id={`item-price-${index}`}
                     inputMode="decimal"
                     min="0"
@@ -194,6 +287,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 <div className="space-y-2">
                   <Label htmlFor={`item-section-${index}`}>Category / section</Label>
                   <Input
+                    aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
+                    className={getFieldClasses(`items.${index}.section`)}
                     id={`item-section-${index}`}
                     value={item.section}
                     onChange={(event) => updateItemField(index, "section", event.target.value)}
@@ -206,6 +301,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor={`item-description-${index}`}>Description</Label>
                   <Textarea
+                    aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
+                    className={getFieldClasses(`items.${index}.description`)}
                     id={`item-description-${index}`}
                     value={item.description}
                     onChange={(event) => updateItemField(index, "description", event.target.value)}

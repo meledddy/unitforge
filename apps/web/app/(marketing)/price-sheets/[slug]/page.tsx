@@ -1,7 +1,6 @@
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@unitforge/ui";
 import { notFound } from "next/navigation";
 
-import { isServerDbConfigured } from "@/server/db";
 import { getPublishedPriceSheetBySlug } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +12,6 @@ interface PublicPriceSheetPageProps {
 }
 
 export default async function PublicPriceSheetPage({ params }: PublicPriceSheetPageProps) {
-  if (!isServerDbConfigured()) {
-    notFound();
-  }
-
   const { slug } = await params;
   const priceSheet = await getPublishedPriceSheetBySlug(slug);
 

@@ -1,13 +1,15 @@
-import "server-only";
-
 import { createDb, type Database } from "@unitforge/db";
+
+import { getRuntimeEnvValue, loadAppRuntimeEnv } from "./runtime-env";
 
 const globalForDb = globalThis as typeof globalThis & {
   __unitforgeDb?: Database;
 };
 
 export function getServerDb() {
-  const connectionString = process.env.DATABASE_URL;
+  loadAppRuntimeEnv();
+
+  const connectionString = getRuntimeEnvValue("DATABASE_URL");
 
   if (!connectionString) {
     return null;
@@ -25,5 +27,5 @@ export function getServerDb() {
 }
 
 export function isServerDbConfigured() {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(getRuntimeEnvValue("DATABASE_URL"));
 }

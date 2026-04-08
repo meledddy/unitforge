@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
@@ -14,6 +15,7 @@ import { isPriceSheetServiceError } from "./errors";
 import {
   createWorkspacePriceSheet,
   deleteWorkspacePriceSheet,
+  getWorkspacePriceSheetForEdit,
   setWorkspacePriceSheetStatus,
   updateWorkspacePriceSheet,
 } from "./service";
@@ -48,14 +50,20 @@ export async function createPriceSheetAction(
   }
 
   const session = await getCurrentAppShellSession();
+  let priceSheet;
 
   try {
-    const priceSheet = await createWorkspacePriceSheet(session, toPriceSheetMutationInput(parsedPayload.data));
-
-    redirect(`/app/price-sheets/${priceSheet.id}`);
+    priceSheet = await createWorkspacePriceSheet(session, toPriceSheetMutationInput(parsedPayload.data));
   } catch (error) {
     return actionErrorState(error, "Price Sheet could not be created.");
   }
+
+  revalidatePriceSheetPaths({
+    priceSheetId: priceSheet.id,
+    slug: priceSheet.slug,
+  });
+
+  redirect(`/app/price-sheets/${priceSheet.id}`);
 }
 
 export async function updatePriceSheetAction(
@@ -83,14 +91,26 @@ export async function updatePriceSheetAction(
   }
 
   const session = await getCurrentAppShellSession();
+  let existingPriceSheet;
+  let priceSheet;
 
   try {
-    await updateWorkspacePriceSheet(session, priceSheetId, toPriceSheetMutationInput(parsedPayload.data));
-
-    redirect(`/app/price-sheets/${priceSheetId}`);
+    existingPriceSheet = await getWorkspacePriceSheetForEdit(session, priceSheetId);
+    priceSheet = await updateWorkspacePriceSheet(session, priceSheetId, toPriceSheetMutationInput(parsedPayload.data));
   } catch (error) {
     return actionErrorState(error, "Price Sheet could not be updated.");
   }
+
+  revalidatePriceSheetPaths({
+    priceSheetId,
+    slug: priceSheet.slug,
+  });
+
+  if (existingPriceSheet.slug !== priceSheet.slug) {
+    revalidatePath(`/price-sheets/${existingPriceSheet.slug}`);
+  }
+
+  redirect(`/app/price-sheets/${priceSheetId}`);
 }
 
 export async function setPriceSheetStatusAction(
@@ -99,18 +119,35 @@ export async function setPriceSheetStatusAction(
   redirectTo: string,
 ) {
   const session = await getCurrentAppShellSession();
-
-  await setWorkspacePriceSheetStatus(session, priceSheetId, status);
+  const priceSheet = await setWorkspacePriceSheetStatus(session, priceSheetId, status);
+  revalidatePriceSheetPaths({
+    priceSheetId,
+    slug: priceSheet.slug,
+  });
+  revalidatePath(redirectTo);
 
   redirect(redirectTo);
 }
 
 export async function deletePriceSheetAction(priceSheetId: string, redirectTo = "/app/price-sheets") {
   const session = await getCurrentAppShellSession();
-
-  await deleteWorkspacePriceSheet(session, priceSheetId);
+  const deletedPriceSheet = await deleteWorkspacePriceSheet(session, priceSheetId);
+  revalidatePriceSheetPaths({
+    priceSheetId: deletedPriceSheet.id,
+    slug: deletedPriceSheet.slug,
+  });
+  revalidatePath(redirectTo);
 
   redirect(redirectTo);
+}
+
+function revalidatePriceSheetPaths(input: {
+  priceSheetId: string;
+  slug: string;
+}) {
+  revalidatePath("/app/price-sheets");
+  revalidatePath(`/app/price-sheets/${input.priceSheetId}`);
+  revalidatePath(`/price-sheets/${input.slug}`);
 }
 
 function actionErrorState(error: unknown, fallbackMessage: string) {
