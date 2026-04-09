@@ -27,10 +27,12 @@ async function main() {
   let createdPriceSheetId: string | null = null;
   const payload = {
     title,
+    description: "Public-facing verification sheet description",
     slug,
     status: "published",
     currency: "USD",
     locale: "en-US",
+    theme: "slate",
     items: [
       {
         name: "Verification Item",
@@ -60,15 +62,20 @@ async function main() {
     createdPriceSheetId = created.id;
     assert.equal(created.status, "published");
     assert.equal(created.itemCount, 1);
+    assert.equal(created.theme, "slate");
 
     const editable = await getWorkspacePriceSheetForEdit(session, created.id);
     assert.equal(editable.title, title);
+    assert.equal(editable.description, payload.description);
     assert.equal(editable.slug, slug);
+    assert.equal(editable.theme, "slate");
     assert.equal(editable.items.length, 1);
 
     const publicSheet = await getPublishedPriceSheetBySlug(slug);
     assert(publicSheet);
+    assert.equal(publicSheet.description, payload.description);
     assert.equal(publicSheet.slug, slug);
+    assert.equal(publicSheet.theme, "slate");
     assert.equal(publicSheet.items.length, 1);
 
     await deleteWorkspacePriceSheet(session, created.id);

@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 export const priceSheetStatusValues = ["draft", "published"] as const;
+export const priceSheetThemeValues = ["amber", "slate", "stone"] as const;
 
 export const priceSheetStatusSchema = z.enum(priceSheetStatusValues);
+export const priceSheetThemeSchema = z.enum(priceSheetThemeValues);
 
 const pricePattern = /^\d+(?:\.\d{1,2})?$/;
 
@@ -20,6 +22,7 @@ export const priceSheetItemFormSchema = z.object({
 
 export const priceSheetFormSchema = z.object({
   title: z.string().trim().min(1, "Title is required.").max(120, "Title is too long."),
+  description: z.string().trim().max(600, "Description is too long."),
   slug: z
     .string()
     .trim()
@@ -33,18 +36,22 @@ export const priceSheetFormSchema = z.object({
     .length(3, "Currency must be a 3-letter ISO code.")
     .transform((value) => value.toUpperCase()),
   locale: z.string().trim().min(2, "Locale is required.").max(32, "Locale is too long."),
+  theme: priceSheetThemeSchema,
   items: z.array(priceSheetItemFormSchema).min(1, "Add at least one item."),
 });
 
 export type PriceSheetStatus = z.infer<typeof priceSheetStatusSchema>;
+export type PriceSheetTheme = z.infer<typeof priceSheetThemeSchema>;
 export type PriceSheetFormValues = z.input<typeof priceSheetFormSchema>;
 
 export interface PriceSheetMutationInput {
   title: string;
+  description: string | null;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
   locale: string;
+  theme: PriceSheetTheme;
   items: Array<{
     id?: string;
     name: string;
@@ -75,10 +82,12 @@ export function getEmptyPriceSheetItemValues(): PriceSheetFormValues["items"][nu
 export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
   return {
     title: "",
+    description: "",
     slug: "",
     status: "draft",
     currency: "USD",
     locale: "en-US",
+    theme: "amber",
     items: [getEmptyPriceSheetItemValues()],
   };
 }
@@ -105,6 +114,7 @@ export function toPriceSheetMutationInput(values: PriceSheetFormValues): PriceSh
 
   return {
     ...parsed,
+    description: parsed.description || null,
     items: parsed.items.map((item) => ({
       id: item.id,
       name: item.name,
@@ -117,10 +127,12 @@ export function toPriceSheetMutationInput(values: PriceSheetFormValues): PriceSh
 
 export function toPriceSheetFormValues(input: {
   title: string;
+  description: string | null;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
   locale: string;
+  theme: PriceSheetTheme;
   items: Array<{
     id?: string;
     name: string;
@@ -131,10 +143,12 @@ export function toPriceSheetFormValues(input: {
 }): PriceSheetFormValues {
   return {
     title: input.title,
+    description: input.description ?? "",
     slug: input.slug,
     status: input.status,
     currency: input.currency,
     locale: input.locale,
+    theme: input.theme,
     items:
       input.items.length > 0
         ? input.items.map((item) => ({

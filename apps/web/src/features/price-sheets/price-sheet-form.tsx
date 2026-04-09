@@ -119,9 +119,11 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
     const topLevelLabels: Record<string, string> = {
       currency: "Currency",
+      description: "Description",
       items: "Items",
       locale: "Locale",
       slug: "Slug",
+      theme: "Theme",
       title: "Title",
     };
 
@@ -158,7 +160,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       <Card>
         <CardHeader>
           <CardTitle>{mode === "create" ? "Price Sheet details" : "Edit Price Sheet"}</CardTitle>
-          <CardDescription>One sheet, one locale, and a focused set of items.</CardDescription>
+          <CardDescription>One sheet, one locale, one presentation theme, and a focused set of items.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
@@ -171,6 +173,18 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               onChange={(event) => updateTitle(event.target.value)}
             />
             {getFieldError("title") ? <p className="text-sm text-destructive">{getFieldError("title")}</p> : null}
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              aria-invalid={Boolean(getFieldError("description"))}
+              className={getFieldClasses("description")}
+              id="description"
+              value={values.description}
+              onChange={(event) => updateTopLevelField("description", event.target.value)}
+            />
+            {getFieldError("description") ? <p className="text-sm text-destructive">{getFieldError("description")}</p> : null}
           </div>
 
           <div className="space-y-2">
@@ -197,6 +211,22 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="theme">Presentation theme</Label>
+            <Select
+              aria-invalid={Boolean(getFieldError("theme"))}
+              className={getFieldClasses("theme")}
+              id="theme"
+              value={values.theme}
+              onChange={(event) => updateTopLevelField("theme", event.target.value)}
+            >
+              <option value="amber">Amber</option>
+              <option value="slate">Slate</option>
+              <option value="stone">Stone</option>
+            </Select>
+            {getFieldError("theme") ? <p className="text-sm text-destructive">{getFieldError("theme")}</p> : null}
           </div>
 
           <div className="space-y-2">

@@ -145,10 +145,11 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
   const language = resolvePublicLanguage(requestedLanguage, priceSheet.locale);
   const copy = publicPriceSheetCopy[language];
   const presentationLocale = resolvePresentationLocale(language, priceSheet.locale);
-  const theme = getPublicPriceSheetTheme(priceSheet.slug);
+  const theme = getPublicPriceSheetTheme(priceSheet.theme);
   const sections = groupPriceSheetItems(priceSheet.items, copy);
   const updatedAt = new Intl.DateTimeFormat(presentationLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
   const introText = buildIntroText(priceSheet, sections.length, presentationLocale);
+  const detailText = priceSheet.description?.trim() || introText;
   const contactHref = buildContactHref(priceSheet.title, language);
 
   return (
@@ -192,13 +193,15 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">{copy.catalogEyebrow}</p>
                 <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{priceSheet.title}</h1>
-                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{introText}</p>
+                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{detailText}</p>
+                {priceSheet.description ? <p className="text-sm leading-6 text-muted-foreground">{introText}</p> : null}
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <MetricChip label={copy.itemCountLabel} value={String(priceSheet.items.length)} />
               <MetricChip label={copy.sectionCountLabel} value={String(sections.length)} />
+              <MetricChip label={copy.localeLabel} value={presentationLocale} />
               <MetricChip label={copy.currencyLabel} value={priceSheet.currency} />
               <MetricChip label={copy.updatedLabel} value={updatedAt} />
             </div>
@@ -399,14 +402,8 @@ function formatPublicPrice(priceCents: number, currency: string, locale: string)
   }).format(priceCents / 100);
 }
 
-function getPublicPriceSheetTheme(slug: string) {
-  let total = 0;
-
-  for (const character of slug) {
-    total += character.charCodeAt(0);
-  }
-
-  return publicPriceSheetThemes[total % publicPriceSheetThemes.length] ?? publicPriceSheetThemes[0]!;
+function getPublicPriceSheetTheme(themeId: PublishedPriceSheet["theme"]) {
+  return publicPriceSheetThemes.find((theme) => theme.id === themeId) ?? publicPriceSheetThemes[0]!;
 }
 
 function getSheetMark(title: string) {

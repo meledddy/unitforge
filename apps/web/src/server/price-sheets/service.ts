@@ -1,4 +1,4 @@
-import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
+import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus, PriceSheetTheme } from "@/features/price-sheets/validation";
 import { formatPriceSheetAmount, toPriceSheetFormValues } from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";
 
@@ -18,10 +18,12 @@ import {
 export interface PriceSheetListItem {
   id: string;
   title: string;
+  description: string | null;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
   locale: string;
+  theme: PriceSheetTheme;
   itemCount: number;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -46,9 +48,11 @@ export interface PriceSheetDetail extends PriceSheetListItem {
 export interface PublishedPriceSheet {
   id: string;
   title: string;
+  description: string | null;
   slug: string;
   currency: string;
   locale: string;
+  theme: PriceSheetTheme;
   updatedAt: Date;
   items: PriceSheetItemView[];
 }
@@ -59,10 +63,12 @@ export async function listWorkspacePriceSheets(session: AppShellSession) {
   return records.map((record) => ({
     id: record.id,
     title: record.title,
+    description: record.description,
     slug: record.slug,
     status: record.status,
     currency: record.currency,
     locale: record.locale,
+    theme: record.theme,
     itemCount: record.items.length,
     updatedAt: record.updatedAt,
     publishedAt: record.publishedAt,
@@ -123,9 +129,11 @@ export async function getPublishedPriceSheetBySlug(slug: string) {
   return {
     id: record.id,
     title: record.title,
+    description: record.description,
     slug: record.slug,
     currency: record.currency,
     locale: record.locale,
+    theme: record.theme,
     updatedAt: record.updatedAt,
     items: mapPriceSheetItems(record),
   } satisfies PublishedPriceSheet;
@@ -155,10 +163,12 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
   return {
     id: record.id,
     title: record.title,
+    description: record.description,
     slug: record.slug,
     status: record.status,
     currency: record.currency,
     locale: record.locale,
+    theme: record.theme,
     itemCount: record.items.length,
     updatedAt: record.updatedAt,
     publishedAt: record.publishedAt,
@@ -167,10 +177,12 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
     items: mapPriceSheetItems(record),
     formValues: toPriceSheetFormValues({
       title: record.title,
+      description: record.description,
       slug: record.slug,
       status: record.status,
       currency: record.currency,
       locale: record.locale,
+      theme: record.theme,
       items: record.items.map((item) => ({
         id: item.id,
         name: item.name,

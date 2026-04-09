@@ -1,7 +1,7 @@
 import { priceSheetItems, priceSheets } from "@unitforge/db";
 import { and, asc, desc, eq } from "drizzle-orm";
 
-import type { PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
+import type { PriceSheetMutationInput, PriceSheetStatus, PriceSheetTheme } from "@/features/price-sheets/validation";
 import { getServerDb } from "@/server/db";
 
 import { PriceSheetServiceError } from "./errors";
@@ -10,10 +10,12 @@ export interface PriceSheetRecord {
   id: string;
   workspaceId: string;
   title: string;
+  description: string | null;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
   locale: string;
+  theme: PriceSheetTheme;
   publishedAt: Date | null;
   createdById: string | null;
   createdAt: Date;
@@ -110,10 +112,12 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
       .values({
         workspaceId,
         title: input.title,
+        description: input.description,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
         locale: input.locale,
+        theme: input.theme,
         publishedAt: input.status === "published" ? new Date() : null,
         createdById,
       })
@@ -167,10 +171,12 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
       .update(priceSheets)
       .set({
         title: input.title,
+        description: input.description,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
         locale: input.locale,
+        theme: input.theme,
         publishedAt: input.status === "published" ? existingRecord.publishedAt ?? new Date() : null,
         updatedAt: new Date(),
       })

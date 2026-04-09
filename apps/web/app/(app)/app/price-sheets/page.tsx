@@ -63,7 +63,10 @@ export default async function PriceSheetsPage() {
                             {priceSheet.currency}
                             {" / "}
                             {priceSheet.locale}
+                            {" / "}
+                            {priceSheet.theme}
                           </CardDescription>
+                          {priceSheet.description ? <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{priceSheet.description}</p> : null}
                         </div>
                       </div>
 

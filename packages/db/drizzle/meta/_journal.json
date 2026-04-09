@@ -8,6 +8,13 @@
       "when": 1775611395838,
       "tag": "0000_absent_madripoor",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775740422250,
+      "tag": "0001_curious_tarantula",
+      "breakpoints": true
     }
   ]
 }

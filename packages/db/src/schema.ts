@@ -95,9 +95,11 @@ export const priceSheets = pgTable(
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
+    description: text("description"),
     slug: varchar("slug", { length: 160 }).notNull(),
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
     locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
+    theme: varchar("theme", { length: 32 }).default("amber").notNull(),
     status: priceSheetStatusEnum("status").default("draft").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
