@@ -66,7 +66,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                   <p>Slug: {priceSheet.slug}</p>
                   <p>Theme: {priceSheet.theme}</p>
                   <p>Currency: {priceSheet.currency}</p>
-                  <p>Locale: {priceSheet.locale}</p>
+                  <p>Default content locale: {priceSheet.defaultContentLocale}</p>
                   {priceSheet.description ? <p>Description: {priceSheet.description}</p> : null}
                   <p>Updated: {priceSheet.updatedAt.toLocaleString()}</p>
                 </div>

@@ -1,7 +1,16 @@
 import { priceSheetItems, priceSheets } from "@unitforge/db";
 import { and, asc, desc, eq } from "drizzle-orm";
 
-import type { PriceSheetMutationInput, PriceSheetStatus, PriceSheetTheme } from "@/features/price-sheets/validation";
+import {
+  normalizePriceSheetContentLocale,
+  normalizePriceSheetItemTranslations,
+  normalizePriceSheetTranslations,
+  type PriceSheetContentLocale,
+  type PriceSheetItemTranslations,
+  type PriceSheetTheme,
+  type PriceSheetTranslations,
+} from "@/features/price-sheets/localization";
+import type { PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
 import { getServerDb } from "@/server/db";
 
 import { PriceSheetServiceError } from "./errors";
@@ -11,10 +20,11 @@ export interface PriceSheetRecord {
   workspaceId: string;
   title: string;
   description: string | null;
+  translations: PriceSheetTranslations;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
-  locale: string;
+  defaultContentLocale: PriceSheetContentLocale;
   theme: PriceSheetTheme;
   publishedAt: Date | null;
   createdById: string | null;
@@ -26,11 +36,43 @@ export interface PriceSheetRecord {
     name: string;
     description: string | null;
     section: string | null;
+    translations: PriceSheetItemTranslations;
     priceCents: number;
     position: number;
     createdAt: Date;
     updatedAt: Date;
   }>;
+}
+
+interface RawPriceSheetItemRecord {
+  id: string;
+  priceSheetId: string;
+  name: string;
+  description: string | null;
+  section: string | null;
+  translations: unknown;
+  priceCents: number;
+  position: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface RawPriceSheetRecord {
+  id: string;
+  workspaceId: string;
+  title: string;
+  description: string | null;
+  translations: unknown;
+  slug: string;
+  status: PriceSheetStatus;
+  currency: string;
+  locale: string;
+  theme: string;
+  publishedAt: Date | null;
+  createdById: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  items: RawPriceSheetItemRecord[];
 }
 
 function getDbOrThrow() {
@@ -58,7 +100,7 @@ export async function listPriceSheetRecordsByWorkspace(workspaceId: string) {
     orderBy: [desc(priceSheets.updatedAt)],
   });
 
-  return records as PriceSheetRecord[];
+  return records.map(mapPriceSheetRecord);
 }
 
 export async function findPriceSheetRecordById(workspaceId: string, priceSheetId: string) {
@@ -72,7 +114,7 @@ export async function findPriceSheetRecordById(workspaceId: string, priceSheetId
     },
   });
 
-  return (record as PriceSheetRecord | undefined) ?? null;
+  return record ? mapPriceSheetRecord(record) : null;
 }
 
 export async function findPriceSheetRecordBySlug(slug: string) {
@@ -86,7 +128,7 @@ export async function findPriceSheetRecordBySlug(slug: string) {
     },
   });
 
-  return (record as PriceSheetRecord | undefined) ?? null;
+  return record ? mapPriceSheetRecord(record) : null;
 }
 
 export async function findPublishedPriceSheetRecordBySlug(slug: string) {
@@ -100,7 +142,7 @@ export async function findPublishedPriceSheetRecordBySlug(slug: string) {
     },
   });
 
-  return (record as PriceSheetRecord | undefined) ?? null;
+  return record ? mapPriceSheetRecord(record) : null;
 }
 
 export async function createPriceSheetRecord(workspaceId: string, createdById: string, input: PriceSheetMutationInput) {
@@ -113,10 +155,11 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
         workspaceId,
         title: input.title,
         description: input.description,
+        translations: input.translations,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
-        locale: input.locale,
+        locale: input.defaultContentLocale,
         theme: input.theme,
         publishedAt: input.status === "published" ? new Date() : null,
         createdById,
@@ -133,6 +176,7 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
         name: item.name,
         description: item.description,
         section: item.section,
+        translations: item.translations,
         priceCents: item.priceCents,
         position: index,
       })),
@@ -151,7 +195,7 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
       throw new PriceSheetServiceError("UNAVAILABLE", "Created Price Sheet could not be loaded.");
     }
 
-    return createdSheet as PriceSheetRecord;
+    return mapPriceSheetRecord(createdSheet);
   });
 }
 
@@ -172,10 +216,11 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
       .set({
         title: input.title,
         description: input.description,
+        translations: input.translations,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
-        locale: input.locale,
+        locale: input.defaultContentLocale,
         theme: input.theme,
         publishedAt: input.status === "published" ? existingRecord.publishedAt ?? new Date() : null,
         updatedAt: new Date(),
@@ -190,6 +235,7 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
         name: item.name,
         description: item.description,
         section: item.section,
+        translations: item.translations,
         priceCents: item.priceCents,
         position: index,
       })),
@@ -208,7 +254,7 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
       throw new PriceSheetServiceError("UNAVAILABLE", "Updated Price Sheet could not be loaded.");
     }
 
-    return updatedRecord as PriceSheetRecord;
+    return mapPriceSheetRecord(updatedRecord);
   });
 }
 
@@ -251,7 +297,7 @@ export async function setPriceSheetRecordStatus(workspaceId: string, priceSheetI
       throw new PriceSheetServiceError("UNAVAILABLE", "Updated Price Sheet could not be loaded.");
     }
 
-    return updatedRecord as PriceSheetRecord;
+    return mapPriceSheetRecord(updatedRecord);
   });
 }
 
@@ -270,4 +316,35 @@ export async function deletePriceSheetRecord(workspaceId: string, priceSheetId: 
   }
 
   return deletedRecord;
+}
+
+function mapPriceSheetRecord(record: RawPriceSheetRecord): PriceSheetRecord {
+  return {
+    id: record.id,
+    workspaceId: record.workspaceId,
+    title: record.title,
+    description: record.description,
+    translations: normalizePriceSheetTranslations(record.translations),
+    slug: record.slug,
+    status: record.status,
+    currency: record.currency,
+    defaultContentLocale: normalizePriceSheetContentLocale(record.locale),
+    theme: record.theme as PriceSheetTheme,
+    publishedAt: record.publishedAt,
+    createdById: record.createdById,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+    items: record.items.map((item) => ({
+      id: item.id,
+      priceSheetId: item.priceSheetId,
+      name: item.name,
+      description: item.description,
+      section: item.section,
+      translations: normalizePriceSheetItemTranslations(item.translations),
+      priceCents: item.priceCents,
+      position: item.position,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    })),
+  };
 }

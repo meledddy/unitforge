@@ -1,7 +1,9 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
+  check,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -11,6 +13,24 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+
+export const priceSheetContentLocaleValues = ["en-US", "ru-RU"] as const;
+
+export type PriceSheetContentLocale = (typeof priceSheetContentLocaleValues)[number];
+
+export interface PriceSheetTranslation {
+  title: string;
+  description: string | null;
+}
+
+export interface PriceSheetItemTranslation {
+  name: string;
+  description: string | null;
+  section: string | null;
+}
+
+export type PriceSheetTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetTranslation>>;
+export type PriceSheetItemTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetItemTranslation>>;
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -99,6 +119,7 @@ export const priceSheets = pgTable(
     slug: varchar("slug", { length: 160 }).notNull(),
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
     locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
+    translations: jsonb("translations").$type<PriceSheetTranslations>().default(sql`'{}'::jsonb`).notNull(),
     theme: varchar("theme", { length: 32 }).default("amber").notNull(),
     status: priceSheetStatusEnum("status").default("draft").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
@@ -108,6 +129,7 @@ export const priceSheets = pgTable(
   (table) => ({
     slugIdx: uniqueIndex("price_sheets_slug_idx").on(table.slug),
     workspaceTitleIdx: index("price_sheets_workspace_title_idx").on(table.workspaceId, table.title),
+    localeCheck: check("price_sheets_locale_check", sql`${table.locale} in ('en-US', 'ru-RU')`),
   }),
 );
 
@@ -121,6 +143,7 @@ export const priceSheetItems = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     section: varchar("section", { length: 120 }),
+    translations: jsonb("translations").$type<PriceSheetItemTranslations>().default(sql`'{}'::jsonb`).notNull(),
     priceCents: integer("price_cents").notNull(),
     position: integer("position").default(0).notNull(),
     ...timestamps,

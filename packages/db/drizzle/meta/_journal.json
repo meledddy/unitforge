@@ -15,6 +15,13 @@
       "when": 1775740422250,
       "tag": "0001_curious_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775746104191,
+      "tag": "0002_nervous_silver_sable",
+      "breakpoints": true
     }
   ]
 }

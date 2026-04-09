@@ -2,9 +2,14 @@ import { appConfig } from "@unitforge/config";
 import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 
-import type { PriceSheetItemView, PublishedPriceSheet } from "@/server/price-sheets/service";
-
-type SupportedPublicLanguage = "en" | "ru";
+import type { PriceSheetInterfaceLanguage } from "@/features/price-sheets/localization";
+import {
+  mapInterfaceLanguageToPriceSheetContentLocale,
+  resolvePriceSheetContent,
+  resolvePriceSheetInterfaceLanguage,
+  resolvePriceSheetItemContent,
+} from "@/features/price-sheets/localization";
+import type { PublishedPriceSheet } from "@/server/price-sheets/service";
 
 interface PublicPriceSheetProps {
   priceSheet: PublishedPriceSheet;
@@ -40,9 +45,17 @@ interface PublicPriceSheetCopy {
   noItemsDescription: string;
 }
 
+interface LocalizedPublicPriceSheetItem {
+  id: string;
+  name: string;
+  description: string | null;
+  section: string | null;
+  priceCents: number;
+}
+
 interface PriceSheetSection {
   title: string;
-  items: PriceSheetItemView[];
+  items: LocalizedPublicPriceSheetItem[];
 }
 
 interface PublicPriceSheetTheme {
@@ -53,7 +66,7 @@ interface PublicPriceSheetTheme {
   glowClassName: string;
 }
 
-const publicPriceSheetCopy: Record<SupportedPublicLanguage, PublicPriceSheetCopy> = {
+const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheetCopy> = {
   en: {
     publishedEyebrow: "Published price sheet",
     languageLabel: "Language",
@@ -137,20 +150,45 @@ const publicPriceSheetThemes: PublicPriceSheetTheme[] = [
 ];
 
 const supportedLanguageOptions = [
-  { value: "en", label: "EN", locale: "en-US" },
-  { value: "ru", label: "RU", locale: "ru-RU" },
+  { value: "en", label: "EN" },
+  { value: "ru", label: "RU" },
 ] as const;
 
 export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceSheetProps) {
-  const language = resolvePublicLanguage(requestedLanguage, priceSheet.locale);
-  const copy = publicPriceSheetCopy[language];
-  const presentationLocale = resolvePresentationLocale(language, priceSheet.locale);
+  const interfaceLanguage = resolvePriceSheetInterfaceLanguage(requestedLanguage, priceSheet.defaultContentLocale);
+  const copy = publicPriceSheetCopy[interfaceLanguage];
+  const interfaceLocale = mapInterfaceLanguageToPriceSheetContentLocale(interfaceLanguage);
+  const localizedSheet = resolvePriceSheetContent({
+    defaultContentLocale: priceSheet.defaultContentLocale,
+    requestedContentLocale: interfaceLocale,
+    title: priceSheet.title,
+    description: priceSheet.description,
+    translations: priceSheet.translations,
+  });
+  const localizedItems = priceSheet.items.map((item) => {
+    const localizedItem = resolvePriceSheetItemContent({
+      defaultContentLocale: priceSheet.defaultContentLocale,
+      requestedContentLocale: interfaceLocale,
+      name: item.name,
+      description: item.description,
+      section: item.section,
+      translations: item.translations,
+    });
+
+    return {
+      id: item.id,
+      name: localizedItem.name,
+      description: localizedItem.description,
+      section: localizedItem.section,
+      priceCents: item.priceCents,
+    } satisfies LocalizedPublicPriceSheetItem;
+  });
   const theme = getPublicPriceSheetTheme(priceSheet.theme);
-  const sections = groupPriceSheetItems(priceSheet.items, copy);
-  const updatedAt = new Intl.DateTimeFormat(presentationLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
-  const introText = buildIntroText(priceSheet, sections.length, presentationLocale);
-  const detailText = priceSheet.description?.trim() || introText;
-  const contactHref = buildContactHref(priceSheet.title, language);
+  const sections = groupPriceSheetItems(localizedItems, copy);
+  const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
+  const introText = buildIntroText(priceSheet, sections.length, interfaceLocale);
+  const detailText = localizedSheet.description?.trim() || introText;
+  const contactHref = buildContactHref(localizedSheet.title, interfaceLanguage);
 
   return (
     <div className="relative isolate overflow-hidden pb-16 sm:pb-24" data-price-sheet-theme={theme.id}>
@@ -165,7 +203,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
           <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/90 px-2 py-2 shadow-sm">
             <span className="px-2 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">{copy.languageLabel}</span>
             {supportedLanguageOptions.map((option) => {
-              const isActive = option.value === language;
+              const isActive = option.value === interfaceLanguage;
 
               return (
                 <Link
@@ -187,21 +225,21 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
           <div className={cn("rounded-[2rem] border p-6 shadow-sm sm:p-8", theme.heroSurfaceClassName)}>
             <div className="flex items-start gap-4">
               <div className={cn("flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm", theme.markClassName)}>
-                {getSheetMark(priceSheet.title)}
+                {getSheetMark(localizedSheet.title)}
               </div>
 
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">{copy.catalogEyebrow}</p>
-                <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{priceSheet.title}</h1>
+                <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{localizedSheet.title}</h1>
                 <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{detailText}</p>
-                {priceSheet.description ? <p className="text-sm leading-6 text-muted-foreground">{introText}</p> : null}
+                {localizedSheet.description ? <p className="text-sm leading-6 text-muted-foreground">{introText}</p> : null}
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <MetricChip label={copy.itemCountLabel} value={String(priceSheet.items.length)} />
               <MetricChip label={copy.sectionCountLabel} value={String(sections.length)} />
-              <MetricChip label={copy.localeLabel} value={presentationLocale} />
+              <MetricChip label={copy.localeLabel} value={interfaceLocale} />
               <MetricChip label={copy.currencyLabel} value={priceSheet.currency} />
               <MetricChip label={copy.updatedLabel} value={updatedAt} />
             </div>
@@ -214,7 +252,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
               </Badge>
               <CardTitle className="pt-3 text-xl">{copy.detailsTitle}</CardTitle>
               <CardDescription>
-                {copy.currencyLabel}: {priceSheet.currency} · {copy.localeLabel}: {presentationLocale}
+                {copy.currencyLabel}: {priceSheet.currency} / {copy.localeLabel}: {interfaceLocale}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -271,7 +309,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
 
                       <div className="sm:text-right">
                         <p className="text-xl font-semibold tracking-tight">
-                          {formatPublicPrice(item.priceCents, priceSheet.currency, presentationLocale)}
+                          {formatPublicPrice(item.priceCents, priceSheet.currency, interfaceLocale)}
                         </p>
                       </div>
                     </article>
@@ -330,12 +368,12 @@ function MetricChip({ label, value }: { label: string; value: string }) {
   );
 }
 
-function groupPriceSheetItems(items: PriceSheetItemView[], copy: PublicPriceSheetCopy) {
+function groupPriceSheetItems(items: LocalizedPublicPriceSheetItem[], copy: PublicPriceSheetCopy) {
   if (items.length === 0) {
     return [] satisfies PriceSheetSection[];
   }
 
-  const groups = new Map<string, PriceSheetItemView[]>();
+  const groups = new Map<string, LocalizedPublicPriceSheetItem[]>();
 
   for (const item of items) {
     const key = item.section?.trim() ?? "";
@@ -351,45 +389,17 @@ function groupPriceSheetItems(items: PriceSheetItemView[], copy: PublicPriceShee
   })) satisfies PriceSheetSection[];
 }
 
-function resolvePublicLanguage(requestedLanguage: string | undefined, storedLocale: string): SupportedPublicLanguage {
-  if (requestedLanguage === "ru" || requestedLanguage === "ru-RU") {
-    return "ru";
-  }
+function buildIntroText(priceSheet: PublishedPriceSheet, sectionCount: number, interfaceLocale: string) {
+  const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
 
-  if (requestedLanguage === "en" || requestedLanguage === "en-US") {
-    return "en";
-  }
-
-  return storedLocale.toLowerCase().startsWith("ru") ? "ru" : "en";
-}
-
-function resolvePresentationLocale(language: SupportedPublicLanguage, storedLocale: string) {
-  if (language === "ru") {
-    return "ru-RU";
-  }
-
-  if (language === "en") {
-    return storedLocale.toLowerCase().startsWith("en") ? storedLocale : "en-US";
-  }
-
-  return storedLocale;
-}
-
-function buildIntroText(
-  priceSheet: PublishedPriceSheet,
-  sectionCount: number,
-  presentationLocale: string,
-) {
-  const updatedAt = new Intl.DateTimeFormat(presentationLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
-
-  if (presentationLocale.startsWith("ru")) {
+  if (interfaceLocale.startsWith("ru")) {
     return `Просмотрите ${priceSheet.items.length} позиций в ${sectionCount} разделах. Цены отображаются в ${priceSheet.currency}, обновление от ${updatedAt}.`;
   }
 
   return `Review ${priceSheet.items.length} priced items across ${sectionCount} sections. Prices are displayed in ${priceSheet.currency}, updated ${updatedAt}.`;
 }
 
-function buildContactHref(title: string, language: SupportedPublicLanguage) {
+function buildContactHref(title: string, language: PriceSheetInterfaceLanguage) {
   const subject = language === "ru" ? `Запрос по прайс-листу: ${title}` : `Price sheet inquiry: ${title}`;
 
   return `mailto:${appConfig.supportEmail}?subject=${encodeURIComponent(subject)}`;

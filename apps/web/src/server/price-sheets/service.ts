@@ -1,8 +1,14 @@
-import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus, PriceSheetTheme } from "@/features/price-sheets/validation";
+import type {
+  PriceSheetContentLocale,
+  PriceSheetItemTranslations,
+  PriceSheetTheme,
+  PriceSheetTranslations,
+} from "@/features/price-sheets/localization";
+import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
 import { formatPriceSheetAmount, toPriceSheetFormValues } from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";
 
-import { isPriceSheetServiceError,PriceSheetServiceError } from "./errors";
+import { isPriceSheetServiceError, PriceSheetServiceError } from "./errors";
 import {
   createPriceSheetRecord,
   deletePriceSheetRecord,
@@ -22,7 +28,7 @@ export interface PriceSheetListItem {
   slug: string;
   status: PriceSheetStatus;
   currency: string;
-  locale: string;
+  defaultContentLocale: PriceSheetContentLocale;
   theme: PriceSheetTheme;
   itemCount: number;
   updatedAt: Date;
@@ -34,11 +40,13 @@ export interface PriceSheetItemView {
   name: string;
   description: string | null;
   section: string | null;
+  translations: PriceSheetItemTranslations;
   priceCents: number;
   formattedPrice: string;
 }
 
 export interface PriceSheetDetail extends PriceSheetListItem {
+  translations: PriceSheetTranslations;
   items: PriceSheetItemView[];
   createdAt: Date;
   publicUrl: string;
@@ -49,9 +57,10 @@ export interface PublishedPriceSheet {
   id: string;
   title: string;
   description: string | null;
+  translations: PriceSheetTranslations;
   slug: string;
   currency: string;
-  locale: string;
+  defaultContentLocale: PriceSheetContentLocale;
   theme: PriceSheetTheme;
   updatedAt: Date;
   items: PriceSheetItemView[];
@@ -67,7 +76,7 @@ export async function listWorkspacePriceSheets(session: AppShellSession) {
     slug: record.slug,
     status: record.status,
     currency: record.currency,
-    locale: record.locale,
+    defaultContentLocale: record.defaultContentLocale,
     theme: record.theme,
     itemCount: record.items.length,
     updatedAt: record.updatedAt,
@@ -130,9 +139,10 @@ export async function getPublishedPriceSheetBySlug(slug: string) {
     id: record.id,
     title: record.title,
     description: record.description,
+    translations: record.translations,
     slug: record.slug,
     currency: record.currency,
-    locale: record.locale,
+    defaultContentLocale: record.defaultContentLocale,
     theme: record.theme,
     updatedAt: record.updatedAt,
     items: mapPriceSheetItems(record),
@@ -164,10 +174,11 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
     id: record.id,
     title: record.title,
     description: record.description,
+    translations: record.translations,
     slug: record.slug,
     status: record.status,
     currency: record.currency,
-    locale: record.locale,
+    defaultContentLocale: record.defaultContentLocale,
     theme: record.theme,
     itemCount: record.items.length,
     updatedAt: record.updatedAt,
@@ -178,29 +189,32 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
     formValues: toPriceSheetFormValues({
       title: record.title,
       description: record.description,
+      translations: record.translations,
       slug: record.slug,
       status: record.status,
       currency: record.currency,
-      locale: record.locale,
+      defaultContentLocale: record.defaultContentLocale,
       theme: record.theme,
       items: record.items.map((item) => ({
         id: item.id,
         name: item.name,
         description: item.description,
         section: item.section,
+        translations: item.translations,
         priceCents: item.priceCents,
       })),
     }),
   } satisfies PriceSheetDetail;
 }
 
-function mapPriceSheetItems(record: Pick<PriceSheetRecord, "currency" | "locale" | "items">) {
+function mapPriceSheetItems(record: Pick<PriceSheetRecord, "currency" | "defaultContentLocale" | "items">) {
   return record.items.map((item) => ({
     id: item.id,
     name: item.name,
     description: item.description,
     section: item.section,
+    translations: item.translations,
     priceCents: item.priceCents,
-    formattedPrice: formatPriceSheetAmount(item.priceCents, record.currency, record.locale),
+    formattedPrice: formatPriceSheetAmount(item.priceCents, record.currency, record.defaultContentLocale),
   })) satisfies PriceSheetItemView[];
 }

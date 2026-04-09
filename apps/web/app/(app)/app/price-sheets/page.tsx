@@ -62,7 +62,7 @@ export default async function PriceSheetsPage() {
                             {" / "}
                             {priceSheet.currency}
                             {" / "}
-                            {priceSheet.locale}
+                            {priceSheet.defaultContentLocale}
                             {" / "}
                             {priceSheet.theme}
                           </CardDescription>

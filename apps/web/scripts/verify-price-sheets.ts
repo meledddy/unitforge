@@ -2,6 +2,10 @@ import "dotenv/config";
 
 import assert from "node:assert/strict";
 
+import {
+  resolvePriceSheetContent,
+  resolvePriceSheetItemContent,
+} from "../src/features/price-sheets/localization";
 import { getCurrentAppShellSession } from "../src/server/current-session";
 import { createPriceSheetAction, type PriceSheetFormActionState } from "../src/server/price-sheets/actions";
 import {
@@ -28,16 +32,21 @@ async function main() {
   const payload = {
     title,
     description: "Public-facing verification sheet description",
+    secondaryTitle: `RU ${title}`,
+    secondaryDescription: "Проверочный русский текст",
     slug,
     status: "published",
     currency: "USD",
-    locale: "en-US",
+    defaultContentLocale: "en-US",
     theme: "slate",
     items: [
       {
         name: "Verification Item",
         description: "Created through createPriceSheetAction",
         section: "Verification",
+        secondaryName: "Проверочная позиция",
+        secondaryDescription: "Создано через createPriceSheetAction",
+        secondarySection: "Проверка",
         price: "125.00",
       },
     ],
@@ -63,20 +72,54 @@ async function main() {
     assert.equal(created.status, "published");
     assert.equal(created.itemCount, 1);
     assert.equal(created.theme, "slate");
+    assert.equal(created.defaultContentLocale, "en-US");
 
     const editable = await getWorkspacePriceSheetForEdit(session, created.id);
     assert.equal(editable.title, title);
     assert.equal(editable.description, payload.description);
     assert.equal(editable.slug, slug);
     assert.equal(editable.theme, "slate");
+    assert.equal(editable.defaultContentLocale, "en-US");
+    assert.equal(editable.formValues.secondaryTitle, payload.secondaryTitle);
     assert.equal(editable.items.length, 1);
+    assert.equal(editable.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
 
     const publicSheet = await getPublishedPriceSheetBySlug(slug);
     assert(publicSheet);
     assert.equal(publicSheet.description, payload.description);
     assert.equal(publicSheet.slug, slug);
     assert.equal(publicSheet.theme, "slate");
+    assert.equal(publicSheet.defaultContentLocale, "en-US");
     assert.equal(publicSheet.items.length, 1);
+    assert.equal(publicSheet.translations["ru-RU"]?.title, payload.secondaryTitle);
+    assert.equal(publicSheet.items[0]?.translations["ru-RU"]?.name, payload.items[0]?.secondaryName);
+
+    const englishContent = resolvePriceSheetContent({
+      defaultContentLocale: publicSheet.defaultContentLocale,
+      requestedContentLocale: "en-US",
+      title: publicSheet.title,
+      description: publicSheet.description,
+      translations: publicSheet.translations,
+    });
+    const russianContent = resolvePriceSheetContent({
+      defaultContentLocale: publicSheet.defaultContentLocale,
+      requestedContentLocale: "ru-RU",
+      title: publicSheet.title,
+      description: publicSheet.description,
+      translations: publicSheet.translations,
+    });
+    const russianItem = resolvePriceSheetItemContent({
+      defaultContentLocale: publicSheet.defaultContentLocale,
+      requestedContentLocale: "ru-RU",
+      name: publicSheet.items[0]!.name,
+      description: publicSheet.items[0]!.description,
+      section: publicSheet.items[0]!.section,
+      translations: publicSheet.items[0]!.translations,
+    });
+
+    assert.equal(englishContent.title, title);
+    assert.equal(russianContent.title, payload.secondaryTitle);
+    assert.equal(russianItem.name, payload.items[0]?.secondaryName);
 
     await deleteWorkspacePriceSheet(session, created.id);
     createdPriceSheetId = null;
