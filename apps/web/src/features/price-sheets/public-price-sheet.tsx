@@ -1,4 +1,3 @@
-import { appConfig } from "@unitforge/config";
 import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 
@@ -20,8 +19,8 @@ interface PublicPriceSheetCopy {
   publishedEyebrow: string;
   languageLabel: string;
   catalogEyebrow: string;
-  introLabel: string;
-  detailsTitle: string;
+  summaryEyebrow: string;
+  summaryTitle: string;
   browseTitle: string;
   browseDescription: string;
   allServicesTitle: string;
@@ -31,16 +30,10 @@ interface PublicPriceSheetCopy {
   localeLabel: string;
   itemCountLabel: string;
   sectionCountLabel: string;
-  requestEyebrow: string;
-  requestTitle: string;
-  requestDescription: string;
-  requestAction: string;
-  contactAction: string;
-  responseNote: string;
-  leadEyebrow: string;
-  leadTitle: string;
-  leadDescription: string;
-  futureFieldLabels: string[];
+  contactEyebrow: string;
+  contactTitle: string;
+  emailLabel: string;
+  phoneLabel: string;
   noItemsTitle: string;
   noItemsDescription: string;
 }
@@ -64,64 +57,54 @@ interface PublicPriceSheetTheme {
   badgeClassName: string;
   markClassName: string;
   glowClassName: string;
+  sidebarSurfaceClassName: string;
+  sectionSurfaceClassName: string;
 }
 
 const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheetCopy> = {
   en: {
-    publishedEyebrow: "Published price sheet",
+    publishedEyebrow: "Public price list",
     languageLabel: "Language",
-    catalogEyebrow: "Customer pricing",
-    introLabel: "Prepared for review",
-    detailsTitle: "Commercial details",
-    browseTitle: "Pricing overview",
-    browseDescription: "Review sections, compare line items, and use this page as the source of truth for commercial conversations.",
+    catalogEyebrow: "Price list",
+    summaryEyebrow: "At a glance",
+    summaryTitle: "Pricing details",
+    browseTitle: "Services and rates",
+    browseDescription: "Browse the available services, compare sections, and use this page as the current customer-facing price reference.",
     allServicesTitle: "Services",
     generalSectionTitle: "General",
     updatedLabel: "Updated",
     currencyLabel: "Currency",
-    localeLabel: "Format",
+    localeLabel: "Content locale",
     itemCountLabel: "Items",
     sectionCountLabel: "Sections",
-    requestEyebrow: "Next step",
-    requestTitle: "Need a tailored quote?",
-    requestDescription: "Use this sheet as the starting point, then request a scoped proposal, timeline, or custom packaging.",
-    requestAction: "Request service",
-    contactAction: "Contact team",
-    responseNote: `Customer inquiries can route to ${appConfig.supportEmail} until a dedicated lead form is connected.`,
-    leadEyebrow: "Lead form slot",
-    leadTitle: "Inquiry form comes next",
-    leadDescription: "This section is reserved for a lightweight lead form and follow-up workflow. The public layout already leaves room for it.",
-    futureFieldLabels: ["Contact name", "Company", "Work email", "Project scope"],
-    noItemsTitle: "No line items available",
-    noItemsDescription: "This sheet is public, but no priced services have been published yet.",
+    contactEyebrow: "Contact",
+    contactTitle: "Get in touch",
+    emailLabel: "Email",
+    phoneLabel: "Phone / messaging",
+    noItemsTitle: "This price list is being updated",
+    noItemsDescription: "Published service items have not been added yet.",
   },
   ru: {
-    publishedEyebrow: "Опубликованный прайс-лист",
+    publishedEyebrow: "Публичный прайс-лист",
     languageLabel: "Язык",
-    catalogEyebrow: "Клиентский прайс",
-    introLabel: "Подготовлено для просмотра",
-    detailsTitle: "Коммерческие детали",
-    browseTitle: "Структура цен",
-    browseDescription: "Просматривайте разделы, сравнивайте позиции и используйте эту страницу как рабочую основу для коммерческого диалога.",
+    catalogEyebrow: "Прайс-лист",
+    summaryEyebrow: "Кратко",
+    summaryTitle: "Детали прайса",
+    browseTitle: "Услуги и цены",
+    browseDescription: "Просматривайте доступные услуги, сравнивайте разделы и используйте эту страницу как актуальный прайс для клиентов.",
     allServicesTitle: "Услуги",
     generalSectionTitle: "Общее",
     updatedLabel: "Обновлено",
     currencyLabel: "Валюта",
-    localeLabel: "Формат",
+    localeLabel: "Язык контента",
     itemCountLabel: "Позиции",
     sectionCountLabel: "Разделы",
-    requestEyebrow: "Следующий шаг",
-    requestTitle: "Нужен индивидуальный расчет?",
-    requestDescription: "Используйте этот прайс как базу, затем запросите уточненное предложение, сроки или индивидуальную упаковку услуги.",
-    requestAction: "Запросить услугу",
-    contactAction: "Связаться",
-    responseNote: `Пока форма еще не подключена, входящие запросы можно направлять на ${appConfig.supportEmail}.`,
-    leadEyebrow: "Слот для формы",
-    leadTitle: "Форма заявки будет следующей",
-    leadDescription: "Этот блок зарезервирован под простую форму лида и дальнейший workflow. Публичная страница уже готова к такому расширению.",
-    futureFieldLabels: ["Контактное лицо", "Компания", "Рабочая почта", "Описание задачи"],
-    noItemsTitle: "Нет опубликованных позиций",
-    noItemsDescription: "Страница уже публична, но ценовые позиции пока не опубликованы.",
+    contactEyebrow: "Контакты",
+    contactTitle: "Связаться",
+    emailLabel: "Почта",
+    phoneLabel: "Телефон / мессенджер",
+    noItemsTitle: "Прайс-лист обновляется",
+    noItemsDescription: "Опубликованные позиции пока не добавлены.",
   },
 };
 
@@ -132,6 +115,8 @@ const publicPriceSheetThemes: PublicPriceSheetTheme[] = [
     badgeClassName: "bg-amber-100 text-amber-950",
     markClassName: "bg-amber-200/80 text-amber-950",
     glowClassName: "bg-gradient-to-b from-amber-200/40 via-amber-100/10 to-transparent",
+    sidebarSurfaceClassName: "border-amber-200/60 bg-gradient-to-br from-amber-50/90 to-card",
+    sectionSurfaceClassName: "border-amber-100/80 bg-amber-50/35",
   },
   {
     id: "slate",
@@ -139,6 +124,8 @@ const publicPriceSheetThemes: PublicPriceSheetTheme[] = [
     badgeClassName: "bg-slate-200 text-slate-900",
     markClassName: "bg-slate-900 text-slate-50",
     glowClassName: "bg-gradient-to-b from-slate-300/35 via-slate-100/10 to-transparent",
+    sidebarSurfaceClassName: "border-slate-200/70 bg-gradient-to-br from-slate-100/95 to-card",
+    sectionSurfaceClassName: "border-slate-200/80 bg-slate-100/40",
   },
   {
     id: "stone",
@@ -146,6 +133,8 @@ const publicPriceSheetThemes: PublicPriceSheetTheme[] = [
     badgeClassName: "bg-stone-200 text-stone-900",
     markClassName: "bg-stone-900 text-stone-50",
     glowClassName: "bg-gradient-to-b from-stone-300/35 via-stone-100/10 to-transparent",
+    sidebarSurfaceClassName: "border-stone-200/70 bg-gradient-to-br from-stone-100/95 to-card",
+    sectionSurfaceClassName: "border-stone-200/80 bg-stone-100/45",
   },
 ];
 
@@ -187,8 +176,13 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
   const sections = groupPriceSheetItems(localizedItems, copy);
   const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
   const introText = buildIntroText(priceSheet, sections.length, interfaceLocale);
-  const detailText = localizedSheet.description?.trim() || introText;
-  const contactHref = buildContactHref(localizedSheet.title, interfaceLanguage);
+  const summaryText = localizedSheet.description?.trim() || introText;
+  const publicContactActions = getPublicContactActions(priceSheet, localizedSheet.title, interfaceLanguage);
+  const hasPublicContactBlock =
+    Boolean(priceSheet.publicSettings.contactEmail) ||
+    Boolean(priceSheet.publicSettings.contactPhone) ||
+    Boolean(priceSheet.publicSettings.inquiryText) ||
+    publicContactActions.length > 0;
 
   return (
     <div className="relative isolate overflow-hidden pb-16 sm:pb-24" data-price-sheet-theme={theme.id}>
@@ -231,8 +225,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">{copy.catalogEyebrow}</p>
                 <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{localizedSheet.title}</h1>
-                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{detailText}</p>
-                {localizedSheet.description ? <p className="text-sm leading-6 text-muted-foreground">{introText}</p> : null}
+                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{summaryText}</p>
               </div>
             </div>
 
@@ -245,24 +238,21 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
             </div>
           </div>
 
-          <Card className="border-primary/10 bg-card/95">
+          <Card className={cn("bg-card/95", theme.sidebarSurfaceClassName)}>
             <CardHeader>
               <Badge className="w-fit" variant="outline">
-                {copy.introLabel}
+                {copy.summaryEyebrow}
               </Badge>
-              <CardTitle className="pt-3 text-xl">{copy.detailsTitle}</CardTitle>
-              <CardDescription>
-                {copy.currencyLabel}: {priceSheet.currency} / {copy.localeLabel}: {interfaceLocale}
-              </CardDescription>
+              <CardTitle className="pt-3 text-xl">{copy.summaryTitle}</CardTitle>
+              <CardDescription>{introText}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Link className={cn(buttonVariants({ size: "lg" }), "w-full")} href="#request">
-                {copy.requestAction}
-              </Link>
-              <Link className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")} href={contactHref}>
-                {copy.contactAction}
-              </Link>
-              <p className="text-sm leading-6 text-muted-foreground">{copy.responseNote}</p>
+            <CardContent className="space-y-4">
+              <DetailRow label={copy.currencyLabel} value={priceSheet.currency} />
+              <DetailRow label={copy.localeLabel} value={interfaceLocale} />
+              <DetailRow label={copy.updatedLabel} value={updatedAt} />
+              <DetailRow label={copy.itemCountLabel} value={String(priceSheet.items.length)} />
+              <DetailRow label={copy.sectionCountLabel} value={String(sections.length)} />
+              {priceSheet.publicSettings.contactLabel ? <DetailRow label={copy.contactEyebrow} value={priceSheet.publicSettings.contactLabel} /> : null}
             </CardContent>
           </Card>
         </div>
@@ -298,7 +288,10 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                   {section.items.map((item) => (
                     <article
                       key={item.id}
-                      className="grid gap-4 rounded-[1.5rem] border border-border/70 bg-background/80 p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5"
+                      className={cn(
+                        "grid gap-4 rounded-[1.5rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5",
+                        theme.sectionSurfaceClassName,
+                      )}
                     >
                       <div className="space-y-2">
                         <div className="space-y-1">
@@ -321,38 +314,54 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
         </div>
 
         <aside className="space-y-4">
-          <Card id="request" className="border-border/70 bg-card/95">
-            <CardHeader>
-              <Badge className="w-fit" variant="secondary">
-                {copy.requestEyebrow}
-              </Badge>
-              <CardTitle className="pt-3">{copy.requestTitle}</CardTitle>
-              <CardDescription>{copy.requestDescription}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Link className={cn(buttonVariants({ variant: "outline" }), "w-full")} href={contactHref}>
-                {copy.contactAction}
-              </Link>
-              <p className="text-sm leading-6 text-muted-foreground">{copy.responseNote}</p>
-            </CardContent>
-          </Card>
+          {hasPublicContactBlock ? (
+            <Card id="contact" className={cn("border-border/70 bg-card/95", theme.sidebarSurfaceClassName)}>
+              <CardHeader>
+                <Badge className="w-fit" variant="secondary">
+                  {copy.contactEyebrow}
+                </Badge>
+                <CardTitle className="pt-3">{priceSheet.publicSettings.contactLabel || copy.contactTitle}</CardTitle>
+                {priceSheet.publicSettings.inquiryText ? <CardDescription>{priceSheet.publicSettings.inquiryText}</CardDescription> : null}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {priceSheet.publicSettings.contactEmail ? (
+                  <ContactRow
+                    href={buildEmailHref(priceSheet.publicSettings.contactEmail, localizedSheet.title, interfaceLanguage)}
+                    label={copy.emailLabel}
+                    value={priceSheet.publicSettings.contactEmail}
+                  />
+                ) : null}
 
-          <Card className="border-dashed border-border/80 bg-background/80">
-            <CardHeader>
-              <Badge className="w-fit" variant="outline">
-                {copy.leadEyebrow}
-              </Badge>
-              <CardTitle className="pt-3">{copy.leadTitle}</CardTitle>
-              <CardDescription>{copy.leadDescription}</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              {copy.futureFieldLabels.map((label) => (
-                <div key={label} className="rounded-2xl border border-dashed border-border/80 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-                  {label}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                {priceSheet.publicSettings.contactPhone ? (
+                  <ContactRow
+                    href={buildPhoneHref(priceSheet.publicSettings.contactPhone) ?? undefined}
+                    label={copy.phoneLabel}
+                    value={priceSheet.publicSettings.contactPhone}
+                  />
+                ) : null}
+
+                {publicContactActions.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    {publicContactActions.map((action, index) => (
+                      <Link
+                        key={`${action.label}-${action.href}`}
+                        className={cn(
+                          buttonVariants({
+                            size: "lg",
+                            variant: index === 0 ? "default" : "outline",
+                          }),
+                          "w-full",
+                        )}
+                        href={action.href}
+                      >
+                        {action.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </CardContent>
+            </Card>
+          ) : null}
         </aside>
       </section>
     </div>
@@ -364,6 +373,32 @@ function MetricChip({ label, value }: { label: string; value: string }) {
     <div className="rounded-full border border-border/70 bg-background/75 px-4 py-2 shadow-sm">
       <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
       <p className="mt-1 text-sm font-semibold">{value}</p>
+    </div>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium">{value}</span>
+    </div>
+  );
+}
+
+function ContactRow({ label, value, href }: { label: string; value: string; href?: string }) {
+  const content = href ? (
+    <Link className="font-medium hover:underline" href={href}>
+      {value}
+    </Link>
+  ) : (
+    <span className="font-medium">{value}</span>
+  );
+
+  return (
+    <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      <div className="mt-2 text-sm">{content}</div>
     </div>
   );
 }
@@ -393,16 +428,64 @@ function buildIntroText(priceSheet: PublishedPriceSheet, sectionCount: number, i
   const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
 
   if (interfaceLocale.startsWith("ru")) {
-    return `Просмотрите ${priceSheet.items.length} позиций в ${sectionCount} разделах. Цены отображаются в ${priceSheet.currency}, обновление от ${updatedAt}.`;
+    return `В прайс-листе ${priceSheet.items.length} позиций в ${sectionCount} разделах. Цены показаны в ${priceSheet.currency}, обновление от ${updatedAt}.`;
   }
 
-  return `Review ${priceSheet.items.length} priced items across ${sectionCount} sections. Prices are displayed in ${priceSheet.currency}, updated ${updatedAt}.`;
+  return `This sheet includes ${priceSheet.items.length} priced items across ${sectionCount} sections. Prices are shown in ${priceSheet.currency}, updated ${updatedAt}.`;
 }
 
-function buildContactHref(title: string, language: PriceSheetInterfaceLanguage) {
+function buildEmailHref(contactEmail: string, title: string, language: PriceSheetInterfaceLanguage) {
   const subject = language === "ru" ? `Запрос по прайс-листу: ${title}` : `Price sheet inquiry: ${title}`;
 
-  return `mailto:${appConfig.supportEmail}?subject=${encodeURIComponent(subject)}`;
+  return `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}`;
+}
+
+function buildPhoneHref(contactPhone: string) {
+  const trimmedValue = contactPhone.trim();
+
+  if (trimmedValue.startsWith("http://") || trimmedValue.startsWith("https://")) {
+    return trimmedValue;
+  }
+
+  if (trimmedValue.startsWith("@")) {
+    return `https://t.me/${trimmedValue.slice(1)}`;
+  }
+
+  if (trimmedValue.includes("t.me/")) {
+    return trimmedValue.startsWith("http") ? trimmedValue : `https://${trimmedValue}`;
+  }
+
+  const normalizedPhone = trimmedValue.replace(/(?!^\+)[^\d]/g, "");
+
+  return normalizedPhone.length >= 6 ? `tel:${normalizedPhone}` : null;
+}
+
+function getPublicContactActions(priceSheet: PublishedPriceSheet, localizedTitle: string, interfaceLanguage: PriceSheetInterfaceLanguage) {
+  const actions: Array<{ label: string; href: string }> = [];
+  const emailHref = priceSheet.publicSettings.contactEmail
+    ? buildEmailHref(priceSheet.publicSettings.contactEmail, localizedTitle, interfaceLanguage)
+    : null;
+  const phoneHref = priceSheet.publicSettings.contactPhone ? buildPhoneHref(priceSheet.publicSettings.contactPhone) : null;
+
+  if (emailHref && priceSheet.publicSettings.primaryCtaLabel) {
+    actions.push({
+      label: priceSheet.publicSettings.primaryCtaLabel,
+      href: emailHref,
+    });
+  }
+
+  const phoneLabel = emailHref
+    ? priceSheet.publicSettings.secondaryCtaLabel
+    : priceSheet.publicSettings.primaryCtaLabel ?? priceSheet.publicSettings.secondaryCtaLabel;
+
+  if (phoneHref && phoneLabel) {
+    actions.push({
+      label: phoneLabel,
+      href: phoneHref,
+    });
+  }
+
+  return actions;
 }
 
 function formatPublicPrice(priceCents: number, currency: string, locale: string) {

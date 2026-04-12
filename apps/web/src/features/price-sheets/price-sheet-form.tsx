@@ -153,11 +153,17 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
     }
 
     const topLevelLabels: Record<string, string> = {
+      contactEmail: "Contact email",
+      contactLabel: "Contact label",
+      contactPhone: "Phone or messaging handle",
       currency: "Currency",
       defaultContentLocale: "Default content locale",
       description: "Description",
+      inquiryText: "Inquiry help text",
       items: "Items",
+      primaryCtaLabel: "Primary CTA label",
       secondaryDescription: "Translated description",
+      secondaryCtaLabel: "Secondary CTA label",
       secondaryTitle: "Translated title",
       slug: "Slug",
       theme: "Theme",
@@ -273,6 +279,91 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               onChange={(event) => updateTopLevelField("currency", event.target.value.toUpperCase())}
             />
             {getFieldError("currency") ? <p className="text-sm text-destructive">{getFieldError("currency")}</p> : null}
+          </div>
+
+          <div className="rounded-3xl border border-border/70 bg-background/70 p-5 md:col-span-2">
+            <p className="text-sm font-medium">Public contact and CTA</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              These details appear on the public page. Leave any field blank to hide it cleanly.
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="contact-label">Business or contact label</Label>
+                <Input
+                  aria-invalid={Boolean(getFieldError("contactLabel"))}
+                  className={getFieldClasses("contactLabel")}
+                  id="contact-label"
+                  value={values.contactLabel}
+                  onChange={(event) => updateTopLevelField("contactLabel", event.target.value)}
+                />
+                {getFieldError("contactLabel") ? <p className="text-sm text-destructive">{getFieldError("contactLabel")}</p> : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact-email">Contact email</Label>
+                <Input
+                  aria-invalid={Boolean(getFieldError("contactEmail"))}
+                  className={getFieldClasses("contactEmail")}
+                  id="contact-email"
+                  type="email"
+                  value={values.contactEmail}
+                  onChange={(event) => updateTopLevelField("contactEmail", event.target.value)}
+                />
+                {getFieldError("contactEmail") ? <p className="text-sm text-destructive">{getFieldError("contactEmail")}</p> : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact-phone">Phone or messaging handle</Label>
+                <Input
+                  aria-invalid={Boolean(getFieldError("contactPhone"))}
+                  className={getFieldClasses("contactPhone")}
+                  id="contact-phone"
+                  value={values.contactPhone}
+                  onChange={(event) => updateTopLevelField("contactPhone", event.target.value)}
+                />
+                {getFieldError("contactPhone") ? <p className="text-sm text-destructive">{getFieldError("contactPhone")}</p> : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="primary-cta-label">Primary CTA label</Label>
+                <Input
+                  aria-invalid={Boolean(getFieldError("primaryCtaLabel"))}
+                  className={getFieldClasses("primaryCtaLabel")}
+                  id="primary-cta-label"
+                  value={values.primaryCtaLabel}
+                  onChange={(event) => updateTopLevelField("primaryCtaLabel", event.target.value)}
+                />
+                {getFieldError("primaryCtaLabel") ? (
+                  <p className="text-sm text-destructive">{getFieldError("primaryCtaLabel")}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="secondary-cta-label">Secondary CTA label</Label>
+                <Input
+                  aria-invalid={Boolean(getFieldError("secondaryCtaLabel"))}
+                  className={getFieldClasses("secondaryCtaLabel")}
+                  id="secondary-cta-label"
+                  value={values.secondaryCtaLabel}
+                  onChange={(event) => updateTopLevelField("secondaryCtaLabel", event.target.value)}
+                />
+                {getFieldError("secondaryCtaLabel") ? (
+                  <p className="text-sm text-destructive">{getFieldError("secondaryCtaLabel")}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="inquiry-text">Public inquiry help text</Label>
+                <Textarea
+                  aria-invalid={Boolean(getFieldError("inquiryText"))}
+                  className={getFieldClasses("inquiryText")}
+                  id="inquiry-text"
+                  value={values.inquiryText}
+                  onChange={(event) => updateTopLevelField("inquiryText", event.target.value)}
+                />
+                {getFieldError("inquiryText") ? <p className="text-sm text-destructive">{getFieldError("inquiryText")}</p> : null}
+              </div>
+            </div>
           </div>
 
           <div className="rounded-3xl border border-border/70 bg-background/70 p-5 md:col-span-2">

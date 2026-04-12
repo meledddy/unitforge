@@ -23,6 +23,15 @@ export interface PriceSheetTranslation {
   description: string | null;
 }
 
+export interface PriceSheetPublicSettings {
+  contactLabel: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  primaryCtaLabel: string | null;
+  secondaryCtaLabel: string | null;
+  inquiryText: string | null;
+}
+
 export interface PriceSheetItemTranslation {
   name: string;
   description: string | null;
@@ -120,6 +129,7 @@ export const priceSheets = pgTable(
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
     locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
     translations: jsonb("translations").$type<PriceSheetTranslations>().default(sql`'{}'::jsonb`).notNull(),
+    publicSettings: jsonb("public_settings").$type<PriceSheetPublicSettings>().default(sql`'{}'::jsonb`).notNull(),
     theme: varchar("theme", { length: 32 }).default("amber").notNull(),
     status: priceSheetStatusEnum("status").default("draft").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),

@@ -1,11 +1,18 @@
+import type { PriceSheetPublicSettings } from "@unitforge/db";
+
 import type {
   PriceSheetContentLocale,
   PriceSheetItemTranslations,
   PriceSheetTheme,
   PriceSheetTranslations,
 } from "@/features/price-sheets/localization";
-import type { PriceSheetFormValues, PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
-import { formatPriceSheetAmount, toPriceSheetFormValues } from "@/features/price-sheets/validation";
+import {
+  formatPriceSheetAmount,
+  type PriceSheetFormValues,
+  type PriceSheetMutationInput,
+  type PriceSheetStatus,
+  toPriceSheetFormValues,
+} from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";
 
 import { isPriceSheetServiceError, PriceSheetServiceError } from "./errors";
@@ -47,6 +54,7 @@ export interface PriceSheetItemView {
 
 export interface PriceSheetDetail extends PriceSheetListItem {
   translations: PriceSheetTranslations;
+  publicSettings: PriceSheetPublicSettings;
   items: PriceSheetItemView[];
   createdAt: Date;
   publicUrl: string;
@@ -58,6 +66,7 @@ export interface PublishedPriceSheet {
   title: string;
   description: string | null;
   translations: PriceSheetTranslations;
+  publicSettings: PriceSheetPublicSettings;
   slug: string;
   currency: string;
   defaultContentLocale: PriceSheetContentLocale;
@@ -140,6 +149,7 @@ export async function getPublishedPriceSheetBySlug(slug: string) {
     title: record.title,
     description: record.description,
     translations: record.translations,
+    publicSettings: record.publicSettings,
     slug: record.slug,
     currency: record.currency,
     defaultContentLocale: record.defaultContentLocale,
@@ -175,6 +185,7 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
     title: record.title,
     description: record.description,
     translations: record.translations,
+    publicSettings: record.publicSettings,
     slug: record.slug,
     status: record.status,
     currency: record.currency,
@@ -190,6 +201,7 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
       title: record.title,
       description: record.description,
       translations: record.translations,
+      publicSettings: record.publicSettings,
       slug: record.slug,
       status: record.status,
       currency: record.currency,

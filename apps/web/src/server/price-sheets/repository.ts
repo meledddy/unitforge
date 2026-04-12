@@ -1,3 +1,4 @@
+import type { PriceSheetPublicSettings } from "@unitforge/db";
 import { priceSheetItems, priceSheets } from "@unitforge/db";
 import { and, asc, desc, eq } from "drizzle-orm";
 
@@ -10,6 +11,7 @@ import {
   type PriceSheetTheme,
   type PriceSheetTranslations,
 } from "@/features/price-sheets/localization";
+import { normalizePriceSheetPublicSettings } from "@/features/price-sheets/public-settings";
 import type { PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
 import { getServerDb } from "@/server/db";
 
@@ -21,6 +23,7 @@ export interface PriceSheetRecord {
   title: string;
   description: string | null;
   translations: PriceSheetTranslations;
+  publicSettings: PriceSheetPublicSettings;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
@@ -63,6 +66,7 @@ interface RawPriceSheetRecord {
   title: string;
   description: string | null;
   translations: unknown;
+  publicSettings: unknown;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
@@ -156,6 +160,7 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
         title: input.title,
         description: input.description,
         translations: input.translations,
+        publicSettings: input.publicSettings,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
@@ -217,6 +222,7 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
         title: input.title,
         description: input.description,
         translations: input.translations,
+        publicSettings: input.publicSettings,
         slug: input.slug,
         status: input.status,
         currency: input.currency,
@@ -325,6 +331,7 @@ function mapPriceSheetRecord(record: RawPriceSheetRecord): PriceSheetRecord {
     title: record.title,
     description: record.description,
     translations: normalizePriceSheetTranslations(record.translations),
+    publicSettings: normalizePriceSheetPublicSettings(record.publicSettings),
     slug: record.slug,
     status: record.status,
     currency: record.currency,

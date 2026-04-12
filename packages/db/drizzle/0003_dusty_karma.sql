@@ -1,0 +1,1 @@
+ALTER TABLE "price_sheets" ADD COLUMN "public_settings" jsonb DEFAULT '{}'::jsonb NOT NULL;

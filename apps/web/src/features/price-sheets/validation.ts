@@ -1,3 +1,4 @@
+import type { PriceSheetPublicSettings } from "@unitforge/db";
 import { z } from "zod";
 
 import type { PriceSheetContentLocale, PriceSheetItemTranslations, PriceSheetTheme, PriceSheetTranslations } from "./localization";
@@ -6,6 +7,7 @@ import {
   priceSheetContentLocaleValues,
   priceSheetThemeValues,
 } from "./localization";
+import { getEmptyPriceSheetPublicSettings } from "./public-settings";
 
 export const priceSheetStatusValues = ["draft", "published"] as const;
 
@@ -46,6 +48,16 @@ export const priceSheetFormSchema = z
     description: z.string().trim().max(600, "Description is too long."),
     secondaryTitle: z.string().trim().max(120, "Translated title is too long."),
     secondaryDescription: z.string().trim().max(600, "Translated description is too long."),
+    contactLabel: z.string().trim().max(120, "Contact label is too long."),
+    contactEmail: z
+      .string()
+      .trim()
+      .max(160, "Contact email is too long.")
+      .refine((value) => value.length === 0 || z.string().email().safeParse(value).success, "Enter a valid contact email."),
+    contactPhone: z.string().trim().max(120, "Phone or messaging handle is too long."),
+    primaryCtaLabel: z.string().trim().max(48, "Primary CTA label is too long."),
+    secondaryCtaLabel: z.string().trim().max(48, "Secondary CTA label is too long."),
+    inquiryText: z.string().trim().max(320, "Inquiry help text is too long."),
     slug: z
       .string()
       .trim()
@@ -79,6 +91,7 @@ export interface PriceSheetMutationInput {
   title: string;
   description: string | null;
   translations: PriceSheetTranslations;
+  publicSettings: PriceSheetPublicSettings;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
@@ -121,6 +134,12 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
     description: "",
     secondaryTitle: "",
     secondaryDescription: "",
+    contactLabel: "",
+    contactEmail: "",
+    contactPhone: "",
+    primaryCtaLabel: "",
+    secondaryCtaLabel: "",
+    inquiryText: "",
     slug: "",
     status: "draft",
     currency: "USD",
@@ -155,6 +174,7 @@ export function toPriceSheetMutationInput(values: PriceSheetFormValues): PriceSh
     title: parsed.title,
     description: parsed.description || null,
     translations: getSheetTranslations(parsed, secondaryLocale),
+    publicSettings: getPublicSettings(parsed),
     slug: parsed.slug,
     status: parsed.status,
     currency: parsed.currency,
@@ -175,6 +195,7 @@ export function toPriceSheetFormValues(input: {
   title: string;
   description: string | null;
   translations: PriceSheetTranslations;
+  publicSettings: PriceSheetPublicSettings;
   slug: string;
   status: PriceSheetStatus;
   currency: string;
@@ -197,6 +218,12 @@ export function toPriceSheetFormValues(input: {
     description: input.description ?? "",
     secondaryTitle: secondarySheetTranslation?.title ?? "",
     secondaryDescription: secondarySheetTranslation?.description ?? "",
+    contactLabel: input.publicSettings.contactLabel ?? "",
+    contactEmail: input.publicSettings.contactEmail ?? "",
+    contactPhone: input.publicSettings.contactPhone ?? "",
+    primaryCtaLabel: input.publicSettings.primaryCtaLabel ?? "",
+    secondaryCtaLabel: input.publicSettings.secondaryCtaLabel ?? "",
+    inquiryText: input.publicSettings.inquiryText ?? "",
     slug: input.slug,
     status: input.status,
     currency: input.currency,
@@ -263,6 +290,25 @@ function getSheetTranslations(
   };
 }
 
+function getPublicSettings(
+  values: Pick<
+    PriceSheetFormValues,
+    "contactLabel" | "contactEmail" | "contactPhone" | "primaryCtaLabel" | "secondaryCtaLabel" | "inquiryText"
+  >,
+): PriceSheetPublicSettings {
+  const emptySettings = getEmptyPriceSheetPublicSettings();
+
+  return {
+    ...emptySettings,
+    contactLabel: toOptionalString(values.contactLabel),
+    contactEmail: toOptionalString(values.contactEmail),
+    contactPhone: toOptionalString(values.contactPhone),
+    primaryCtaLabel: toOptionalString(values.primaryCtaLabel),
+    secondaryCtaLabel: toOptionalString(values.secondaryCtaLabel),
+    inquiryText: toOptionalString(values.inquiryText),
+  };
+}
+
 function getItemTranslations(
   values: Pick<PriceSheetFormValues["items"][number], "secondaryName" | "secondaryDescription" | "secondarySection">,
   secondaryLocale: PriceSheetContentLocale,
@@ -282,4 +328,10 @@ function getItemTranslations(
 
 function decimalToCents(value: string) {
   return Math.round(Number(value) * 100);
+}
+
+function toOptionalString(value: string) {
+  const trimmedValue = value.trim();
+
+  return trimmedValue.length > 0 ? trimmedValue : null;
 }

@@ -34,6 +34,12 @@ async function main() {
     description: "Public-facing verification sheet description",
     secondaryTitle: `RU ${title}`,
     secondaryDescription: "Проверочный русский текст",
+    contactLabel: "Verification Studio",
+    contactEmail: "hello@example.com",
+    contactPhone: "@verificationstudio",
+    primaryCtaLabel: "Email us",
+    secondaryCtaLabel: "Message us",
+    inquiryText: "Reach out for scope confirmation and booking.",
     slug,
     status: "published",
     currency: "USD",
@@ -81,6 +87,12 @@ async function main() {
     assert.equal(editable.theme, "slate");
     assert.equal(editable.defaultContentLocale, "en-US");
     assert.equal(editable.formValues.secondaryTitle, payload.secondaryTitle);
+    assert.equal(editable.formValues.contactLabel, payload.contactLabel);
+    assert.equal(editable.formValues.contactEmail, payload.contactEmail);
+    assert.equal(editable.formValues.contactPhone, payload.contactPhone);
+    assert.equal(editable.formValues.primaryCtaLabel, payload.primaryCtaLabel);
+    assert.equal(editable.formValues.secondaryCtaLabel, payload.secondaryCtaLabel);
+    assert.equal(editable.formValues.inquiryText, payload.inquiryText);
     assert.equal(editable.items.length, 1);
     assert.equal(editable.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
 
@@ -92,6 +104,12 @@ async function main() {
     assert.equal(publicSheet.defaultContentLocale, "en-US");
     assert.equal(publicSheet.items.length, 1);
     assert.equal(publicSheet.translations["ru-RU"]?.title, payload.secondaryTitle);
+    assert.equal(publicSheet.publicSettings.contactLabel, payload.contactLabel);
+    assert.equal(publicSheet.publicSettings.contactEmail, payload.contactEmail);
+    assert.equal(publicSheet.publicSettings.contactPhone, payload.contactPhone);
+    assert.equal(publicSheet.publicSettings.primaryCtaLabel, payload.primaryCtaLabel);
+    assert.equal(publicSheet.publicSettings.secondaryCtaLabel, payload.secondaryCtaLabel);
+    assert.equal(publicSheet.publicSettings.inquiryText, payload.inquiryText);
     assert.equal(publicSheet.items[0]?.translations["ru-RU"]?.name, payload.items[0]?.secondaryName);
 
     const englishContent = resolvePriceSheetContent({
