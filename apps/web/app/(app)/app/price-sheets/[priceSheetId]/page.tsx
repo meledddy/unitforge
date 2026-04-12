@@ -7,8 +7,9 @@ import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { getCurrentAppShellSession } from "@/server/current-session";
+import { listWorkspacePriceSheetLeads } from "@/server/price-sheet-leads/service";
 import { deletePriceSheetAction, setPriceSheetStatusAction, updatePriceSheetAction } from "@/server/price-sheets/actions";
-import { getPriceSheetErrorMessage, getWorkspacePriceSheetForEdit,isKnownPriceSheetError } from "@/server/price-sheets/service";
+import { getPriceSheetErrorMessage, getWorkspacePriceSheetForEdit, isKnownPriceSheetError } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,10 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
   const { priceSheetId } = await params;
 
   try {
-    const priceSheet = await getWorkspacePriceSheetForEdit(session, priceSheetId);
+    const [priceSheet, leads] = await Promise.all([
+      getWorkspacePriceSheetForEdit(session, priceSheetId),
+      listWorkspacePriceSheetLeads(session, priceSheetId),
+    ]);
     const nextStatus = priceSheet.status === "published" ? "draft" : "published";
     const statusActionLabel = priceSheet.status === "published" ? "Unpublish" : "Publish";
 
@@ -94,6 +98,41 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
             </Card>
           </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Leads</CardTitle>
+            <CardDescription>Public inquiries submitted through this published Price Sheet appear here.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {leads.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No inquiries yet for this Price Sheet.</p>
+            ) : (
+              <div className="space-y-4">
+                {leads.map((lead) => (
+                  <article key={lead.id} className="rounded-3xl border border-border/70 bg-background/70 p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="space-y-1">
+                        <p className="font-medium">{lead.contactName}</p>
+                        <p className="text-sm text-muted-foreground">{lead.email}</p>
+                        {lead.companyOrBusinessName ? <p className="text-sm text-muted-foreground">{lead.companyOrBusinessName}</p> : null}
+                        {lead.phoneOrHandle ? <p className="text-sm text-muted-foreground">{lead.phoneOrHandle}</p> : null}
+                      </div>
+                      <div className="text-sm text-muted-foreground sm:text-right">
+                        <p>{lead.createdAt.toLocaleString()}</p>
+                        <p>{lead.locale}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border border-border/70 bg-card/70 px-4 py-3">
+                      <p className="text-sm leading-6">{lead.message}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   } catch (error) {

@@ -14,6 +14,7 @@ export const priceSheetStatusValues = ["draft", "published"] as const;
 export const priceSheetStatusSchema = z.enum(priceSheetStatusValues);
 export const priceSheetThemeSchema = z.enum(priceSheetThemeValues);
 export const priceSheetContentLocaleSchema = z.enum(priceSheetContentLocaleValues);
+export const priceSheetPublicInquiryStateSchema = z.enum(["enabled", "hidden"]);
 
 const pricePattern = /^\d+(?:\.\d{1,2})?$/;
 
@@ -58,6 +59,7 @@ export const priceSheetFormSchema = z
     primaryCtaLabel: z.string().trim().max(48, "Primary CTA label is too long."),
     secondaryCtaLabel: z.string().trim().max(48, "Secondary CTA label is too long."),
     inquiryText: z.string().trim().max(320, "Inquiry help text is too long."),
+    publicInquiryState: priceSheetPublicInquiryStateSchema,
     slug: z
       .string()
       .trim()
@@ -140,6 +142,7 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
     primaryCtaLabel: "",
     secondaryCtaLabel: "",
     inquiryText: "",
+    publicInquiryState: "enabled",
     slug: "",
     status: "draft",
     currency: "USD",
@@ -224,6 +227,7 @@ export function toPriceSheetFormValues(input: {
     primaryCtaLabel: input.publicSettings.primaryCtaLabel ?? "",
     secondaryCtaLabel: input.publicSettings.secondaryCtaLabel ?? "",
     inquiryText: input.publicSettings.inquiryText ?? "",
+    publicInquiryState: input.publicSettings.inquiryEnabled ? "enabled" : "hidden",
     slug: input.slug,
     status: input.status,
     currency: input.currency,
@@ -293,7 +297,7 @@ function getSheetTranslations(
 function getPublicSettings(
   values: Pick<
     PriceSheetFormValues,
-    "contactLabel" | "contactEmail" | "contactPhone" | "primaryCtaLabel" | "secondaryCtaLabel" | "inquiryText"
+    "contactLabel" | "contactEmail" | "contactPhone" | "primaryCtaLabel" | "secondaryCtaLabel" | "inquiryText" | "publicInquiryState"
   >,
 ): PriceSheetPublicSettings {
   const emptySettings = getEmptyPriceSheetPublicSettings();
@@ -306,6 +310,7 @@ function getPublicSettings(
     primaryCtaLabel: toOptionalString(values.primaryCtaLabel),
     secondaryCtaLabel: toOptionalString(values.secondaryCtaLabel),
     inquiryText: toOptionalString(values.inquiryText),
+    inquiryEnabled: values.publicInquiryState === "enabled",
   };
 }
 

@@ -7,15 +7,22 @@ import {
   resolvePriceSheetItemContent,
 } from "../src/features/price-sheets/localization";
 import { getCurrentAppShellSession } from "../src/server/current-session";
+import { type PriceSheetLeadActionState,submitPriceSheetLeadAction } from "../src/server/price-sheet-leads/actions";
+import { listWorkspacePriceSheetLeads } from "../src/server/price-sheet-leads/service";
 import { createPriceSheetAction, type PriceSheetFormActionState } from "../src/server/price-sheets/actions";
 import {
   deleteWorkspacePriceSheet,
   getPublishedPriceSheetBySlug,
   getWorkspacePriceSheetForEdit,
   listWorkspacePriceSheets,
+  setWorkspacePriceSheetStatus,
 } from "../src/server/price-sheets/service";
 
-const initialActionState: PriceSheetFormActionState = {
+const initialPriceSheetActionState: PriceSheetFormActionState = {
+  status: "idle",
+};
+
+const initialLeadActionState: PriceSheetLeadActionState = {
   status: "idle",
 };
 
@@ -33,13 +40,14 @@ async function main() {
     title,
     description: "Public-facing verification sheet description",
     secondaryTitle: `RU ${title}`,
-    secondaryDescription: "Проверочный русский текст",
+    secondaryDescription: "Russian verification text",
     contactLabel: "Verification Studio",
     contactEmail: "hello@example.com",
     contactPhone: "@verificationstudio",
     primaryCtaLabel: "Email us",
     secondaryCtaLabel: "Message us",
     inquiryText: "Reach out for scope confirmation and booking.",
+    publicInquiryState: "enabled",
     slug,
     status: "published",
     currency: "USD",
@@ -50,9 +58,9 @@ async function main() {
         name: "Verification Item",
         description: "Created through createPriceSheetAction",
         section: "Verification",
-        secondaryName: "Проверочная позиция",
-        secondaryDescription: "Создано через createPriceSheetAction",
-        secondarySection: "Проверка",
+        secondaryName: "Verification Item RU",
+        secondaryDescription: "Created through createPriceSheetAction RU",
+        secondarySection: "Verification RU",
         price: "125.00",
       },
     ],
@@ -64,7 +72,7 @@ async function main() {
 
   try {
     try {
-      const result = await createPriceSheetAction(initialActionState, formData);
+      const result = await createPriceSheetAction(initialPriceSheetActionState, formData);
       assert.fail(`Expected redirect from createPriceSheetAction, received ${JSON.stringify(result)}.`);
     } catch (error) {
       assert(isExpectedActionCompletion(error), `Expected redirect or revalidation completion signal, received ${String(error)}.`);
@@ -93,6 +101,7 @@ async function main() {
     assert.equal(editable.formValues.primaryCtaLabel, payload.primaryCtaLabel);
     assert.equal(editable.formValues.secondaryCtaLabel, payload.secondaryCtaLabel);
     assert.equal(editable.formValues.inquiryText, payload.inquiryText);
+    assert.equal(editable.formValues.publicInquiryState, payload.publicInquiryState);
     assert.equal(editable.items.length, 1);
     assert.equal(editable.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
 
@@ -110,6 +119,7 @@ async function main() {
     assert.equal(publicSheet.publicSettings.primaryCtaLabel, payload.primaryCtaLabel);
     assert.equal(publicSheet.publicSettings.secondaryCtaLabel, payload.secondaryCtaLabel);
     assert.equal(publicSheet.publicSettings.inquiryText, payload.inquiryText);
+    assert.equal(publicSheet.publicSettings.inquiryEnabled, true);
     assert.equal(publicSheet.items[0]?.translations["ru-RU"]?.name, payload.items[0]?.secondaryName);
 
     const englishContent = resolvePriceSheetContent({
@@ -138,6 +148,34 @@ async function main() {
     assert.equal(englishContent.title, title);
     assert.equal(russianContent.title, payload.secondaryTitle);
     assert.equal(russianItem.name, payload.items[0]?.secondaryName);
+
+    const leadFormData = new FormData();
+    leadFormData.set("priceSheetSlug", slug);
+    leadFormData.set("locale", "ru-RU");
+    leadFormData.set("language", "ru");
+    leadFormData.set("contactName", "Verification Contact");
+    leadFormData.set("companyOrBusinessName", "Verification Company");
+    leadFormData.set("email", "lead@example.com");
+    leadFormData.set("phoneOrHandle", "@leadcontact");
+    leadFormData.set("message", "Need a tailored package for this sheet.");
+
+    const leadResult = await submitPriceSheetLeadAction(initialLeadActionState, leadFormData);
+    assert.equal(leadResult.status, "success");
+
+    const storedLeads = await listWorkspacePriceSheetLeads(session, created.id);
+    assert.equal(storedLeads.length, 1);
+    assert.equal(storedLeads[0]?.contactName, "Verification Contact");
+    assert.equal(storedLeads[0]?.companyOrBusinessName, "Verification Company");
+    assert.equal(storedLeads[0]?.email, "lead@example.com");
+    assert.equal(storedLeads[0]?.phoneOrHandle, "@leadcontact");
+    assert.equal(storedLeads[0]?.message, "Need a tailored package for this sheet.");
+    assert.equal(storedLeads[0]?.locale, "ru-RU");
+    assert.equal(storedLeads[0]?.sheetSlugSnapshot, slug);
+
+    await setWorkspacePriceSheetStatus(session, created.id, "draft");
+
+    const unpublishedLeadResult = await submitPriceSheetLeadAction(initialLeadActionState, leadFormData);
+    assert.equal(unpublishedLeadResult.status, "error");
 
     await deleteWorkspacePriceSheet(session, created.id);
     createdPriceSheetId = null;

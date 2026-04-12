@@ -30,6 +30,7 @@ export interface PriceSheetPublicSettings {
   primaryCtaLabel: string | null;
   secondaryCtaLabel: string | null;
   inquiryText: string | null;
+  inquiryEnabled: boolean;
 }
 
 export interface PriceSheetItemTranslation {
@@ -163,6 +164,28 @@ export const priceSheetItems = pgTable(
   }),
 );
 
+export const priceSheetLeads = pgTable(
+  "price_sheet_leads",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    priceSheetId: uuid("price_sheet_id")
+      .notNull()
+      .references(() => priceSheets.id, { onDelete: "cascade" }),
+    sheetSlugSnapshot: varchar("sheet_slug_snapshot", { length: 160 }).notNull(),
+    contactName: text("contact_name").notNull(),
+    companyOrBusinessName: text("company_or_business_name"),
+    email: text("email").notNull(),
+    phoneOrHandle: text("phone_or_handle"),
+    message: text("message").notNull(),
+    locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    priceSheetIdx: index("price_sheet_leads_price_sheet_idx").on(table.priceSheetId),
+    localeCheck: check("price_sheet_leads_locale_check", sql`${table.locale} in ('en-US', 'ru-RU')`),
+  }),
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   memberships: many(memberships),
   ownedWorkspaces: many(workspaces),
@@ -206,6 +229,7 @@ export const priceSheetsRelations = relations(priceSheets, ({ many, one }) => ({
     references: [users.id],
   }),
   items: many(priceSheetItems),
+  leads: many(priceSheetLeads),
   workspace: one(workspaces, {
     fields: [priceSheets.workspaceId],
     references: [workspaces.id],
@@ -219,12 +243,20 @@ export const priceSheetItemsRelations = relations(priceSheetItems, ({ one }) => 
   }),
 }));
 
+export const priceSheetLeadsRelations = relations(priceSheetLeads, ({ one }) => ({
+  priceSheet: one(priceSheets, {
+    fields: [priceSheetLeads.priceSheetId],
+    references: [priceSheets.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
 export type Membership = typeof memberships.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type PriceSheet = typeof priceSheets.$inferSelect;
 export type PriceSheetItem = typeof priceSheetItems.$inferSelect;
+export type PriceSheetLead = typeof priceSheetLeads.$inferSelect;
 
 export type NewUser = typeof users.$inferInsert;
 export type NewWorkspace = typeof workspaces.$inferInsert;
@@ -232,3 +264,4 @@ export type NewMembership = typeof memberships.$inferInsert;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NewPriceSheet = typeof priceSheets.$inferInsert;
 export type NewPriceSheetItem = typeof priceSheetItems.$inferInsert;
+export type NewPriceSheetLead = typeof priceSheetLeads.$inferInsert;

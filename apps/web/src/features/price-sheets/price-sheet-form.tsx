@@ -162,6 +162,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       inquiryText: "Inquiry help text",
       items: "Items",
       primaryCtaLabel: "Primary CTA label",
+      publicInquiryState: "Public inquiry form",
       secondaryDescription: "Translated description",
       secondaryCtaLabel: "Secondary CTA label",
       secondaryTitle: "Translated title",
@@ -335,6 +336,23 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 />
                 {getFieldError("primaryCtaLabel") ? (
                   <p className="text-sm text-destructive">{getFieldError("primaryCtaLabel")}</p>
+                ) : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="public-inquiry-state">Public inquiry form</Label>
+                <Select
+                  aria-invalid={Boolean(getFieldError("publicInquiryState"))}
+                  className={getFieldClasses("publicInquiryState")}
+                  id="public-inquiry-state"
+                  value={values.publicInquiryState}
+                  onChange={(event) => updateTopLevelField("publicInquiryState", event.target.value)}
+                >
+                  <option value="enabled">Enabled</option>
+                  <option value="hidden">Hidden</option>
+                </Select>
+                {getFieldError("publicInquiryState") ? (
+                  <p className="text-sm text-destructive">{getFieldError("publicInquiryState")}</p>
                 ) : null}
               </div>
 

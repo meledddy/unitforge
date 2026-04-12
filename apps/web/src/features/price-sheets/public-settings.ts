@@ -8,6 +8,7 @@ export function getEmptyPriceSheetPublicSettings(): PriceSheetPublicSettings {
     primaryCtaLabel: null,
     secondaryCtaLabel: null,
     inquiryText: null,
+    inquiryEnabled: true,
   };
 }
 
@@ -25,6 +26,7 @@ export function normalizePriceSheetPublicSettings(value: unknown): PriceSheetPub
     primaryCtaLabel: normalizeOptionalString(value.primaryCtaLabel),
     secondaryCtaLabel: normalizeOptionalString(value.secondaryCtaLabel),
     inquiryText: normalizeOptionalString(value.inquiryText),
+    inquiryEnabled: normalizeBoolean(value.inquiryEnabled, emptySettings.inquiryEnabled),
   };
 }
 
@@ -36,6 +38,10 @@ function normalizeOptionalString(value: unknown) {
   const trimmedValue = value.trim();
 
   return trimmedValue.length > 0 ? trimmedValue : null;
+}
+
+function normalizeBoolean(value: unknown, fallbackValue: boolean) {
+  return typeof value === "boolean" ? value : fallbackValue;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

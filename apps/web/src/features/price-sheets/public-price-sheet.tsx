@@ -8,6 +8,7 @@ import {
   resolvePriceSheetInterfaceLanguage,
   resolvePriceSheetItemContent,
 } from "@/features/price-sheets/localization";
+import { PublicPriceSheetLeadForm } from "@/features/price-sheets/public-price-sheet-lead-form";
 import type { PublishedPriceSheet } from "@/server/price-sheets/service";
 
 interface PublicPriceSheetProps {
@@ -362,6 +363,13 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
               </CardContent>
             </Card>
           ) : null}
+
+          <PublicPriceSheetLeadForm
+            inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
+            interfaceLanguage={interfaceLanguage}
+            locale={interfaceLocale}
+            priceSheetSlug={priceSheet.slug}
+          />
         </aside>
       </section>
     </div>
