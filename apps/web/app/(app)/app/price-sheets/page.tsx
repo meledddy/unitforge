@@ -23,7 +23,7 @@ export default async function PriceSheetsPage() {
           title="Price sheets"
           description="Create and manage public-facing price sheets for the current workspace."
           actions={
-            <Link className={cn(buttonVariants({ size: "sm" }))} href="/app/price-sheets/new">
+            <Link className={cn(buttonVariants({ size: "sm" }), "w-full sm:w-auto")} href="/app/price-sheets/new">
               New Price Sheet
             </Link>
           }
@@ -41,7 +41,7 @@ export default async function PriceSheetsPage() {
             </div>
           </PlaceholderPanel>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-4 sm:gap-5">
             {priceSheets.map((priceSheet) => {
               const nextStatus = priceSheet.status === "published" ? "draft" : "published";
               const statusActionLabel = priceSheet.status === "published" ? "Unpublish" : "Publish";
@@ -70,24 +70,27 @@ export default async function PriceSheetsPage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                         <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, "/app/price-sheets")}>
-                          <Button type="submit" variant="outline">
+                          <Button className="w-full sm:w-auto" type="submit" variant="outline">
                             {statusActionLabel}
                           </Button>
                         </form>
                         {priceSheet.status === "published" ? (
-                          <Link className={cn(buttonVariants({ size: "default", variant: "outline" }))} href={`/price-sheets/${priceSheet.slug}`}>
+                          <Link
+                            className={cn(buttonVariants({ size: "default", variant: "outline" }), "w-full sm:w-auto")}
+                            href={`/price-sheets/${priceSheet.slug}`}
+                          >
                             Public page
                           </Link>
                         ) : null}
-                        <Link className={cn(buttonVariants({ size: "default" }))} href={`/app/price-sheets/${priceSheet.id}`}>
+                        <Link className={cn(buttonVariants({ size: "default" }), "w-full sm:w-auto")} href={`/app/price-sheets/${priceSheet.id}`}>
                           Edit
                         </Link>
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                  <CardContent className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                     <p>Updated {priceSheet.updatedAt.toLocaleString()}</p>
                     <p>{priceSheet.publishedAt ? `Published ${priceSheet.publishedAt.toLocaleString()}` : "Not yet published"}</p>
                   </CardContent>

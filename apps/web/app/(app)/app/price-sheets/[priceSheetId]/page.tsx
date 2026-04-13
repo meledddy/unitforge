@@ -39,7 +39,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           description="Update metadata, adjust items, and control publication state for this sheet."
           actions={
             priceSheet.status === "published" ? (
-              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href={priceSheet.publicUrl}>
+              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href={priceSheet.publicUrl}>
                 Public page
               </Link>
             ) : undefined
@@ -76,7 +76,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                 </div>
 
                 <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, `/app/price-sheets/${priceSheet.id}`)}>
-                  <Button type="submit" variant="outline">
+                  <Button className="w-full" type="submit" variant="outline">
                     {statusActionLabel}
                   </Button>
                 </form>
@@ -90,7 +90,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               </CardHeader>
               <CardContent>
                 <form action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}>
-                  <Button type="submit" variant="destructive">
+                  <Button className="w-full" type="submit" variant="destructive">
                     Delete Price Sheet
                   </Button>
                 </form>
@@ -124,7 +124,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                       </div>
                     </div>
 
-                    <div className="mt-4 rounded-2xl border border-border/70 bg-card/70 px-4 py-3">
+                    <div className="mt-4 rounded-2xl border border-border/70 bg-card/70 px-4 py-3 sm:px-5">
                       <p className="text-sm leading-6">{lead.message}</p>
                     </div>
                   </article>

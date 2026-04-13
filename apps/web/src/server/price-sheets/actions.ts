@@ -21,7 +21,7 @@ import {
 } from "./service";
 
 export interface PriceSheetFormActionState {
-  status: "idle" | "error";
+  status: "idle" | "error" | "success";
   message?: string;
   fieldErrors?: Record<string, string>;
 }
@@ -63,7 +63,7 @@ export async function createPriceSheetAction(
     slug: priceSheet.slug,
   });
 
-  redirect(`/app/price-sheets/${priceSheet.id}`);
+  redirect("/app/price-sheets");
 }
 
 export async function updatePriceSheetAction(
@@ -91,6 +91,7 @@ export async function updatePriceSheetAction(
   }
 
   const session = await getCurrentAppShellSession();
+  const saveIntent = getSaveIntent(formData);
   let existingPriceSheet;
   let priceSheet;
 
@@ -110,7 +111,14 @@ export async function updatePriceSheetAction(
     revalidatePath(`/price-sheets/${existingPriceSheet.slug}`);
   }
 
-  redirect(`/app/price-sheets/${priceSheetId}`);
+  if (saveIntent === "return") {
+    redirect("/app/price-sheets");
+  }
+
+  return {
+    status: "success",
+    message: "Changes saved. Continue editing or publish when ready.",
+  } satisfies PriceSheetFormActionState;
 }
 
 export async function setPriceSheetStatusAction(
@@ -172,4 +180,10 @@ function actionErrorState(error: unknown, fallbackMessage: string) {
     status: "error",
     message: fallbackMessage,
   } satisfies PriceSheetFormActionState;
+}
+
+function getSaveIntent(formData: FormData) {
+  const intent = formData.get("intent");
+
+  return intent === "return" ? "return" : "continue";
 }

@@ -186,7 +186,7 @@ export function PublicPriceSheetLeadForm({
             {getFieldError("message") ? <p className="text-sm text-destructive">{getFieldError("message")}</p> : null}
           </div>
 
-          <Button disabled={isPending} type="submit">
+          <Button className="w-full sm:w-auto" disabled={isPending} type="submit">
             {isPending ? copy.submittingLabel : copy.submitLabel}
           </Button>
         </form>

@@ -189,13 +189,13 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
     <div className="relative isolate overflow-hidden pb-16 sm:pb-24" data-price-sheet-theme={theme.id}>
       <div aria-hidden className={cn("absolute inset-x-0 top-0 h-[26rem] blur-3xl", theme.glowClassName)} />
 
-      <section className="container relative pt-8 sm:pt-12">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <section className="container relative pt-6 sm:pt-12">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <Badge className={cn("border-transparent px-3 py-1 text-xs uppercase tracking-[0.22em]", theme.badgeClassName)} variant="secondary">
             {copy.publishedEyebrow}
           </Badge>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/90 px-2 py-2 shadow-sm">
+          <div className="inline-flex w-full items-center justify-between gap-2 rounded-full border border-border/70 bg-card/90 px-2 py-2 shadow-sm sm:w-auto sm:justify-start">
             <span className="px-2 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">{copy.languageLabel}</span>
             {supportedLanguageOptions.map((option) => {
               const isActive = option.value === interfaceLanguage;
@@ -216,17 +216,17 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.1fr),320px] lg:items-start">
-          <div className={cn("rounded-[2rem] border p-6 shadow-sm sm:p-8", theme.heroSurfaceClassName)}>
-            <div className="flex items-start gap-4">
-              <div className={cn("flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm", theme.markClassName)}>
+        <div className="mt-6 grid gap-5 sm:mt-8 sm:gap-6 lg:grid-cols-[minmax(0,1.1fr),320px] lg:items-start">
+          <div className={cn("rounded-[2rem] border p-5 shadow-sm sm:p-8", theme.heroSurfaceClassName)}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className={cn("flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm sm:h-16 sm:w-16", theme.markClassName)}>
                 {getSheetMark(localizedSheet.title)}
               </div>
 
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">{copy.catalogEyebrow}</p>
-                <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{localizedSheet.title}</h1>
-                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{summaryText}</p>
+                <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl">{localizedSheet.title}</h1>
+                <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{summaryText}</p>
               </div>
             </div>
 
@@ -259,7 +259,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
         </div>
       </section>
 
-      <section className="container relative mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr),320px]">
+      <section className="container relative mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-[minmax(0,1fr),320px]">
         <div className="space-y-5">
           <div className="space-y-2">
             <p className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">{copy.catalogEyebrow}</p>
@@ -289,10 +289,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                   {section.items.map((item) => (
                     <article
                       key={item.id}
-                      className={cn(
-                        "grid gap-4 rounded-[1.5rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5",
-                        theme.sectionSurfaceClassName,
-                      )}
+                      className={cn("grid gap-4 rounded-[1.35rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5", theme.sectionSurfaceClassName)}
                     >
                       <div className="space-y-2">
                         <div className="space-y-1">
