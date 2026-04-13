@@ -1,17 +1,19 @@
 "use client";
 
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Textarea } from "@unitforge/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, cn, Input, Label, Textarea } from "@unitforge/ui";
 import { useActionState, useState } from "react";
 
 import { getPriceSheetLeadCopy, type PriceSheetLeadFormCopy } from "@/features/price-sheets/lead-form";
 import type { PriceSheetContentLocale, PriceSheetInterfaceLanguage } from "@/features/price-sheets/localization";
-import { type PriceSheetLeadActionState,submitPriceSheetLeadAction } from "@/server/price-sheet-leads/actions";
+import type { PublicPriceSheetTheme } from "@/features/price-sheets/public-theme";
+import { type PriceSheetLeadActionState, submitPriceSheetLeadAction } from "@/server/price-sheet-leads/actions";
 
 interface PublicPriceSheetLeadFormProps {
   interfaceLanguage: PriceSheetInterfaceLanguage;
   locale: PriceSheetContentLocale;
   priceSheetSlug: string;
   inquiryEnabled: boolean;
+  theme: PublicPriceSheetTheme;
 }
 
 interface LeadFormValues {
@@ -39,6 +41,7 @@ export function PublicPriceSheetLeadForm({
   locale,
   priceSheetSlug,
   inquiryEnabled,
+  theme,
 }: PublicPriceSheetLeadFormProps) {
   const copy = getPriceSheetLeadCopy(interfaceLanguage);
   const [state, formAction, isPending] = useActionState(submitPriceSheetLeadAction, initialActionState);
@@ -46,10 +49,10 @@ export function PublicPriceSheetLeadForm({
 
   if (!inquiryEnabled) {
     return (
-      <Card className="border-border/70 bg-card/95">
+      <Card className={theme.leadCardClassName}>
         <CardHeader>
-          <CardTitle>{copy.hiddenTitle}</CardTitle>
-          <CardDescription>{copy.hiddenDescription}</CardDescription>
+          <CardTitle className={theme.leadTitleClassName}>{copy.hiddenTitle}</CardTitle>
+          <CardDescription className={theme.leadDescriptionClassName}>{copy.hiddenDescription}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -57,10 +60,10 @@ export function PublicPriceSheetLeadForm({
 
   if (state.status === "success") {
     return (
-      <Card className="border-border/70 bg-card/95">
+      <Card className={theme.leadCardClassName}>
         <CardHeader>
-          <CardTitle>{copy.successTitle}</CardTitle>
-          <CardDescription>{state.message || copy.successDescription}</CardDescription>
+          <CardTitle className={theme.leadTitleClassName}>{copy.successTitle}</CardTitle>
+          <CardDescription className={theme.leadDescriptionClassName}>{state.message || copy.successDescription}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -84,11 +87,11 @@ export function PublicPriceSheetLeadForm({
   }
 
   return (
-    <Card className="border-border/70 bg-card/95">
+    <Card className={theme.leadCardClassName}>
       <CardHeader>
-        <CardDescription>{copy.eyebrow}</CardDescription>
-        <CardTitle>{copy.title}</CardTitle>
-        <CardDescription>{copy.description}</CardDescription>
+        <CardDescription className={theme.leadEyebrowClassName}>{copy.eyebrow}</CardDescription>
+        <CardTitle className={theme.leadTitleClassName}>{copy.title}</CardTitle>
+        <CardDescription className={theme.leadDescriptionClassName}>{copy.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
@@ -116,10 +119,12 @@ export function PublicPriceSheetLeadForm({
           ) : null}
 
           <div className="space-y-2">
-            <Label htmlFor="lead-contact-name">{copy.contactNameLabel}</Label>
+            <Label className={theme.leadLabelClassName} htmlFor="lead-contact-name">
+              {copy.contactNameLabel}
+            </Label>
             <Input
               aria-invalid={Boolean(getFieldError("contactName"))}
-              className={getFieldClasses("contactName")}
+              className={cn(theme.leadInputClassName, getFieldClasses("contactName"))}
               id="lead-contact-name"
               name="contactName"
               value={values.contactName}
@@ -129,10 +134,12 @@ export function PublicPriceSheetLeadForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="lead-company-name">{copy.companyNameLabel}</Label>
+            <Label className={theme.leadLabelClassName} htmlFor="lead-company-name">
+              {copy.companyNameLabel}
+            </Label>
             <Input
               aria-invalid={Boolean(getFieldError("companyOrBusinessName"))}
-              className={getFieldClasses("companyOrBusinessName")}
+              className={cn(theme.leadInputClassName, getFieldClasses("companyOrBusinessName"))}
               id="lead-company-name"
               name="companyOrBusinessName"
               value={values.companyOrBusinessName}
@@ -145,10 +152,12 @@ export function PublicPriceSheetLeadForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="lead-email">{copy.emailLabel}</Label>
+              <Label className={theme.leadLabelClassName} htmlFor="lead-email">
+                {copy.emailLabel}
+              </Label>
               <Input
                 aria-invalid={Boolean(getFieldError("email"))}
-                className={getFieldClasses("email")}
+                className={cn(theme.leadInputClassName, getFieldClasses("email"))}
                 id="lead-email"
                 name="email"
                 type="email"
@@ -159,10 +168,12 @@ export function PublicPriceSheetLeadForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="lead-phone">{copy.phoneLabel}</Label>
+              <Label className={theme.leadLabelClassName} htmlFor="lead-phone">
+                {copy.phoneLabel}
+              </Label>
               <Input
                 aria-invalid={Boolean(getFieldError("phoneOrHandle"))}
-                className={getFieldClasses("phoneOrHandle")}
+                className={cn(theme.leadInputClassName, getFieldClasses("phoneOrHandle"))}
                 id="lead-phone"
                 name="phoneOrHandle"
                 value={values.phoneOrHandle}
@@ -173,10 +184,12 @@ export function PublicPriceSheetLeadForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="lead-message">{copy.messageLabel}</Label>
+            <Label className={theme.leadLabelClassName} htmlFor="lead-message">
+              {copy.messageLabel}
+            </Label>
             <Textarea
               aria-invalid={Boolean(getFieldError("message"))}
-              className={getFieldClasses("message")}
+              className={cn(theme.leadTextareaClassName, getFieldClasses("message"))}
               id="lead-message"
               name="message"
               rows={6}
@@ -186,7 +199,7 @@ export function PublicPriceSheetLeadForm({
             {getFieldError("message") ? <p className="text-sm text-destructive">{getFieldError("message")}</p> : null}
           </div>
 
-          <Button className="w-full sm:w-auto" disabled={isPending} type="submit">
+          <Button className={cn("w-full sm:w-auto", theme.leadSubmitButtonClassName)} disabled={isPending} type="submit">
             {isPending ? copy.submittingLabel : copy.submitLabel}
           </Button>
         </form>

@@ -9,6 +9,7 @@ import {
   resolvePriceSheetItemContent,
 } from "@/features/price-sheets/localization";
 import { PublicPriceSheetLeadForm } from "@/features/price-sheets/public-price-sheet-lead-form";
+import { getPublicPriceSheetTheme, type PublicPriceSheetTheme } from "@/features/price-sheets/public-theme";
 import type { PublishedPriceSheet } from "@/server/price-sheets/service";
 
 interface PublicPriceSheetProps {
@@ -50,16 +51,6 @@ interface LocalizedPublicPriceSheetItem {
 interface PriceSheetSection {
   title: string;
   items: LocalizedPublicPriceSheetItem[];
-}
-
-interface PublicPriceSheetTheme {
-  id: string;
-  heroSurfaceClassName: string;
-  badgeClassName: string;
-  markClassName: string;
-  glowClassName: string;
-  sidebarSurfaceClassName: string;
-  sectionSurfaceClassName: string;
 }
 
 const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheetCopy> = {
@@ -109,36 +100,6 @@ const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheet
   },
 };
 
-const publicPriceSheetThemes: PublicPriceSheetTheme[] = [
-  {
-    id: "amber",
-    heroSurfaceClassName: "border-amber-200/70 bg-gradient-to-br from-amber-50 via-card to-card",
-    badgeClassName: "bg-amber-100 text-amber-950",
-    markClassName: "bg-amber-200/80 text-amber-950",
-    glowClassName: "bg-gradient-to-b from-amber-200/40 via-amber-100/10 to-transparent",
-    sidebarSurfaceClassName: "border-amber-200/60 bg-gradient-to-br from-amber-50/90 to-card",
-    sectionSurfaceClassName: "border-amber-100/80 bg-amber-50/35",
-  },
-  {
-    id: "slate",
-    heroSurfaceClassName: "border-slate-200/80 bg-gradient-to-br from-slate-100 via-card to-card",
-    badgeClassName: "bg-slate-200 text-slate-900",
-    markClassName: "bg-slate-900 text-slate-50",
-    glowClassName: "bg-gradient-to-b from-slate-300/35 via-slate-100/10 to-transparent",
-    sidebarSurfaceClassName: "border-slate-200/70 bg-gradient-to-br from-slate-100/95 to-card",
-    sectionSurfaceClassName: "border-slate-200/80 bg-slate-100/40",
-  },
-  {
-    id: "stone",
-    heroSurfaceClassName: "border-stone-200/80 bg-gradient-to-br from-stone-100 via-card to-card",
-    badgeClassName: "bg-stone-200 text-stone-900",
-    markClassName: "bg-stone-900 text-stone-50",
-    glowClassName: "bg-gradient-to-b from-stone-300/35 via-stone-100/10 to-transparent",
-    sidebarSurfaceClassName: "border-stone-200/70 bg-gradient-to-br from-stone-100/95 to-card",
-    sectionSurfaceClassName: "border-stone-200/80 bg-stone-100/45",
-  },
-];
-
 const supportedLanguageOptions = [
   { value: "en", label: "EN" },
   { value: "ru", label: "RU" },
@@ -186,17 +147,22 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
     publicContactActions.length > 0;
 
   return (
-    <div className="relative isolate overflow-hidden pb-16 sm:pb-24" data-price-sheet-theme={theme.id}>
+    <div className={cn("relative isolate overflow-hidden pb-16 sm:pb-24", theme.pageClassName)} data-price-sheet-theme={theme.id}>
       <div aria-hidden className={cn("absolute inset-x-0 top-0 h-[26rem] blur-3xl", theme.glowClassName)} />
 
       <section className="container relative pt-6 sm:pt-12">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <Badge className={cn("border-transparent px-3 py-1 text-xs uppercase tracking-[0.22em]", theme.badgeClassName)} variant="secondary">
+          <Badge className={cn("px-3 py-1 text-xs uppercase tracking-[0.22em]", theme.eyebrowBadgeClassName)} variant="secondary">
             {copy.publishedEyebrow}
           </Badge>
 
-          <div className="inline-flex w-full items-center justify-between gap-2 rounded-full border border-border/70 bg-card/90 px-2 py-2 shadow-sm sm:w-auto sm:justify-start">
-            <span className="px-2 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">{copy.languageLabel}</span>
+          <div
+            className={cn(
+              "inline-flex w-full items-center justify-between gap-2 rounded-full border px-2 py-2 shadow-sm sm:w-auto sm:justify-start",
+              theme.languageShellClassName,
+            )}
+          >
+            <span className={cn("px-2 text-xs font-medium uppercase tracking-[0.22em]", theme.languageLabelClassName)}>{copy.languageLabel}</span>
             {supportedLanguageOptions.map((option) => {
               const isActive = option.value === interfaceLanguage;
 
@@ -205,7 +171,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                   key={option.value}
                   className={cn(
                     "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                    isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    isActive ? theme.languageActiveClassName : theme.languageInactiveClassName,
                   )}
                   href={`/price-sheets/${priceSheet.slug}?lang=${option.value}`}
                 >
@@ -219,41 +185,43 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
         <div className="mt-6 grid gap-5 sm:mt-8 sm:gap-6 lg:grid-cols-[minmax(0,1.1fr),320px] lg:items-start">
           <div className={cn("rounded-[2rem] border p-5 shadow-sm sm:p-8", theme.heroSurfaceClassName)}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <div className={cn("flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm sm:h-16 sm:w-16", theme.markClassName)}>
+              <div className={cn("flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm sm:h-16 sm:w-16", theme.heroMarkClassName)}>
                 {getSheetMark(localizedSheet.title)}
               </div>
 
               <div className="space-y-3">
-                <p className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">{copy.catalogEyebrow}</p>
-                <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-5xl">{localizedSheet.title}</h1>
-                <p className="max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{summaryText}</p>
+                <p className={cn("font-mono text-xs uppercase tracking-[0.28em]", theme.heroEyebrowClassName)}>{copy.catalogEyebrow}</p>
+                <h1 className={cn("text-balance text-3xl font-semibold tracking-tight sm:text-5xl", theme.heroTitleClassName)}>
+                  {localizedSheet.title}
+                </h1>
+                <p className={cn("max-w-3xl text-base leading-7 sm:text-lg sm:leading-8", theme.heroBodyClassName)}>{summaryText}</p>
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <MetricChip label={copy.itemCountLabel} value={String(priceSheet.items.length)} />
-              <MetricChip label={copy.sectionCountLabel} value={String(sections.length)} />
-              <MetricChip label={copy.localeLabel} value={interfaceLocale} />
-              <MetricChip label={copy.currencyLabel} value={priceSheet.currency} />
-              <MetricChip label={copy.updatedLabel} value={updatedAt} />
+              <MetricChip label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
+              <MetricChip label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
+              <MetricChip label={copy.localeLabel} theme={theme} value={interfaceLocale} />
+              <MetricChip label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
+              <MetricChip label={copy.updatedLabel} theme={theme} value={updatedAt} />
             </div>
           </div>
 
-          <Card className={cn("bg-card/95", theme.sidebarSurfaceClassName)}>
+          <Card className={theme.summaryCardClassName}>
             <CardHeader>
-              <Badge className="w-fit" variant="outline">
+              <Badge className={cn("w-fit", theme.summaryBadgeClassName)} variant="outline">
                 {copy.summaryEyebrow}
               </Badge>
-              <CardTitle className="pt-3 text-xl">{copy.summaryTitle}</CardTitle>
-              <CardDescription>{introText}</CardDescription>
+              <CardTitle className={cn("pt-3 text-xl", theme.summaryTitleClassName)}>{copy.summaryTitle}</CardTitle>
+              <CardDescription className={theme.summaryDescriptionClassName}>{introText}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <DetailRow label={copy.currencyLabel} value={priceSheet.currency} />
-              <DetailRow label={copy.localeLabel} value={interfaceLocale} />
-              <DetailRow label={copy.updatedLabel} value={updatedAt} />
-              <DetailRow label={copy.itemCountLabel} value={String(priceSheet.items.length)} />
-              <DetailRow label={copy.sectionCountLabel} value={String(sections.length)} />
-              {priceSheet.publicSettings.contactLabel ? <DetailRow label={copy.contactEyebrow} value={priceSheet.publicSettings.contactLabel} /> : null}
+              <DetailRow label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
+              <DetailRow label={copy.localeLabel} theme={theme} value={interfaceLocale} />
+              <DetailRow label={copy.updatedLabel} theme={theme} value={updatedAt} />
+              <DetailRow label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
+              <DetailRow label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
+              {priceSheet.publicSettings.contactLabel ? <DetailRow label={copy.contactEyebrow} theme={theme} value={priceSheet.publicSettings.contactLabel} /> : null}
             </CardContent>
           </Card>
         </div>
@@ -262,25 +230,25 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
       <section className="container relative mt-8 grid gap-5 sm:mt-10 sm:gap-6 lg:grid-cols-[minmax(0,1fr),320px]">
         <div className="space-y-5">
           <div className="space-y-2">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">{copy.catalogEyebrow}</p>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{copy.browseTitle}</h2>
-            <p className="max-w-2xl text-muted-foreground">{copy.browseDescription}</p>
+            <p className={cn("font-mono text-xs uppercase tracking-[0.24em]", theme.heroEyebrowClassName)}>{copy.catalogEyebrow}</p>
+            <h2 className={cn("text-2xl font-semibold tracking-tight sm:text-3xl", theme.heroTitleClassName)}>{copy.browseTitle}</h2>
+            <p className={cn("max-w-2xl", theme.heroBodyClassName)}>{copy.browseDescription}</p>
           </div>
 
           {sections.length === 0 ? (
-            <Card>
+            <Card className={theme.sectionCardClassName}>
               <CardHeader>
-                <CardTitle>{copy.noItemsTitle}</CardTitle>
-                <CardDescription>{copy.noItemsDescription}</CardDescription>
+                <CardTitle className={theme.heroTitleClassName}>{copy.noItemsTitle}</CardTitle>
+                <CardDescription className={theme.heroBodyClassName}>{copy.noItemsDescription}</CardDescription>
               </CardHeader>
             </Card>
           ) : (
             sections.map((section) => (
-              <Card key={section.title}>
-                <CardHeader className="gap-2 border-b border-border/70">
+              <Card key={section.title} className={theme.sectionCardClassName}>
+                <CardHeader className={cn("gap-2 border-b", theme.sectionHeaderClassName)}>
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <CardTitle className="text-xl">{section.title}</CardTitle>
-                    <Badge variant="outline">
+                    <CardTitle className={cn("text-xl", theme.heroTitleClassName)}>{section.title}</CardTitle>
+                    <Badge className={theme.sectionBadgeClassName} variant="outline">
                       {section.items.length} {copy.itemCountLabel.toLowerCase()}
                     </Badge>
                   </div>
@@ -289,17 +257,17 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                   {section.items.map((item) => (
                     <article
                       key={item.id}
-                      className={cn("grid gap-4 rounded-[1.35rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5", theme.sectionSurfaceClassName)}
+                      className={cn("grid gap-4 rounded-[1.35rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:p-5", theme.itemSurfaceClassName)}
                     >
                       <div className="space-y-2">
                         <div className="space-y-1">
-                          <h3 className="text-lg font-semibold">{item.name}</h3>
-                          {item.description ? <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{item.description}</p> : null}
+                          <h3 className={cn("text-lg font-semibold", theme.itemTitleClassName)}>{item.name}</h3>
+                          {item.description ? <p className={cn("max-w-2xl text-sm leading-6", theme.itemDescriptionClassName)}>{item.description}</p> : null}
                         </div>
                       </div>
 
                       <div className="sm:text-right">
-                        <p className="text-xl font-semibold tracking-tight">
+                        <p className={cn("text-xl font-semibold tracking-tight", theme.priceClassName)}>
                           {formatPublicPrice(item.priceCents, priceSheet.currency, interfaceLocale)}
                         </p>
                       </div>
@@ -313,19 +281,22 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
 
         <aside className="space-y-4">
           {hasPublicContactBlock ? (
-            <Card id="contact" className={cn("border-border/70 bg-card/95", theme.sidebarSurfaceClassName)}>
+            <Card id="contact" className={theme.railCardClassName}>
               <CardHeader>
-                <Badge className="w-fit" variant="secondary">
+                <Badge className={cn("w-fit", theme.railBadgeClassName)} variant="secondary">
                   {copy.contactEyebrow}
                 </Badge>
-                <CardTitle className="pt-3">{priceSheet.publicSettings.contactLabel || copy.contactTitle}</CardTitle>
-                {priceSheet.publicSettings.inquiryText ? <CardDescription>{priceSheet.publicSettings.inquiryText}</CardDescription> : null}
+                <CardTitle className={cn("pt-3", theme.summaryTitleClassName)}>{priceSheet.publicSettings.contactLabel || copy.contactTitle}</CardTitle>
+                {priceSheet.publicSettings.inquiryText ? (
+                  <CardDescription className={theme.summaryDescriptionClassName}>{priceSheet.publicSettings.inquiryText}</CardDescription>
+                ) : null}
               </CardHeader>
               <CardContent className="space-y-4">
                 {priceSheet.publicSettings.contactEmail ? (
                   <ContactRow
                     href={buildEmailHref(priceSheet.publicSettings.contactEmail, localizedSheet.title, interfaceLanguage)}
                     label={copy.emailLabel}
+                    theme={theme}
                     value={priceSheet.publicSettings.contactEmail}
                   />
                 ) : null}
@@ -334,6 +305,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                   <ContactRow
                     href={buildPhoneHref(priceSheet.publicSettings.contactPhone) ?? undefined}
                     label={copy.phoneLabel}
+                    theme={theme}
                     value={priceSheet.publicSettings.contactPhone}
                   />
                 ) : null}
@@ -349,6 +321,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
                             variant: index === 0 ? "default" : "outline",
                           }),
                           "w-full",
+                          index === 0 ? theme.primaryButtonClassName : theme.secondaryButtonClassName,
                         )}
                         href={action.href}
                       >
@@ -366,6 +339,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
             interfaceLanguage={interfaceLanguage}
             locale={interfaceLocale}
             priceSheetSlug={priceSheet.slug}
+            theme={theme}
           />
         </aside>
       </section>
@@ -373,36 +347,46 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
   );
 }
 
-function MetricChip({ label, value }: { label: string; value: string }) {
+function MetricChip({ label, theme, value }: { label: string; theme: PublicPriceSheetTheme; value: string }) {
   return (
-    <div className="rounded-full border border-border/70 bg-background/75 px-4 py-2 shadow-sm">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-semibold">{value}</p>
+    <div className={cn("rounded-full border px-4 py-2 shadow-sm", theme.metricChipClassName)}>
+      <p className={cn("text-xs uppercase tracking-[0.18em]", theme.metricChipLabelClassName)}>{label}</p>
+      <p className={cn("mt-1 text-sm font-semibold", theme.metricChipValueClassName)}>{value}</p>
     </div>
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, theme, value }: { label: string; theme: PublicPriceSheetTheme; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{value}</span>
+    <div className={cn("flex items-center justify-between gap-4 rounded-2xl border px-4 py-3", theme.detailRowClassName)}>
+      <span className={cn("text-sm", theme.detailRowLabelClassName)}>{label}</span>
+      <span className={cn("text-sm font-medium", theme.detailRowValueClassName)}>{value}</span>
     </div>
   );
 }
 
-function ContactRow({ label, value, href }: { label: string; value: string; href?: string }) {
+function ContactRow({
+  label,
+  value,
+  href,
+  theme,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  theme: PublicPriceSheetTheme;
+}) {
   const content = href ? (
-    <Link className="font-medium hover:underline" href={href}>
+    <Link className={cn("font-medium hover:underline", theme.contactValueClassName)} href={href}>
       {value}
     </Link>
   ) : (
-    <span className="font-medium">{value}</span>
+    <span className={cn("font-medium", theme.contactValueClassName)}>{value}</span>
   );
 
   return (
-    <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+    <div className={cn("rounded-2xl border px-4 py-3", theme.contactRowClassName)}>
+      <p className={cn("text-xs uppercase tracking-[0.18em]", theme.contactLabelClassName)}>{label}</p>
       <div className="mt-2 text-sm">{content}</div>
     </div>
   );
@@ -498,10 +482,6 @@ function formatPublicPrice(priceCents: number, currency: string, locale: string)
     style: "currency",
     currency,
   }).format(priceCents / 100);
-}
-
-function getPublicPriceSheetTheme(themeId: PublishedPriceSheet["theme"]) {
-  return publicPriceSheetThemes.find((theme) => theme.id === themeId) ?? publicPriceSheetThemes[0]!;
 }
 
 function getSheetMark(title: string) {
