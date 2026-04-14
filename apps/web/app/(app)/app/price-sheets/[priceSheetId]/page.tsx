@@ -1,10 +1,11 @@
-import { Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import { Badge, Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
+import { PriceSheetLeadsPanel, PriceSheetLeadsSummary } from "@/features/price-sheets/price-sheet-leads-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { requireCurrentAppShellSession } from "@/server/current-session";
 import { listWorkspacePriceSheetLeads } from "@/server/price-sheet-leads/service";
@@ -30,6 +31,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
     ]);
     const nextStatus = priceSheet.status === "published" ? "draft" : "published";
     const statusActionLabel = priceSheet.status === "published" ? "Unpublish" : "Publish";
+    const leadCountLabel = `${leads.length} ${leads.length === 1 ? "lead" : "leads"}`;
 
     return (
       <div className="space-y-8">
@@ -38,12 +40,25 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           title={priceSheet.title}
           description="Update metadata, adjust items, and control publication state for this sheet."
           actions={
-            priceSheet.status === "published" ? (
-              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href={priceSheet.publicUrl}>
-                Public page
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="outline">{leadCountLabel}</Badge>
+              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href="#sheet-leads">
+                Leads
               </Link>
-            ) : undefined
+              {priceSheet.status === "published" ? (
+                <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href={priceSheet.publicUrl}>
+                  Public page
+                </Link>
+              ) : null}
+            </div>
           }
+        />
+
+        <PriceSheetLeadsSummary
+          inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
+          leads={leads}
+          publicUrl={priceSheet.publicUrl}
+          status={priceSheet.status}
         />
 
         <div className="grid gap-6 xl:grid-cols-[1fr,320px]">
@@ -99,40 +114,12 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Leads</CardTitle>
-            <CardDescription>Public inquiries submitted through this published Price Sheet appear here.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {leads.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No inquiries yet for this Price Sheet.</p>
-            ) : (
-              <div className="space-y-4">
-                {leads.map((lead) => (
-                  <article key={lead.id} className="rounded-3xl border border-border/70 bg-background/70 p-5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-1">
-                        <p className="font-medium">{lead.contactName}</p>
-                        <p className="text-sm text-muted-foreground">{lead.email}</p>
-                        {lead.companyOrBusinessName ? <p className="text-sm text-muted-foreground">{lead.companyOrBusinessName}</p> : null}
-                        {lead.phoneOrHandle ? <p className="text-sm text-muted-foreground">{lead.phoneOrHandle}</p> : null}
-                      </div>
-                      <div className="text-sm text-muted-foreground sm:text-right">
-                        <p>{lead.createdAt.toLocaleString()}</p>
-                        <p>{lead.locale}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 rounded-2xl border border-border/70 bg-card/70 px-4 py-3 sm:px-5">
-                      <p className="text-sm leading-6">{lead.message}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <PriceSheetLeadsPanel
+          inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
+          leads={leads}
+          publicUrl={priceSheet.publicUrl}
+          status={priceSheet.status}
+        />
       </div>
     );
   } catch (error) {
