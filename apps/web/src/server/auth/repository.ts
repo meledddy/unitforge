@@ -21,7 +21,12 @@ export async function findUserByEmail(email: string) {
   });
 }
 
-export async function createAuthSessionRecord(input: { userId: string; tokenHash: string; expiresAt: Date }) {
+export async function createAuthSessionRecord(input: {
+  userId: string;
+  workspaceId: string;
+  tokenHash: string;
+  expiresAt: Date;
+}) {
   const db = getRequiredDb();
 
   await db.delete(authSessions).where(and(eq(authSessions.userId, input.userId), lt(authSessions.expiresAt, new Date())));
@@ -30,6 +35,7 @@ export async function createAuthSessionRecord(input: { userId: string; tokenHash
     .insert(authSessions)
     .values({
       userId: input.userId,
+      workspaceId: input.workspaceId,
       tokenHash: input.tokenHash,
       expiresAt: input.expiresAt,
     })
@@ -41,9 +47,6 @@ export async function createAuthSessionRecord(input: { userId: string; tokenHash
 export async function findAuthSessionRecordByTokenHash(tokenHash: string) {
   return getRequiredDb().query.authSessions.findFirst({
     where: and(eq(authSessions.tokenHash, tokenHash), gt(authSessions.expiresAt, new Date())),
-    with: {
-      user: true,
-    },
   });
 }
 
@@ -51,7 +54,7 @@ export async function deleteAuthSessionRecordByTokenHash(tokenHash: string) {
   return getRequiredDb().delete(authSessions).where(eq(authSessions.tokenHash, tokenHash));
 }
 
-export async function findPrimaryWorkspaceMembershipForUser(userId: string) {
+export async function findDefaultWorkspaceMembershipForUser(userId: string) {
   return getRequiredDb().query.memberships.findFirst({
     where: eq(memberships.userId, userId),
     orderBy: (membership, { asc }) => [asc(membership.joinedAt)],

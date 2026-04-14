@@ -1,10 +1,9 @@
-import { mockSessionUser, mockSessionWorkspace } from "@unitforge/core";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
 import { AUTH_SESSION_COOKIE_NAME } from "@/server/auth/constants";
-import { getAppShellSessionForSessionToken, getBootstrapAppShellSession } from "@/server/auth/service";
+import { getAppShellSessionForSessionToken } from "@/server/auth/service";
 import { getAuthSessionTokenFromCookie } from "@/server/auth/session";
 
 type MembershipRole = "owner" | "admin" | "member";
@@ -56,11 +55,4 @@ export async function requireCurrentAppShellSession() {
   }
 
   return session;
-}
-
-export async function getSeededAppShellSession() {
-  return getBootstrapAppShellSession({
-    userId: mockSessionUser.id,
-    workspaceId: mockSessionWorkspace.id,
-  });
 }

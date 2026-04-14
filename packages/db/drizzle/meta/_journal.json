@@ -43,6 +43,13 @@
       "when": 1776052325418,
       "tag": "0005_dazzling_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776125935393,
+      "tag": "0006_little_norrin_radd",
+      "breakpoints": true
     }
   ]
 }

@@ -73,6 +73,9 @@ export const authSessions = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     tokenHash: varchar("token_hash", { length: 64 }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -80,6 +83,7 @@ export const authSessions = pgTable(
   (table) => ({
     tokenHashIdx: uniqueIndex("auth_sessions_token_hash_idx").on(table.tokenHash),
     userIdx: index("auth_sessions_user_idx").on(table.userId),
+    workspaceIdx: index("auth_sessions_workspace_idx").on(table.workspaceId),
     expiresAtIdx: index("auth_sessions_expires_at_idx").on(table.expiresAt),
   }),
 );
@@ -217,6 +221,10 @@ export const authSessionsRelations = relations(authSessions, ({ one }) => ({
     fields: [authSessions.userId],
     references: [users.id],
   }),
+  workspace: one(workspaces, {
+    fields: [authSessions.workspaceId],
+    references: [workspaces.id],
+  }),
 }));
 
 export const workspacesRelations = relations(workspaces, ({ many, one }) => ({
@@ -224,6 +232,7 @@ export const workspacesRelations = relations(workspaces, ({ many, one }) => ({
     fields: [workspaces.ownerId],
     references: [users.id],
   }),
+  authSessions: many(authSessions),
   memberships: many(memberships),
   priceSheets: many(priceSheets),
   subscription: one(subscriptions, {

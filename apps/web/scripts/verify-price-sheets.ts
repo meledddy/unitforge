@@ -1,13 +1,16 @@
 import "dotenv/config";
 
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+
+import { createDb, memberships, priceSheetItems, priceSheets, users, workspaces } from "@unitforge/db";
+import { eq } from "drizzle-orm";
 
 import {
   resolvePriceSheetContent,
   resolvePriceSheetItemContent,
 } from "../src/features/price-sheets/localization";
 import { type PriceSheetFormValues, toPriceSheetMutationInput } from "../src/features/price-sheets/validation";
-import { getSeededAppShellSession } from "../src/server/current-session";
 import { type PriceSheetLeadActionState, submitPriceSheetLeadAction } from "../src/server/price-sheet-leads/actions";
 import { listWorkspacePriceSheetLeads } from "../src/server/price-sheet-leads/service";
 import {
@@ -17,7 +20,9 @@ import {
   getWorkspacePriceSheetForEdit,
   listWorkspacePriceSheets,
   setWorkspacePriceSheetStatus,
+  updateWorkspacePriceSheet,
 } from "../src/server/price-sheets/service";
+import { getSeededAppShellSession } from "./bootstrap-session";
 
 const initialLeadActionState: PriceSheetLeadActionState = {
   status: "idle",
@@ -33,6 +38,7 @@ async function main() {
   const slug = `verification-sheet-${timestamp}`;
   const title = `Verification Sheet ${timestamp}`;
   let createdPriceSheetId: string | null = null;
+  let foreignFixture: Awaited<ReturnType<typeof createForeignWorkspaceFixture>> | null = null;
   const payload: PriceSheetFormValues = {
     title,
     description: "Public-facing verification sheet description",
@@ -161,6 +167,35 @@ async function main() {
     assert.equal(storedLeads[0]?.locale, "ru-RU");
     assert.equal(storedLeads[0]?.sheetSlugSnapshot, slug);
 
+    foreignFixture = await createForeignWorkspaceFixture();
+    const foreignSheet = foreignFixture;
+
+    const listedDuringForeignFixture = await listWorkspacePriceSheets(session);
+    assert(!listedDuringForeignFixture.some((priceSheet) => priceSheet.id === foreignSheet.priceSheetId));
+
+    await assertRejectsCrossWorkspaceAccess(async () => {
+      await getWorkspacePriceSheetForEdit(session, foreignSheet.priceSheetId);
+    });
+
+    await assertRejectsCrossWorkspaceAccess(async () => {
+      await updateWorkspacePriceSheet(
+        session,
+        foreignSheet.priceSheetId,
+        toPriceSheetMutationInput({
+          ...payload,
+          slug: foreignSheet.slug,
+        }),
+      );
+    });
+
+    await assertRejectsCrossWorkspaceAccess(async () => {
+      await setWorkspacePriceSheetStatus(session, foreignSheet.priceSheetId, "draft");
+    });
+
+    await assertRejectsCrossWorkspaceAccess(async () => {
+      await listWorkspacePriceSheetLeads(session, foreignSheet.priceSheetId);
+    });
+
     await setWorkspacePriceSheetStatus(session, created.id, "draft");
 
     const unpublishedLeadResult = await submitPriceSheetLeadAction(initialLeadActionState, leadFormData);
@@ -179,6 +214,10 @@ async function main() {
     if (createdPriceSheetId) {
       await deleteWorkspacePriceSheet(session, createdPriceSheetId);
     }
+
+    if (foreignFixture) {
+      await cleanupForeignWorkspaceFixture(foreignFixture);
+    }
   }
 }
 
@@ -190,6 +229,87 @@ async function cleanupVerificationArtifacts(session: Awaited<ReturnType<typeof g
       await deleteWorkspacePriceSheet(session, priceSheet.id);
     }
   }
+}
+
+async function assertRejectsCrossWorkspaceAccess(run: () => Promise<unknown>) {
+  await assert.rejects(run, (error: unknown) => {
+    if (typeof error === "object" && error !== null && "code" in error) {
+      assert.equal((error as { code?: string }).code, "NOT_FOUND");
+      return true;
+    }
+
+    return false;
+  });
+}
+
+async function createForeignWorkspaceFixture() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required.");
+  }
+
+  const db = createDb(process.env.DATABASE_URL);
+  const userId = randomUUID();
+  const workspaceId = randomUUID();
+  const priceSheetId = randomUUID();
+  const timestamp = Date.now().toString();
+  const slug = `ownership-foreign-${timestamp}`;
+
+  await db.transaction(async (tx) => {
+    await tx.insert(users).values({
+      id: userId,
+      email: `ownership-${timestamp}@unitforge.dev`,
+      name: "Ownership Verification User",
+    });
+
+    await tx.insert(workspaces).values({
+      id: workspaceId,
+      name: "Ownership Verification Workspace",
+      slug,
+      ownerId: userId,
+    });
+
+    await tx.insert(memberships).values({
+      workspaceId,
+      userId,
+      role: "owner",
+    });
+
+    await tx.insert(priceSheets).values({
+      id: priceSheetId,
+      workspaceId,
+      title: "Foreign Ownership Sheet",
+      slug: `${slug}-sheet`,
+      status: "draft",
+      currency: "USD",
+      locale: "en-US",
+      createdById: userId,
+    });
+
+    await tx.insert(priceSheetItems).values({
+      priceSheetId,
+      name: "Foreign Item",
+      priceCents: 1000,
+      position: 0,
+    });
+  });
+
+  return {
+    userId,
+    workspaceId,
+    priceSheetId,
+    slug: `${slug}-sheet`,
+  };
+}
+
+async function cleanupForeignWorkspaceFixture(input: Awaited<ReturnType<typeof createForeignWorkspaceFixture>>) {
+  if (!process.env.DATABASE_URL) {
+    return;
+  }
+
+  const db = createDb(process.env.DATABASE_URL);
+
+  await db.delete(workspaces).where(eq(workspaces.id, input.workspaceId));
+  await db.delete(users).where(eq(users.id, input.userId));
 }
 
 main()

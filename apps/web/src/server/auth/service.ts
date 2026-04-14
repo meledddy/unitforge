@@ -7,7 +7,7 @@ import {
   createAuthSessionRecord,
   deleteAuthSessionRecordByTokenHash,
   findAuthSessionRecordByTokenHash,
-  findPrimaryWorkspaceMembershipForUser,
+  findDefaultWorkspaceMembershipForUser,
   findSubscriptionByWorkspaceId,
   findUserByEmail,
   findWorkspaceMembership,
@@ -21,11 +21,18 @@ export async function authenticateUserByPassword(input: { email: string; passwor
     throw new AuthServiceError("INVALID_CREDENTIALS", "Email or password is incorrect.");
   }
 
+  const defaultMembership = await findDefaultWorkspaceMembershipForUser(user.id);
+
+  if (!defaultMembership?.workspace) {
+    throw new AuthServiceError("WORKSPACE_NOT_FOUND", "This user does not have a workspace membership.");
+  }
+
   const sessionToken = createAuthSessionToken();
   const tokenHash = hashAuthSessionToken(sessionToken);
 
   await createAuthSessionRecord({
     userId: user.id,
+    workspaceId: defaultMembership.workspace.id,
     tokenHash,
     expiresAt: getAuthSessionExpiryDate(),
   });
@@ -43,11 +50,11 @@ export async function invalidateAuthSession(sessionToken: string) {
 export async function getAppShellSessionForSessionToken(sessionToken: string): Promise<AppShellSession | null> {
   const authSession = await findAuthSessionRecordByTokenHash(hashAuthSessionToken(sessionToken));
 
-  if (!authSession?.user) {
+  if (!authSession) {
     return null;
   }
 
-  return buildAppShellSession(authSession.user.id);
+  return buildAppShellSession(authSession.userId, authSession.workspaceId);
 }
 
 export async function getBootstrapAppShellSession(input: { userId: string; workspaceId: string }) {
@@ -65,8 +72,8 @@ export async function getBootstrapAppShellSession(input: { userId: string; works
   });
 }
 
-async function buildAppShellSession(userId: string): Promise<AppShellSession | null> {
-  const membership = await findPrimaryWorkspaceMembershipForUser(userId);
+async function buildAppShellSession(userId: string, workspaceId: string): Promise<AppShellSession | null> {
+  const membership = await findWorkspaceMembership(userId, workspaceId);
 
   if (!membership?.user || !membership.workspace) {
     return null;
@@ -81,7 +88,7 @@ async function buildAppShellSession(userId: string): Promise<AppShellSession | n
 }
 
 function mapAppShellSession(input: {
-  membership: NonNullable<Awaited<ReturnType<typeof findPrimaryWorkspaceMembershipForUser>>>;
+  membership: NonNullable<Awaited<ReturnType<typeof findDefaultWorkspaceMembershipForUser>>>;
   subscription: Awaited<ReturnType<typeof findSubscriptionByWorkspaceId>>;
 }): AppShellSession {
   return {
