@@ -3,7 +3,11 @@ import { marketingLinks } from "@unitforge/core";
 import { buttonVariants, cn } from "@unitforge/ui";
 import Link from "next/link";
 
-export function SiteHeader() {
+import { getCurrentAppShellSession } from "@/server/current-session";
+
+export async function SiteHeader() {
+  const session = await getCurrentAppShellSession();
+
   return (
     <header className="sticky top-0 z-20 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="container flex min-h-16 flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-0">
@@ -25,12 +29,11 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <Link className={cn(buttonVariants({ size: "sm" }))} href="/app">
-            Open App
+          <Link className={cn(buttonVariants({ size: "sm" }))} href={session ? "/app" : "/login"}>
+            {session ? "Open App" : "Sign in"}
           </Link>
         </div>
       </div>
     </header>
   );
 }
-

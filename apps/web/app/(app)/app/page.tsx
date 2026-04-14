@@ -4,17 +4,17 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 
 export default async function DashboardPage() {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
 
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Authenticated app shell"
         title="Workspace overview"
-        description="The first functional slice focuses on shell quality, typed defaults, and a clean path to real authentication and billing."
+        description="The first functional slice now runs behind real login, session handling, and workspace-scoped data access."
         actions={
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/app/settings">
             Review settings
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Current user</CardTitle>
-            <CardDescription>Mocked for now, shaped to drop behind a real auth provider later.</CardDescription>
+            <CardDescription>The authenticated operator account now drives protected app access.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentUser.name}</p>
@@ -38,12 +38,12 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Current workspace</CardTitle>
-            <CardDescription>Workspace selection is mocked, but the database model already supports memberships.</CardDescription>
+            <CardDescription>The current workspace comes from the authenticated membership context.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentWorkspace.name}</p>
             <p>{session.currentWorkspace.slug}</p>
-            <p>Prepared for workspace-scoped queries and billing ownership.</p>
+            <p>Workspace-scoped queries and billing ownership now resolve from the signed-in user session.</p>
           </CardContent>
         </Card>
 

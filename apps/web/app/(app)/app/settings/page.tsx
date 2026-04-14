@@ -4,10 +4,10 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 
 export default async function SettingsPage() {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   const stripe = getStripeScaffoldState(process.env);
 
   return (
@@ -15,7 +15,7 @@ export default async function SettingsPage() {
       <PageHeader
         eyebrow="Workspace settings"
         title="Settings"
-        description="This area holds the first operational defaults: workspace identity, mock session context, and Stripe readiness."
+        description="This area holds workspace identity, authenticated user context, and Stripe readiness."
         actions={
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/pricing">
             Pricing page
@@ -27,7 +27,7 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Workspace</CardTitle>
-            <CardDescription>Prepared for real persistence when a workspace switcher and auth provider are added.</CardDescription>
+            <CardDescription>Workspace access now resolves from the active authenticated membership.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentWorkspace.name}</p>
@@ -39,19 +39,19 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Current user</CardTitle>
-            <CardDescription>The authenticated state is mocked, but its shape matches the production direction.</CardDescription>
+            <CardDescription>The protected app now uses the real signed-in operator account.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentUser.name}</p>
             <p>{session.currentUser.email}</p>
-            <p>Replace this source with your auth provider when sign-in work begins.</p>
+            <p>Sign out from the app shell to clear the current session cookie and block access again.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>Subscription</CardTitle>
-            <CardDescription>Billing state is mocked and aligned with the subscriptions table.</CardDescription>
+            <CardDescription>Billing state is loaded from the workspace subscription record.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium capitalize text-foreground">{session.subscription?.status ?? "Unconfigured"}</p>
@@ -83,4 +83,3 @@ export default async function SettingsPage() {
     </div>
   );
 }
-

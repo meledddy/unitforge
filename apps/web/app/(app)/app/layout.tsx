@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { AppTopbar } from "@/components/app/app-topbar";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
 
   return (
     <div className="min-h-screen">

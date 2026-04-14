@@ -9,7 +9,7 @@ import {
   type PriceSheetStatus,
   toPriceSheetMutationInput,
 } from "@/features/price-sheets/validation";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 
 import { isPriceSheetServiceError } from "./errors";
 import {
@@ -49,7 +49,7 @@ export async function createPriceSheetAction(
     } satisfies PriceSheetFormActionState;
   }
 
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   let priceSheet;
 
   try {
@@ -90,7 +90,7 @@ export async function updatePriceSheetAction(
     } satisfies PriceSheetFormActionState;
   }
 
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   const saveIntent = getSaveIntent(formData);
   let existingPriceSheet;
   let priceSheet;
@@ -126,7 +126,7 @@ export async function setPriceSheetStatusAction(
   status: PriceSheetStatus,
   redirectTo: string,
 ) {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   const priceSheet = await setWorkspacePriceSheetStatus(session, priceSheetId, status);
   revalidatePriceSheetPaths({
     priceSheetId,
@@ -138,7 +138,7 @@ export async function setPriceSheetStatusAction(
 }
 
 export async function deletePriceSheetAction(priceSheetId: string, redirectTo = "/app/price-sheets") {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   const deletedPriceSheet = await deleteWorkspacePriceSheet(session, priceSheetId);
   revalidatePriceSheetPaths({
     priceSheetId: deletedPriceSheet.id,

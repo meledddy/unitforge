@@ -6,21 +6,18 @@ import {
   resolvePriceSheetContent,
   resolvePriceSheetItemContent,
 } from "../src/features/price-sheets/localization";
-import { getCurrentAppShellSession } from "../src/server/current-session";
-import { type PriceSheetLeadActionState,submitPriceSheetLeadAction } from "../src/server/price-sheet-leads/actions";
+import { type PriceSheetFormValues, toPriceSheetMutationInput } from "../src/features/price-sheets/validation";
+import { getSeededAppShellSession } from "../src/server/current-session";
+import { type PriceSheetLeadActionState, submitPriceSheetLeadAction } from "../src/server/price-sheet-leads/actions";
 import { listWorkspacePriceSheetLeads } from "../src/server/price-sheet-leads/service";
-import { createPriceSheetAction, type PriceSheetFormActionState } from "../src/server/price-sheets/actions";
 import {
+  createWorkspacePriceSheet,
   deleteWorkspacePriceSheet,
   getPublishedPriceSheetBySlug,
   getWorkspacePriceSheetForEdit,
   listWorkspacePriceSheets,
   setWorkspacePriceSheetStatus,
 } from "../src/server/price-sheets/service";
-
-const initialPriceSheetActionState: PriceSheetFormActionState = {
-  status: "idle",
-};
 
 const initialLeadActionState: PriceSheetLeadActionState = {
   status: "idle",
@@ -31,12 +28,12 @@ async function main() {
     throw new Error("DATABASE_URL is required.");
   }
 
-  const session = await getCurrentAppShellSession();
+  const session = await getSeededAppShellSession();
   const timestamp = Date.now().toString();
   const slug = `verification-sheet-${timestamp}`;
   const title = `Verification Sheet ${timestamp}`;
   let createdPriceSheetId: string | null = null;
-  const payload = {
+  const payload: PriceSheetFormValues = {
     title,
     description: "Public-facing verification sheet description",
     secondaryTitle: `RU ${title}`,
@@ -65,18 +62,10 @@ async function main() {
       },
     ],
   };
-  const formData = new FormData();
-
   await cleanupVerificationArtifacts(session);
-  formData.set("payload", JSON.stringify(payload));
 
   try {
-    try {
-      const result = await createPriceSheetAction(initialPriceSheetActionState, formData);
-      assert.fail(`Expected redirect from createPriceSheetAction, received ${JSON.stringify(result)}.`);
-    } catch (error) {
-      assert(isExpectedActionCompletion(error), `Expected redirect or revalidation completion signal, received ${String(error)}.`);
-    }
+    await createWorkspacePriceSheet(session, toPriceSheetMutationInput(payload));
 
     const listedAfterCreate = await listWorkspacePriceSheets(session);
     const created = listedAfterCreate.find((priceSheet) => priceSheet.slug === slug);
@@ -185,7 +174,7 @@ async function main() {
 
     console.log("Price Sheets verification passed.");
     console.log(`Verified workspace: ${session.currentWorkspace.slug}`);
-    console.log(`Verified create action slug: ${slug}`);
+    console.log(`Verified create flow slug: ${slug}`);
   } finally {
     if (createdPriceSheetId) {
       await deleteWorkspacePriceSheet(session, createdPriceSheetId);
@@ -193,7 +182,7 @@ async function main() {
   }
 }
 
-async function cleanupVerificationArtifacts(session: Awaited<ReturnType<typeof getCurrentAppShellSession>>) {
+async function cleanupVerificationArtifacts(session: Awaited<ReturnType<typeof getSeededAppShellSession>>) {
   const listedPriceSheets = await listWorkspacePriceSheets(session);
 
   for (const priceSheet of listedPriceSheets) {
@@ -201,24 +190,6 @@ async function cleanupVerificationArtifacts(session: Awaited<ReturnType<typeof g
       await deleteWorkspacePriceSheet(session, priceSheet.id);
     }
   }
-}
-
-function isExpectedActionCompletion(error: unknown) {
-  return isRedirectError(error) || isRevalidateInvariant(error);
-}
-
-function isRedirectError(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "digest" in error &&
-    typeof error.digest === "string" &&
-    error.digest.startsWith("NEXT_REDIRECT;")
-  );
-}
-
-function isRevalidateInvariant(error: unknown) {
-  return error instanceof Error && error.message.includes("static generation store missing in revalidatePath");
 }
 
 main()

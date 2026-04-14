@@ -4,14 +4,14 @@ import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 import { setPriceSheetStatusAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function PriceSheetsPage() {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
 
   try {
     const priceSheets = await listWorkspacePriceSheets(session);
@@ -37,7 +37,7 @@ export default async function PriceSheetsPage() {
             actionLabel="Create your first Price Sheet"
           >
             <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
-              Sheets stay empty until you add real content. Nothing is seeded beyond the current mock session and workspace.
+              Sheets stay empty until you add real content. Only the bootstrap operator account and workspace are seeded for local verification.
             </div>
           </PlaceholderPanel>
         ) : (

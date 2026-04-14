@@ -58,10 +58,29 @@ export const users = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull(),
     name: text("name"),
+    passwordHash: text("password_hash"),
     ...timestamps,
   },
   (table) => ({
     emailIdx: uniqueIndex("users_email_idx").on(table.email),
+  }),
+);
+
+export const authSessions = pgTable(
+  "auth_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    tokenHashIdx: uniqueIndex("auth_sessions_token_hash_idx").on(table.tokenHash),
+    userIdx: index("auth_sessions_user_idx").on(table.userId),
+    expiresAtIdx: index("auth_sessions_expires_at_idx").on(table.expiresAt),
   }),
 );
 
@@ -187,9 +206,17 @@ export const priceSheetLeads = pgTable(
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
+  authSessions: many(authSessions),
   memberships: many(memberships),
   ownedWorkspaces: many(workspaces),
   createdPriceSheets: many(priceSheets),
+}));
+
+export const authSessionsRelations = relations(authSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [authSessions.userId],
+    references: [users.id],
+  }),
 }));
 
 export const workspacesRelations = relations(workspaces, ({ many, one }) => ({
@@ -257,6 +284,7 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type PriceSheet = typeof priceSheets.$inferSelect;
 export type PriceSheetItem = typeof priceSheetItems.$inferSelect;
 export type PriceSheetLead = typeof priceSheetLeads.$inferSelect;
+export type AuthSession = typeof authSessions.$inferSelect;
 
 export type NewUser = typeof users.$inferInsert;
 export type NewWorkspace = typeof workspaces.$inferInsert;
@@ -265,3 +293,4 @@ export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NewPriceSheet = typeof priceSheets.$inferInsert;
 export type NewPriceSheetItem = typeof priceSheetItems.$inferInsert;
 export type NewPriceSheetLead = typeof priceSheetLeads.$inferInsert;
+export type NewAuthSession = typeof authSessions.$inferInsert;

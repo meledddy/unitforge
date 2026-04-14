@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
-import { getCurrentAppShellSession } from "@/server/current-session";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 import { listWorkspacePriceSheetLeads } from "@/server/price-sheet-leads/service";
 import { deletePriceSheetAction, setPriceSheetStatusAction, updatePriceSheetAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, getWorkspacePriceSheetForEdit, isKnownPriceSheetError } from "@/server/price-sheets/service";
@@ -20,7 +20,7 @@ interface PriceSheetEditPageProps {
 }
 
 export default async function PriceSheetEditPage({ params }: PriceSheetEditPageProps) {
-  const session = await getCurrentAppShellSession();
+  const session = await requireCurrentAppShellSession();
   const { priceSheetId } = await params;
 
   try {

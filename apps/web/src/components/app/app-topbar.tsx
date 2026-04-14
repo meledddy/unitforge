@@ -1,10 +1,11 @@
 "use client";
 
 import { getCurrentAppNavigationItem } from "@unitforge/core";
-import { Avatar, Badge, buttonVariants, cn } from "@unitforge/ui";
+import { Avatar, Badge, Button, buttonVariants, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { signOutAction } from "@/server/auth/actions";
 import type { AppShellSession } from "@/server/current-session";
 
 interface AppTopbarProps {
@@ -24,7 +25,7 @@ export function AppTopbar({ session }: AppTopbarProps) {
           <p className="mt-1 text-sm text-muted-foreground">{currentItem?.description ?? "Authenticated workspace shell."}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="outline">Mock session</Badge>
+          <Badge variant="outline">Signed in</Badge>
           <Badge variant="outline">{session.subscription?.status ?? "setup"}</Badge>
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/pricing">
             Pricing
@@ -35,6 +36,11 @@ export function AppTopbar({ session }: AppTopbarProps) {
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/">
             Marketing Site
           </Link>
+          <form action={signOutAction}>
+            <Button size="sm" type="submit" variant="outline">
+              Sign out
+            </Button>
+          </form>
           <Avatar name={session.currentUser.name} size="sm" />
         </div>
       </div>
