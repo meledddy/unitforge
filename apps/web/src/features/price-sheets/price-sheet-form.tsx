@@ -521,10 +521,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium">Content editor</p>
-                <p className="text-sm text-muted-foreground">
-                  Keep the primary locale complete. Translation stays optional and the public page still falls back to the default
-                  content locale when translation fields are blank.
-                </p>
+                <p className="text-sm text-muted-foreground">Primary content is required. Translation stays optional.</p>
               </div>
               <EditorTabSwitcher
                 activeTab={sheetContentTab}
@@ -608,7 +605,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <CardTitle>Items</CardTitle>
-              <CardDescription>Enter primary content first, then add optional translated copy for the second locale.</CardDescription>
+              <CardDescription>Each item keeps shared fields separate from localized content.</CardDescription>
             </div>
             <Button className="w-full sm:w-auto" onClick={addItem} type="button" variant="outline">
               Add item
@@ -630,175 +627,195 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                   itemError ? "border-destructive/40" : "border-border/70",
                 )}
               >
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium">{item.name.trim() || `Item ${index + 1}`}</p>
-                      <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                        {itemSummary.price}
-                      </span>
-                      {itemSummary.section ? (
-                        <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
-                          {itemSummary.section}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                          Item {index + 1}
                         </span>
-                      ) : null}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{isCollapsed ? itemSummary.description : itemSummary.helperText}</p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button onClick={() => toggleItem(index)} size="sm" type="button" variant="ghost">
-                      {isCollapsed ? "Expand" : "Collapse"}
-                    </Button>
-                    <Button onClick={() => duplicateItem(index)} size="sm" type="button" variant="outline">
-                      Duplicate
-                    </Button>
-                    <Button onClick={() => removeItem(index)} size="sm" type="button" variant="ghost">
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-
-                {!isCollapsed ? (
-                  <div className="mt-4 grid gap-4 xl:grid-cols-[180px,minmax(0,1fr)]">
-                    <div className="space-y-2 rounded-2xl border border-border/70 bg-card/80 p-4">
-                      <Label htmlFor={`item-price-${index}`}>Price</Label>
-                      <Input
-                        aria-invalid={Boolean(getFieldError(`items.${index}.price`))}
-                        className={getFieldClasses(`items.${index}.price`)}
-                        id={`item-price-${index}`}
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        type="number"
-                        value={item.price}
-                        onChange={(event) => updateItemField(index, "price", event.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground">Shared across locales.</p>
-                      {getFieldError(`items.${index}.price`) ? (
-                        <p className="text-sm text-destructive">{getFieldError(`items.${index}.price`)}</p>
-                      ) : null}
+                        <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                          {itemSummary.price}
+                        </span>
+                        {itemSummary.section ? (
+                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
+                            {itemSummary.section}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-medium">{item.name.trim() || `Item ${index + 1}`}</p>
+                        {isCollapsed ? <p className="text-sm text-muted-foreground">{itemSummary.description}</p> : null}
+                      </div>
                     </div>
 
-                    <div className="space-y-4 rounded-2xl border border-border/70 bg-card/80 p-4">
-                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-border/70 bg-card/80 p-1">
+                      <Button
+                        className="h-8 rounded-xl px-3"
+                        onClick={() => toggleItem(index)}
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                      >
+                        {isCollapsed ? "Expand" : "Collapse"}
+                      </Button>
+                      <Button
+                        className="h-8 rounded-xl px-3"
+                        onClick={() => duplicateItem(index)}
+                        size="sm"
+                        type="button"
+                        variant="outline"
+                      >
+                        Duplicate
+                      </Button>
+                      <Button
+                        className="h-8 rounded-xl px-3 text-muted-foreground"
+                        onClick={() => removeItem(index)}
+                        size="sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+
+                  {!isCollapsed ? (
+                    <div className="grid gap-4 xl:grid-cols-[minmax(0,220px),minmax(0,1fr)]">
+                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
                         <div className="space-y-1">
-                          <p className="text-sm font-medium">Localized content</p>
-                          <p className="text-sm text-muted-foreground">
-                            Keep primary content complete. Translation fields remain optional for fallback behavior.
-                          </p>
+                          <p className="text-sm font-medium">Shared fields</p>
+                          <p className="text-xs text-muted-foreground">Price stays the same across locales.</p>
                         </div>
-                        <EditorTabSwitcher
-                          activeTab={activeItemTab}
-                          primaryHasErrors={hasItemTabErrors(index, "primary")}
-                          primaryLocaleLabel={primaryLocaleLabel}
-                          secondaryLocaleLabel={secondaryLocaleLabel}
-                          translationHasErrors={hasItemTabErrors(index, "translation")}
-                          onChange={(tab) => setItemContentTab(index, tab)}
-                        />
+                        <div className="mt-4 space-y-2">
+                          <Label htmlFor={`item-price-${index}`}>Price</Label>
+                          <Input
+                            aria-invalid={Boolean(getFieldError(`items.${index}.price`))}
+                            className={getFieldClasses(`items.${index}.price`)}
+                            id={`item-price-${index}`}
+                            inputMode="decimal"
+                            min="0"
+                            step="0.01"
+                            type="number"
+                            value={item.price}
+                            onChange={(event) => updateItemField(index, "price", event.target.value)}
+                          />
+                          {getFieldError(`items.${index}.price`) ? (
+                            <p className="text-sm text-destructive">{getFieldError(`items.${index}.price`)}</p>
+                          ) : null}
+                        </div>
                       </div>
 
-                      {activeItemTab === "primary" ? (
-                        <div className="grid gap-4 lg:grid-cols-2">
-                          <div className="space-y-2">
-                            <Label htmlFor={`item-name-${index}`}>Name</Label>
-                            <Input
-                              aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
-                              className={getFieldClasses(`items.${index}.name`)}
-                              id={`item-name-${index}`}
-                              value={item.name}
-                              onChange={(event) => updateItemField(index, "name", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.name`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.name`)}</p>
-                            ) : null}
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor={`item-section-${index}`}>Category / section</Label>
-                            <Input
-                              aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
-                              className={getFieldClasses(`items.${index}.section`)}
-                              id={`item-section-${index}`}
-                              value={item.section}
-                              onChange={(event) => updateItemField(index, "section", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.section`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.section`)}</p>
-                            ) : null}
-                          </div>
-
-                          <div className="space-y-2 lg:col-span-2">
-                            <Label htmlFor={`item-description-${index}`}>Description</Label>
-                            <Textarea
-                              aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
-                              className={getFieldClasses(`items.${index}.description`)}
-                              id={`item-description-${index}`}
-                              rows={4}
-                              value={item.description}
-                              onChange={(event) => updateItemField(index, "description", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.description`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.description`)}</p>
-                            ) : null}
-                          </div>
+                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-sm font-medium">Localized content</p>
+                          <EditorTabSwitcher
+                            activeTab={activeItemTab}
+                            primaryHasErrors={hasItemTabErrors(index, "primary")}
+                            primaryLocaleLabel={primaryLocaleLabel}
+                            secondaryLocaleLabel={secondaryLocaleLabel}
+                            translationHasErrors={hasItemTabErrors(index, "translation")}
+                            onChange={(tab) => setItemContentTab(index, tab)}
+                          />
                         </div>
-                      ) : (
-                        <div className="grid gap-4 lg:grid-cols-2">
-                          <div className="space-y-2 lg:col-span-2">
-                            <p className="text-sm text-muted-foreground">
-                              {secondaryLocaleLabel}. Leave these fields blank if you want the public page to reuse the primary item
-                              content.
-                            </p>
-                          </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor={`item-secondary-name-${index}`}>Translated name</Label>
-                            <Input
-                              aria-invalid={Boolean(getFieldError(`items.${index}.secondaryName`))}
-                              className={getFieldClasses(`items.${index}.secondaryName`)}
-                              id={`item-secondary-name-${index}`}
-                              value={item.secondaryName}
-                              onChange={(event) => updateItemField(index, "secondaryName", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.secondaryName`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryName`)}</p>
-                            ) : null}
-                          </div>
+                        <div className="mt-4">
+                          {activeItemTab === "primary" ? (
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <div className="space-y-2">
+                                <Label htmlFor={`item-name-${index}`}>Name</Label>
+                                <Input
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
+                                  className={getFieldClasses(`items.${index}.name`)}
+                                  id={`item-name-${index}`}
+                                  value={item.name}
+                                  onChange={(event) => updateItemField(index, "name", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.name`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.name`)}</p>
+                                ) : null}
+                              </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor={`item-secondary-section-${index}`}>Translated category / section</Label>
-                            <Input
-                              aria-invalid={Boolean(getFieldError(`items.${index}.secondarySection`))}
-                              className={getFieldClasses(`items.${index}.secondarySection`)}
-                              id={`item-secondary-section-${index}`}
-                              value={item.secondarySection}
-                              onChange={(event) => updateItemField(index, "secondarySection", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.secondarySection`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondarySection`)}</p>
-                            ) : null}
-                          </div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`item-section-${index}`}>Category / section</Label>
+                                <Input
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
+                                  className={getFieldClasses(`items.${index}.section`)}
+                                  id={`item-section-${index}`}
+                                  value={item.section}
+                                  onChange={(event) => updateItemField(index, "section", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.section`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.section`)}</p>
+                                ) : null}
+                              </div>
 
-                          <div className="space-y-2 lg:col-span-2">
-                            <Label htmlFor={`item-secondary-description-${index}`}>Translated description</Label>
-                            <Textarea
-                              aria-invalid={Boolean(getFieldError(`items.${index}.secondaryDescription`))}
-                              className={getFieldClasses(`items.${index}.secondaryDescription`)}
-                              id={`item-secondary-description-${index}`}
-                              rows={4}
-                              value={item.secondaryDescription}
-                              onChange={(event) => updateItemField(index, "secondaryDescription", event.target.value)}
-                            />
-                            {getFieldError(`items.${index}.secondaryDescription`) ? (
-                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryDescription`)}</p>
-                            ) : null}
-                          </div>
+                              <div className="space-y-2 lg:col-span-2">
+                                <Label htmlFor={`item-description-${index}`}>Description</Label>
+                                <Textarea
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
+                                  className={getFieldClasses(`items.${index}.description`)}
+                                  id={`item-description-${index}`}
+                                  rows={3}
+                                  value={item.description}
+                                  onChange={(event) => updateItemField(index, "description", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.description`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.description`)}</p>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="grid gap-4 lg:grid-cols-2">
+                              <div className="space-y-2">
+                                <Label htmlFor={`item-secondary-name-${index}`}>Translated name</Label>
+                                <Input
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.secondaryName`))}
+                                  className={getFieldClasses(`items.${index}.secondaryName`)}
+                                  id={`item-secondary-name-${index}`}
+                                  value={item.secondaryName}
+                                  onChange={(event) => updateItemField(index, "secondaryName", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.secondaryName`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryName`)}</p>
+                                ) : null}
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label htmlFor={`item-secondary-section-${index}`}>Translated category / section</Label>
+                                <Input
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.secondarySection`))}
+                                  className={getFieldClasses(`items.${index}.secondarySection`)}
+                                  id={`item-secondary-section-${index}`}
+                                  value={item.secondarySection}
+                                  onChange={(event) => updateItemField(index, "secondarySection", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.secondarySection`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondarySection`)}</p>
+                                ) : null}
+                              </div>
+
+                              <div className="space-y-2 lg:col-span-2">
+                                <Label htmlFor={`item-secondary-description-${index}`}>Translated description</Label>
+                                <Textarea
+                                  aria-invalid={Boolean(getFieldError(`items.${index}.secondaryDescription`))}
+                                  className={getFieldClasses(`items.${index}.secondaryDescription`)}
+                                  id={`item-secondary-description-${index}`}
+                                  rows={3}
+                                  value={item.secondaryDescription}
+                                  onChange={(event) => updateItemField(index, "secondaryDescription", event.target.value)}
+                                />
+                                {getFieldError(`items.${index}.secondaryDescription`) ? (
+                                  <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryDescription`)}</p>
+                                ) : null}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
             );
           })}
@@ -843,12 +860,11 @@ function createInitialItemContentTabs(itemsLength: number) {
 }
 
 function getItemSummary(item: PriceSheetItemValues, currency: string, locale: PriceSheetContentLocale) {
-  const description = item.description.trim() || item.secondaryDescription.trim() || "Expand to edit the full item content.";
+  const description = item.description.trim() || item.secondaryDescription.trim() || "No description yet";
   const section = item.section.trim() || item.secondarySection.trim();
 
   return {
     description,
-    helperText: "Price stays shared across languages. Expand when you need to edit details or translations.",
     price: formatItemSummaryPrice(item.price, currency, locale),
     section,
   };
