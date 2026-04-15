@@ -628,8 +628,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 )}
               >
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-2">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="min-w-0 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                           Item {index + 1}
@@ -644,12 +644,12 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                         ) : null}
                       </div>
                       <div className="space-y-1">
-                        <p className="font-medium">{item.name.trim() || `Item ${index + 1}`}</p>
+                        <p className="truncate font-medium">{item.name.trim() || `Item ${index + 1}`}</p>
                         {isCollapsed ? <p className="text-sm text-muted-foreground">{itemSummary.description}</p> : null}
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-border/70 bg-card/80 p-1">
+                    <div className="flex shrink-0 flex-wrap items-center gap-1 self-start rounded-2xl border border-border/70 bg-card/80 p-1">
                       <Button
                         className="h-8 rounded-xl px-3"
                         onClick={() => toggleItem(index)}
@@ -681,13 +681,12 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                   </div>
 
                   {!isCollapsed ? (
-                    <div className="grid gap-4 xl:grid-cols-[minmax(0,220px),minmax(0,1fr)]">
-                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
-                        <div className="space-y-1">
+                    <div className="grid gap-4 xl:grid-cols-[minmax(0,208px),minmax(0,1fr)]">
+                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
+                        <div className="space-y-0.5">
                           <p className="text-sm font-medium">Shared fields</p>
-                          <p className="text-xs text-muted-foreground">Price stays the same across locales.</p>
                         </div>
-                        <div className="mt-4 space-y-2">
+                        <div className="mt-3 space-y-2">
                           <Label htmlFor={`item-price-${index}`}>Price</Label>
                           <Input
                             aria-invalid={Boolean(getFieldError(`items.${index}.price`))}
