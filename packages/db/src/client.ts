@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import { normalizeDatabaseConnectionString } from "./connection-string";
 import * as schema from "./schema";
 
 export function createDb(connectionString = process.env.DATABASE_URL) {
@@ -8,10 +9,11 @@ export function createDb(connectionString = process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is required to initialize the database client.");
   }
 
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({
+    connectionString: normalizeDatabaseConnectionString(connectionString),
+  });
 
   return drizzle(pool, { schema });
 }
 
 export type Database = ReturnType<typeof createDb>;
-
