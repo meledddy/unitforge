@@ -42,6 +42,7 @@ interface PriceSheetFormProps {
 }
 
 type PriceSheetItemValues = PriceSheetFormValues["items"][number];
+type ContentEditorTab = "primary" | "translation";
 
 const initialFormState: PriceSheetFormActionState = {
   status: "idle",
@@ -51,7 +52,9 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
   const [state, formAction, isPending] = useActionState(action, initialFormState);
   const [values, setValues] = useState(initialValues);
   const [hasEditedSlug, setHasEditedSlug] = useState(Boolean(initialValues.slug));
+  const [sheetContentTab, setSheetContentTab] = useState<ContentEditorTab>("primary");
   const [collapsedItems, setCollapsedItems] = useState(() => createInitialCollapsedItems(initialValues.items.length));
+  const [itemContentTabs, setItemContentTabs] = useState(() => createInitialItemContentTabs(initialValues.items.length));
   const fieldErrorEntries = state.fieldErrors ? Object.entries(state.fieldErrors) : [];
   const secondaryLocale = getAlternatePriceSheetContentLocale(values.defaultContentLocale);
   const primaryLocaleLabel = getPriceSheetContentLocaleLabel(values.defaultContentLocale);
@@ -63,22 +66,50 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
     }
 
     const itemIndexesWithErrors = new Set<number>();
+    const itemTabsWithErrors = new Map<number, ContentEditorTab>();
+    let nextSheetContentTab: ContentEditorTab | null = null;
 
     for (const path of Object.keys(state.fieldErrors)) {
+      if (path === "secondaryTitle" || path === "secondaryDescription") {
+        nextSheetContentTab = "translation";
+      } else if ((path === "title" || path === "description") && nextSheetContentTab !== "translation") {
+        nextSheetContentTab = "primary";
+      }
+
       const itemMatch = path.match(/^items\.(\d+)\./);
 
       if (itemMatch) {
-        itemIndexesWithErrors.add(Number(itemMatch[1]));
+        const itemIndex = Number(itemMatch[1]);
+        itemIndexesWithErrors.add(itemIndex);
+
+        if (path.startsWith(`items.${itemIndex}.secondary`)) {
+          itemTabsWithErrors.set(itemIndex, "translation");
+        } else if (!path.endsWith(".price") && !itemTabsWithErrors.has(itemIndex)) {
+          itemTabsWithErrors.set(itemIndex, "primary");
+        }
       }
     }
 
     if (itemIndexesWithErrors.size === 0) {
+      if (nextSheetContentTab) {
+        setSheetContentTab(nextSheetContentTab);
+      }
       return;
     }
 
     setCollapsedItems((currentState) =>
       currentState.map((isCollapsed, index) => (itemIndexesWithErrors.has(index) ? false : isCollapsed)),
     );
+
+    if (nextSheetContentTab) {
+      setSheetContentTab(nextSheetContentTab);
+    }
+
+    if (itemTabsWithErrors.size > 0) {
+      setItemContentTabs((currentState) =>
+        currentState.map((tab, index) => itemTabsWithErrors.get(index) ?? tab ?? "primary"),
+      );
+    }
   }, [state.fieldErrors]);
 
   function updateTopLevelField(field: keyof Omit<PriceSheetFormValues, "items">, value: string) {
@@ -147,6 +178,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       items: [...currentValues.items, getEmptyPriceSheetItemValues()],
     }));
     setCollapsedItems((currentState) => [...currentState, false]);
+    setItemContentTabs((currentState) => [...currentState, "primary"]);
   }
 
   function duplicateItem(index: number) {
@@ -168,6 +200,11 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       };
     });
     setCollapsedItems((currentState) => [...currentState.slice(0, index + 1), false, ...currentState.slice(index + 1)]);
+    setItemContentTabs((currentState) => [
+      ...currentState.slice(0, index + 1),
+      currentState[index] ?? "primary",
+      ...currentState.slice(index + 1),
+    ]);
   }
 
   function removeItem(index: number) {
@@ -182,10 +219,17 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
     setCollapsedItems((currentState) =>
       currentState.length > 1 ? currentState.filter((_, itemIndex) => itemIndex !== index) : [false],
     );
+    setItemContentTabs((currentState) =>
+      currentState.length > 1 ? currentState.filter((_, itemIndex) => itemIndex !== index) : ["primary"],
+    );
   }
 
   function toggleItem(index: number) {
     setCollapsedItems((currentState) => currentState.map((isCollapsed, itemIndex) => (itemIndex === index ? !isCollapsed : isCollapsed)));
+  }
+
+  function setItemContentTab(index: number, tab: ContentEditorTab) {
+    setItemContentTabs((currentState) => currentState.map((currentTab, itemIndex) => (itemIndex === index ? tab : currentTab)));
   }
 
   function getFieldError(path: string) {
@@ -241,6 +285,24 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
   function hasItemErrors(index: number) {
     return fieldErrorEntries.some(([path]) => path.startsWith(`items.${index}.`));
+  }
+
+  function hasSheetTabErrors(tab: ContentEditorTab) {
+    const fieldPaths =
+      tab === "primary"
+        ? ["title", "description"]
+        : ["secondaryTitle", "secondaryDescription"];
+
+    return fieldPaths.some((path) => Boolean(getFieldError(path)));
+  }
+
+  function hasItemTabErrors(index: number, tab: ContentEditorTab) {
+    const fieldPaths =
+      tab === "primary"
+        ? [`items.${index}.name`, `items.${index}.section`, `items.${index}.description`]
+        : [`items.${index}.secondaryName`, `items.${index}.secondarySection`, `items.${index}.secondaryDescription`];
+
+    return fieldPaths.some((path) => Boolean(getFieldError(path)));
   }
 
   return (
@@ -456,66 +518,86 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           </div>
 
           <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:col-span-2">
-            <p className="text-sm font-medium">Primary content</p>
-            <p className="mt-1 text-sm text-muted-foreground">{primaryLocaleLabel}</p>
-            <div className="mt-4 grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  aria-invalid={Boolean(getFieldError("title"))}
-                  className={getFieldClasses("title")}
-                  id="title"
-                  value={values.title}
-                  onChange={(event) => updateTitle(event.target.value)}
-                />
-                {getFieldError("title") ? <p className="text-sm text-destructive">{getFieldError("title")}</p> : null}
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Content editor</p>
+                <p className="text-sm text-muted-foreground">
+                  Keep the primary locale complete. Translation stays optional and the public page still falls back to the default
+                  content locale when translation fields are blank.
+                </p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  aria-invalid={Boolean(getFieldError("description"))}
-                  className={getFieldClasses("description")}
-                  id="description"
-                  value={values.description}
-                  onChange={(event) => updateTopLevelField("description", event.target.value)}
-                />
-                {getFieldError("description") ? <p className="text-sm text-destructive">{getFieldError("description")}</p> : null}
-              </div>
+              <EditorTabSwitcher
+                activeTab={sheetContentTab}
+                primaryHasErrors={hasSheetTabErrors("primary")}
+                primaryLocaleLabel={primaryLocaleLabel}
+                secondaryLocaleLabel={secondaryLocaleLabel}
+                translationHasErrors={hasSheetTabErrors("translation")}
+                onChange={setSheetContentTab}
+              />
             </div>
-          </div>
 
-          <div className="rounded-3xl border border-dashed border-border/80 bg-background/60 p-4 sm:p-5 md:col-span-2">
-            <p className="text-sm font-medium">Optional translated content</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {secondaryLocaleLabel}. Leave blank to keep public pages falling back to the default content locale.
-            </p>
-            <div className="mt-4 grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="secondary-title">Translated title</Label>
-                <Input
-                  aria-invalid={Boolean(getFieldError("secondaryTitle"))}
-                  className={getFieldClasses("secondaryTitle")}
-                  id="secondary-title"
-                  value={values.secondaryTitle}
-                  onChange={(event) => updateTopLevelField("secondaryTitle", event.target.value)}
-                />
-                {getFieldError("secondaryTitle") ? <p className="text-sm text-destructive">{getFieldError("secondaryTitle")}</p> : null}
-              </div>
+            <div className="mt-4 rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
+              {sheetContentTab === "primary" ? (
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="space-y-2 lg:col-span-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      aria-invalid={Boolean(getFieldError("title"))}
+                      className={getFieldClasses("title")}
+                      id="title"
+                      value={values.title}
+                      onChange={(event) => updateTitle(event.target.value)}
+                    />
+                    {getFieldError("title") ? <p className="text-sm text-destructive">{getFieldError("title")}</p> : null}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="secondary-description">Translated description</Label>
-                <Textarea
-                  aria-invalid={Boolean(getFieldError("secondaryDescription"))}
-                  className={getFieldClasses("secondaryDescription")}
-                  id="secondary-description"
-                  value={values.secondaryDescription}
-                  onChange={(event) => updateTopLevelField("secondaryDescription", event.target.value)}
-                />
-                {getFieldError("secondaryDescription") ? (
-                  <p className="text-sm text-destructive">{getFieldError("secondaryDescription")}</p>
-                ) : null}
-              </div>
+                  <div className="space-y-2 lg:col-span-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      aria-invalid={Boolean(getFieldError("description"))}
+                      className={getFieldClasses("description")}
+                      id="description"
+                      value={values.description}
+                      onChange={(event) => updateTopLevelField("description", event.target.value)}
+                    />
+                    {getFieldError("description") ? <p className="text-sm text-destructive">{getFieldError("description")}</p> : null}
+                  </div>
+                </div>
+              ) : (
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="space-y-2 lg:col-span-2">
+                    <p className="text-sm text-muted-foreground">
+                      {secondaryLocaleLabel}. Leave these fields blank if you want the public page to use the primary content.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 lg:col-span-2">
+                    <Label htmlFor="secondary-title">Translated title</Label>
+                    <Input
+                      aria-invalid={Boolean(getFieldError("secondaryTitle"))}
+                      className={getFieldClasses("secondaryTitle")}
+                      id="secondary-title"
+                      value={values.secondaryTitle}
+                      onChange={(event) => updateTopLevelField("secondaryTitle", event.target.value)}
+                    />
+                    {getFieldError("secondaryTitle") ? <p className="text-sm text-destructive">{getFieldError("secondaryTitle")}</p> : null}
+                  </div>
+
+                  <div className="space-y-2 lg:col-span-2">
+                    <Label htmlFor="secondary-description">Translated description</Label>
+                    <Textarea
+                      aria-invalid={Boolean(getFieldError("secondaryDescription"))}
+                      className={getFieldClasses("secondaryDescription")}
+                      id="secondary-description"
+                      value={values.secondaryDescription}
+                      onChange={(event) => updateTopLevelField("secondaryDescription", event.target.value)}
+                    />
+                    {getFieldError("secondaryDescription") ? (
+                      <p className="text-sm text-destructive">{getFieldError("secondaryDescription")}</p>
+                    ) : null}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -536,6 +618,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
         <CardContent className="space-y-4">
           {values.items.map((item, index) => {
             const isCollapsed = collapsedItems[index] ?? false;
+            const activeItemTab = itemContentTabs[index] ?? "primary";
             const itemError = hasItemErrors(index);
             const itemSummary = getItemSummary(item, values.currency, values.defaultContentLocale);
 
@@ -577,7 +660,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 </div>
 
                 {!isCollapsed ? (
-                  <div className="mt-4 grid gap-4 xl:grid-cols-[180px,minmax(0,1fr),minmax(0,1fr)]">
+                  <div className="mt-4 grid gap-4 xl:grid-cols-[180px,minmax(0,1fr)]">
                     <div className="space-y-2 rounded-2xl border border-border/70 bg-card/80 p-4">
                       <Label htmlFor={`item-price-${index}`}>Price</Label>
                       <Input
@@ -597,104 +680,122 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                       ) : null}
                     </div>
 
-                    <div className="space-y-3 rounded-2xl border border-border/70 bg-card/80 p-4">
-                      <div>
-                        <p className="text-sm font-medium">Primary content</p>
-                        <p className="text-sm text-muted-foreground">{primaryLocaleLabel}</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-name-${index}`}>Name</Label>
-                        <Input
-                          aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
-                          className={getFieldClasses(`items.${index}.name`)}
-                          id={`item-name-${index}`}
-                          value={item.name}
-                          onChange={(event) => updateItemField(index, "name", event.target.value)}
+                    <div className="space-y-4 rounded-2xl border border-border/70 bg-card/80 p-4">
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">Localized content</p>
+                          <p className="text-sm text-muted-foreground">
+                            Keep primary content complete. Translation fields remain optional for fallback behavior.
+                          </p>
+                        </div>
+                        <EditorTabSwitcher
+                          activeTab={activeItemTab}
+                          primaryHasErrors={hasItemTabErrors(index, "primary")}
+                          primaryLocaleLabel={primaryLocaleLabel}
+                          secondaryLocaleLabel={secondaryLocaleLabel}
+                          translationHasErrors={hasItemTabErrors(index, "translation")}
+                          onChange={(tab) => setItemContentTab(index, tab)}
                         />
-                        {getFieldError(`items.${index}.name`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.name`)}</p>
-                        ) : null}
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-section-${index}`}>Category / section</Label>
-                        <Input
-                          aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
-                          className={getFieldClasses(`items.${index}.section`)}
-                          id={`item-section-${index}`}
-                          value={item.section}
-                          onChange={(event) => updateItemField(index, "section", event.target.value)}
-                        />
-                        {getFieldError(`items.${index}.section`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.section`)}</p>
-                        ) : null}
-                      </div>
+                      {activeItemTab === "primary" ? (
+                        <div className="grid gap-4 lg:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor={`item-name-${index}`}>Name</Label>
+                            <Input
+                              aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
+                              className={getFieldClasses(`items.${index}.name`)}
+                              id={`item-name-${index}`}
+                              value={item.name}
+                              onChange={(event) => updateItemField(index, "name", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.name`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.name`)}</p>
+                            ) : null}
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-description-${index}`}>Description</Label>
-                        <Textarea
-                          aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
-                          className={getFieldClasses(`items.${index}.description`)}
-                          id={`item-description-${index}`}
-                          rows={4}
-                          value={item.description}
-                          onChange={(event) => updateItemField(index, "description", event.target.value)}
-                        />
-                        {getFieldError(`items.${index}.description`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.description`)}</p>
-                        ) : null}
-                      </div>
-                    </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`item-section-${index}`}>Category / section</Label>
+                            <Input
+                              aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
+                              className={getFieldClasses(`items.${index}.section`)}
+                              id={`item-section-${index}`}
+                              value={item.section}
+                              onChange={(event) => updateItemField(index, "section", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.section`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.section`)}</p>
+                            ) : null}
+                          </div>
 
-                    <div className="space-y-3 rounded-2xl border border-dashed border-border/80 bg-card/60 p-4">
-                      <div>
-                        <p className="text-sm font-medium">Optional translated content</p>
-                        <p className="text-sm text-muted-foreground">{secondaryLocaleLabel}</p>
-                      </div>
+                          <div className="space-y-2 lg:col-span-2">
+                            <Label htmlFor={`item-description-${index}`}>Description</Label>
+                            <Textarea
+                              aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
+                              className={getFieldClasses(`items.${index}.description`)}
+                              id={`item-description-${index}`}
+                              rows={4}
+                              value={item.description}
+                              onChange={(event) => updateItemField(index, "description", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.description`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.description`)}</p>
+                            ) : null}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid gap-4 lg:grid-cols-2">
+                          <div className="space-y-2 lg:col-span-2">
+                            <p className="text-sm text-muted-foreground">
+                              {secondaryLocaleLabel}. Leave these fields blank if you want the public page to reuse the primary item
+                              content.
+                            </p>
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-secondary-name-${index}`}>Translated name</Label>
-                        <Input
-                          aria-invalid={Boolean(getFieldError(`items.${index}.secondaryName`))}
-                          className={getFieldClasses(`items.${index}.secondaryName`)}
-                          id={`item-secondary-name-${index}`}
-                          value={item.secondaryName}
-                          onChange={(event) => updateItemField(index, "secondaryName", event.target.value)}
-                        />
-                        {getFieldError(`items.${index}.secondaryName`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryName`)}</p>
-                        ) : null}
-                      </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`item-secondary-name-${index}`}>Translated name</Label>
+                            <Input
+                              aria-invalid={Boolean(getFieldError(`items.${index}.secondaryName`))}
+                              className={getFieldClasses(`items.${index}.secondaryName`)}
+                              id={`item-secondary-name-${index}`}
+                              value={item.secondaryName}
+                              onChange={(event) => updateItemField(index, "secondaryName", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.secondaryName`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryName`)}</p>
+                            ) : null}
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-secondary-section-${index}`}>Translated category / section</Label>
-                        <Input
-                          aria-invalid={Boolean(getFieldError(`items.${index}.secondarySection`))}
-                          className={getFieldClasses(`items.${index}.secondarySection`)}
-                          id={`item-secondary-section-${index}`}
-                          value={item.secondarySection}
-                          onChange={(event) => updateItemField(index, "secondarySection", event.target.value)}
-                        />
-                        {getFieldError(`items.${index}.secondarySection`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondarySection`)}</p>
-                        ) : null}
-                      </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`item-secondary-section-${index}`}>Translated category / section</Label>
+                            <Input
+                              aria-invalid={Boolean(getFieldError(`items.${index}.secondarySection`))}
+                              className={getFieldClasses(`items.${index}.secondarySection`)}
+                              id={`item-secondary-section-${index}`}
+                              value={item.secondarySection}
+                              onChange={(event) => updateItemField(index, "secondarySection", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.secondarySection`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondarySection`)}</p>
+                            ) : null}
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`item-secondary-description-${index}`}>Translated description</Label>
-                        <Textarea
-                          aria-invalid={Boolean(getFieldError(`items.${index}.secondaryDescription`))}
-                          className={getFieldClasses(`items.${index}.secondaryDescription`)}
-                          id={`item-secondary-description-${index}`}
-                          rows={4}
-                          value={item.secondaryDescription}
-                          onChange={(event) => updateItemField(index, "secondaryDescription", event.target.value)}
-                        />
-                        {getFieldError(`items.${index}.secondaryDescription`) ? (
-                          <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryDescription`)}</p>
-                        ) : null}
-                      </div>
+                          <div className="space-y-2 lg:col-span-2">
+                            <Label htmlFor={`item-secondary-description-${index}`}>Translated description</Label>
+                            <Textarea
+                              aria-invalid={Boolean(getFieldError(`items.${index}.secondaryDescription`))}
+                              className={getFieldClasses(`items.${index}.secondaryDescription`)}
+                              id={`item-secondary-description-${index}`}
+                              rows={4}
+                              value={item.secondaryDescription}
+                              onChange={(event) => updateItemField(index, "secondaryDescription", event.target.value)}
+                            />
+                            {getFieldError(`items.${index}.secondaryDescription`) ? (
+                              <p className="text-sm text-destructive">{getFieldError(`items.${index}.secondaryDescription`)}</p>
+                            ) : null}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : null}
@@ -737,6 +838,10 @@ function createInitialCollapsedItems(itemsLength: number) {
   return Array.from({ length: itemsLength }, (_, index) => index > 0);
 }
 
+function createInitialItemContentTabs(itemsLength: number) {
+  return Array.from({ length: Math.max(itemsLength, 1) }, (): ContentEditorTab => "primary");
+}
+
 function getItemSummary(item: PriceSheetItemValues, currency: string, locale: PriceSheetContentLocale) {
   const description = item.description.trim() || item.secondaryDescription.trim() || "Expand to edit the full item content.";
   const section = item.section.trim() || item.secondarySection.trim();
@@ -770,4 +875,69 @@ function formatItemSummaryPrice(value: string, currency: string, locale: PriceSh
   } catch {
     return `${currency} ${amount.toFixed(2)}`;
   }
+}
+
+interface EditorTabSwitcherProps {
+  activeTab: ContentEditorTab;
+  onChange: (tab: ContentEditorTab) => void;
+  primaryLocaleLabel: string;
+  secondaryLocaleLabel: string;
+  primaryHasErrors?: boolean;
+  translationHasErrors?: boolean;
+}
+
+function EditorTabSwitcher({
+  activeTab,
+  onChange,
+  primaryLocaleLabel,
+  secondaryLocaleLabel,
+  primaryHasErrors = false,
+  translationHasErrors = false,
+}: EditorTabSwitcherProps) {
+  return (
+    <div className="inline-flex rounded-2xl border border-border/70 bg-background/80 p-1">
+      <EditorTabButton
+        active={activeTab === "primary"}
+        hasErrors={primaryHasErrors}
+        label="Primary content"
+        localeLabel={primaryLocaleLabel}
+        onClick={() => onChange("primary")}
+      />
+      <EditorTabButton
+        active={activeTab === "translation"}
+        hasErrors={translationHasErrors}
+        label="Translation"
+        localeLabel={`${secondaryLocaleLabel} optional`}
+        onClick={() => onChange("translation")}
+      />
+    </div>
+  );
+}
+
+interface EditorTabButtonProps {
+  active: boolean;
+  hasErrors: boolean;
+  label: string;
+  localeLabel: string;
+  onClick: () => void;
+}
+
+function EditorTabButton({ active, hasErrors, label, localeLabel, onClick }: EditorTabButtonProps) {
+  return (
+    <button
+      aria-pressed={active}
+      className={cn(
+        "min-w-[132px] rounded-xl px-3 py-2 text-left transition-colors",
+        active ? "bg-foreground text-background shadow-sm" : "text-foreground hover:bg-card",
+      )}
+      type="button"
+      onClick={onClick}
+    >
+      <span className="flex items-center gap-2 text-sm font-medium">
+        {label}
+        {hasErrors ? <span className={cn("h-2 w-2 rounded-full", active ? "bg-background" : "bg-destructive")} /> : null}
+      </span>
+      <span className={cn("mt-1 block text-xs", active ? "text-background/75" : "text-muted-foreground")}>{localeLabel}</span>
+    </button>
+  );
 }
