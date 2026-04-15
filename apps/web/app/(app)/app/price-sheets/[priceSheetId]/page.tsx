@@ -9,7 +9,12 @@ import { PriceSheetLeadsPanel, PriceSheetLeadsSummary } from "@/features/price-s
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { requireCurrentAppShellSession } from "@/server/current-session";
 import { listWorkspacePriceSheetLeads } from "@/server/price-sheet-leads/service";
-import { deletePriceSheetAction, setPriceSheetStatusAction, updatePriceSheetAction } from "@/server/price-sheets/actions";
+import {
+  deletePriceSheetAction,
+  duplicatePriceSheetAction,
+  setPriceSheetStatusAction,
+  updatePriceSheetAction,
+} from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, getWorkspacePriceSheetForEdit, isKnownPriceSheetError } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +50,11 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href="#sheet-leads">
                 Leads
               </Link>
+              <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
+                <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
+                  Duplicate
+                </Button>
+              </form>
               {priceSheet.status === "published" ? (
                 <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href={priceSheet.publicUrl}>
                   Public page

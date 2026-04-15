@@ -11,6 +11,7 @@ import {
   type PriceSheetFormValues,
   type PriceSheetMutationInput,
   type PriceSheetStatus,
+  slugifyPriceSheetValue,
   toPriceSheetFormValues,
 } from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";
@@ -111,6 +112,42 @@ export async function createWorkspacePriceSheet(session: AppShellSession, input:
   return mapPriceSheetDetail(record);
 }
 
+export async function duplicateWorkspacePriceSheet(session: AppShellSession, sourcePriceSheetId: string) {
+  const sourceRecord = await findPriceSheetRecordById(session.currentWorkspace.id, sourcePriceSheetId);
+
+  if (!sourceRecord) {
+    throw new PriceSheetServiceError("NOT_FOUND", "Price Sheet not found.");
+  }
+
+  const workspaceRecords = await listPriceSheetRecordsByWorkspace(session.currentWorkspace.id);
+  const nextTitle = getUniqueCopyTitle(
+    sourceRecord.title,
+    workspaceRecords.map((record) => record.title),
+  );
+  const nextSlug = await getUniqueCopySlug(sourceRecord.slug);
+
+  const record = await createPriceSheetRecord(session.currentWorkspace.id, session.currentUser.id, {
+    title: nextTitle,
+    description: sourceRecord.description,
+    translations: sourceRecord.translations,
+    publicSettings: sourceRecord.publicSettings,
+    slug: nextSlug,
+    status: "draft",
+    currency: sourceRecord.currency,
+    defaultContentLocale: sourceRecord.defaultContentLocale,
+    theme: sourceRecord.theme,
+    items: sourceRecord.items.map((item) => ({
+      name: item.name,
+      description: item.description,
+      section: item.section,
+      translations: item.translations,
+      priceCents: item.priceCents,
+    })),
+  });
+
+  return mapPriceSheetDetail(record);
+}
+
 export async function updateWorkspacePriceSheet(
   session: AppShellSession,
   priceSheetId: string,
@@ -177,6 +214,52 @@ async function assertSlugAvailable(slug: string, currentPriceSheetId?: string) {
   if (existingRecord && existingRecord.id !== currentPriceSheetId) {
     throw new PriceSheetServiceError("SLUG_CONFLICT", "Slug is already in use.");
   }
+}
+
+async function getUniqueCopySlug(sourceSlug: string) {
+  const sourceSlugRoot = stripCopySlugSuffix(sourceSlug);
+  const baseSlug = slugifyPriceSheetValue(`${sourceSlugRoot}-copy`) || "price-sheet-copy";
+  let suffix = 1;
+
+  for (;;) {
+    const candidateSlug = suffix === 1 ? baseSlug : `${baseSlug}-${suffix}`;
+    const existingRecord = await findPriceSheetRecordBySlug(candidateSlug);
+
+    if (!existingRecord) {
+      return candidateSlug;
+    }
+
+    suffix += 1;
+  }
+}
+
+function getUniqueCopyTitle(sourceTitle: string, existingTitles: string[]) {
+  const normalizedExistingTitles = new Set(existingTitles.map((title) => title.trim().toLowerCase()));
+  const sourceTitleRoot = stripCopyTitleSuffix(sourceTitle);
+  const baseTitle = `${sourceTitleRoot} Copy`;
+  let suffix = 1;
+
+  for (;;) {
+    const candidateTitle = suffix === 1 ? baseTitle : `${baseTitle} ${suffix}`;
+
+    if (!normalizedExistingTitles.has(candidateTitle.trim().toLowerCase())) {
+      return candidateTitle;
+    }
+
+    suffix += 1;
+  }
+}
+
+function stripCopyTitleSuffix(title: string) {
+  const strippedTitle = title.trim().replace(/\s+copy(?:\s+\d+)?$/i, "").trim();
+
+  return strippedTitle.length > 0 ? strippedTitle : title.trim();
+}
+
+function stripCopySlugSuffix(slug: string) {
+  const strippedSlug = slug.replace(/-copy(?:-\d+)?$/i, "");
+
+  return strippedSlug.length > 0 ? strippedSlug : slug;
 }
 
 function mapPriceSheetDetail(record: PriceSheetRecord) {

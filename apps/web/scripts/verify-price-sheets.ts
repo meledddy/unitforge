@@ -16,6 +16,7 @@ import { listWorkspacePriceSheetLeads } from "../src/server/price-sheet-leads/se
 import {
   createWorkspacePriceSheet,
   deleteWorkspacePriceSheet,
+  duplicateWorkspacePriceSheet,
   getPublishedPriceSheetBySlug,
   getWorkspacePriceSheetForEdit,
   listWorkspacePriceSheets,
@@ -38,6 +39,7 @@ async function main() {
   const slug = `verification-sheet-${timestamp}`;
   const title = `Verification Sheet ${timestamp}`;
   let createdPriceSheetId: string | null = null;
+  let duplicatedPriceSheetId: string | null = null;
   let foreignFixture: Awaited<ReturnType<typeof createForeignWorkspaceFixture>> | null = null;
   const payload: PriceSheetFormValues = {
     title,
@@ -167,6 +169,50 @@ async function main() {
     assert.equal(storedLeads[0]?.locale, "ru-RU");
     assert.equal(storedLeads[0]?.sheetSlugSnapshot, slug);
 
+    const duplicated = await duplicateWorkspacePriceSheet(session, created.id);
+    duplicatedPriceSheetId = duplicated.id;
+
+    assert.notEqual(duplicated.id, created.id);
+    assert.equal(duplicated.status, "draft");
+    assert.equal(duplicated.title, `${title} Copy`);
+    assert.equal(duplicated.description, payload.description);
+    assert.notEqual(duplicated.slug, slug);
+    assert.equal(duplicated.slug, `${slug}-copy`);
+    assert.equal(duplicated.theme, "slate");
+    assert.equal(duplicated.defaultContentLocale, "en-US");
+    assert.equal(duplicated.publicSettings.contactLabel, payload.contactLabel);
+    assert.equal(duplicated.publicSettings.contactEmail, payload.contactEmail);
+    assert.equal(duplicated.publicSettings.contactPhone, payload.contactPhone);
+    assert.equal(duplicated.publicSettings.primaryCtaLabel, payload.primaryCtaLabel);
+    assert.equal(duplicated.publicSettings.secondaryCtaLabel, payload.secondaryCtaLabel);
+    assert.equal(duplicated.publicSettings.inquiryText, payload.inquiryText);
+    assert.equal(duplicated.publicSettings.inquiryEnabled, true);
+    assert.equal(duplicated.items.length, 1);
+    assert.equal(duplicated.formValues.secondaryTitle, payload.secondaryTitle);
+    assert.equal(duplicated.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
+    assert.equal(duplicated.formValues.items[0]?.secondaryDescription, payload.items[0]?.secondaryDescription);
+    assert.equal(duplicated.formValues.items[0]?.secondarySection, payload.items[0]?.secondarySection);
+    assert.equal(duplicated.formValues.status, "draft");
+
+    const listedAfterDuplicate = await listWorkspacePriceSheets(session);
+    const duplicatedListItem = listedAfterDuplicate.find((priceSheet) => priceSheet.id === duplicated.id);
+    assert(duplicatedListItem, "Duplicated Price Sheet was not found in the workspace list.");
+    assert.equal(duplicatedListItem.status, "draft");
+    assert.equal(duplicatedListItem.slug, `${slug}-copy`);
+
+    const duplicatedEditable = await getWorkspacePriceSheetForEdit(session, duplicated.id);
+    assert.equal(duplicatedEditable.title, `${title} Copy`);
+    assert.equal(duplicatedEditable.slug, `${slug}-copy`);
+    assert.equal(duplicatedEditable.status, "draft");
+    assert.equal(duplicatedEditable.formValues.secondaryTitle, payload.secondaryTitle);
+    assert.equal(duplicatedEditable.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
+
+    const duplicatedLeads = await listWorkspacePriceSheetLeads(session, duplicated.id);
+    assert.equal(duplicatedLeads.length, 0);
+
+    const duplicatedPublicSheet = await getPublishedPriceSheetBySlug(duplicated.slug);
+    assert.equal(duplicatedPublicSheet, null);
+
     foreignFixture = await createForeignWorkspaceFixture();
     const foreignSheet = foreignFixture;
 
@@ -193,6 +239,10 @@ async function main() {
     });
 
     await assertRejectsCrossWorkspaceAccess(async () => {
+      await duplicateWorkspacePriceSheet(session, foreignSheet.priceSheetId);
+    });
+
+    await assertRejectsCrossWorkspaceAccess(async () => {
       await listWorkspacePriceSheetLeads(session, foreignSheet.priceSheetId);
     });
 
@@ -211,6 +261,10 @@ async function main() {
     console.log(`Verified workspace: ${session.currentWorkspace.slug}`);
     console.log(`Verified create flow slug: ${slug}`);
   } finally {
+    if (duplicatedPriceSheetId) {
+      await deleteWorkspacePriceSheet(session, duplicatedPriceSheetId);
+    }
+
     if (createdPriceSheetId) {
       await deleteWorkspacePriceSheet(session, createdPriceSheetId);
     }

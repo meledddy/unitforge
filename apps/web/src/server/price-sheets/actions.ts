@@ -15,6 +15,7 @@ import { isPriceSheetServiceError } from "./errors";
 import {
   createWorkspacePriceSheet,
   deleteWorkspacePriceSheet,
+  duplicateWorkspacePriceSheet,
   getWorkspacePriceSheetForEdit,
   setWorkspacePriceSheetStatus,
   updateWorkspacePriceSheet,
@@ -135,6 +136,28 @@ export async function setPriceSheetStatusAction(
   revalidatePath(redirectTo);
 
   redirect(redirectTo);
+}
+
+export async function duplicatePriceSheetAction(priceSheetId: string) {
+  const session = await requireCurrentAppShellSession();
+  let duplicatedPriceSheet;
+
+  try {
+    duplicatedPriceSheet = await duplicateWorkspacePriceSheet(session, priceSheetId);
+  } catch (error) {
+    if (isPriceSheetServiceError(error) && error.code === "NOT_FOUND") {
+      redirect("/app/price-sheets");
+    }
+
+    throw error;
+  }
+
+  revalidatePriceSheetPaths({
+    priceSheetId: duplicatedPriceSheet.id,
+    slug: duplicatedPriceSheet.slug,
+  });
+
+  redirect(`/app/price-sheets/${duplicatedPriceSheet.id}`);
 }
 
 export async function deletePriceSheetAction(priceSheetId: string, redirectTo = "/app/price-sheets") {

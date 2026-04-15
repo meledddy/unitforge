@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { requireCurrentAppShellSession } from "@/server/current-session";
-import { setPriceSheetStatusAction } from "@/server/price-sheets/actions";
+import { duplicatePriceSheetAction, setPriceSheetStatusAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +74,11 @@ export default async function PriceSheetsPage() {
                         <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, "/app/price-sheets")}>
                           <Button className="w-full sm:w-auto" type="submit" variant="outline">
                             {statusActionLabel}
+                          </Button>
+                        </form>
+                        <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
+                          <Button className="w-full sm:w-auto" type="submit" variant="outline">
+                            Duplicate
                           </Button>
                         </form>
                         {priceSheet.status === "published" ? (
