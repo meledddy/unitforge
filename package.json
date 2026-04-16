@@ -10,11 +10,13 @@
     "db:generate": "pnpm --filter @unitforge/db db:generate",
     "db:migrate": "pnpm --filter @unitforge/db db:migrate",
     "db:seed:mock-session": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/seed-mock-session.ts",
+    "onboard:pilot": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/onboard-pilot-user.ts",
     "dev": "pnpm --filter @unitforge/web dev",
     "build": "pnpm --filter \"./packages/**\" build && pnpm --filter @unitforge/web build",
     "lint": "pnpm --filter \"./packages/**\" lint && pnpm --filter @unitforge/web lint",
     "typecheck": "pnpm --filter \"./packages/**\" typecheck && pnpm --filter @unitforge/web typecheck",
     "verify:auth": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-auth.ts",
+    "verify:onboarding": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-pilot-onboarding.ts",
     "verify:price-sheets": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-price-sheets.ts",
     "format": "prettier --check .",
     "format:write": "prettier --write ."
