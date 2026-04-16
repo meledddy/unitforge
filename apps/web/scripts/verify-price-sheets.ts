@@ -44,8 +44,8 @@ async function main() {
   const payload: PriceSheetFormValues = {
     title,
     description: "Public-facing verification sheet description",
-    secondaryTitle: `RU ${title}`,
-    secondaryDescription: "Russian verification text",
+    secondaryTitle: `Прайс-лист ${timestamp}`,
+    secondaryDescription: "Русское описание для проверки",
     contactLabel: "Verification Studio",
     contactEmail: "hello@example.com",
     contactPhone: "@verificationstudio",
@@ -63,9 +63,9 @@ async function main() {
         name: "Verification Item",
         description: "Created through createPriceSheetAction",
         section: "Verification",
-        secondaryName: "Verification Item RU",
-        secondaryDescription: "Created through createPriceSheetAction RU",
-        secondarySection: "Verification RU",
+        secondaryName: "Проверочная позиция",
+        secondaryDescription: "Русское описание позиции",
+        secondarySection: "Проверка",
         price: "125.00",
       },
     ],
@@ -213,11 +213,60 @@ async function main() {
     const duplicatedPublicSheet = await getPublishedPriceSheetBySlug(duplicated.slug);
     assert.equal(duplicatedPublicSheet, null);
 
+    const searchedByTitle = await listWorkspacePriceSheets(session, {
+      query: title,
+    });
+    assert(searchedByTitle.some((priceSheet) => priceSheet.id === created.id));
+
+    const searchedBySlug = await listWorkspacePriceSheets(session, {
+      query: slug,
+    });
+    assert(searchedBySlug.some((priceSheet) => priceSheet.id === created.id));
+
+    const searchedByDescription = await listWorkspacePriceSheets(session, {
+      query: payload.description,
+    });
+    assert(searchedByDescription.some((priceSheet) => priceSheet.id === created.id));
+
+    const searchedByRussianTitle = await listWorkspacePriceSheets(session, {
+      query: payload.secondaryTitle.toLowerCase(),
+    });
+    assert(searchedByRussianTitle.some((priceSheet) => priceSheet.id === created.id));
+
+    const searchedByRussianDescription = await listWorkspacePriceSheets(session, {
+      query: "русское описание",
+    });
+    assert(searchedByRussianDescription.some((priceSheet) => priceSheet.id === created.id));
+
+    const publishedOnly = await listWorkspacePriceSheets(session, {
+      status: "published",
+    });
+    assert(publishedOnly.some((priceSheet) => priceSheet.id === created.id));
+    assert(!publishedOnly.some((priceSheet) => priceSheet.id === duplicated.id));
+
+    const draftOnly = await listWorkspacePriceSheets(session, {
+      status: "draft",
+    });
+    assert(draftOnly.some((priceSheet) => priceSheet.id === duplicated.id));
+    assert(!draftOnly.some((priceSheet) => priceSheet.id === created.id));
+
+    const filteredSearch = await listWorkspacePriceSheets(session, {
+      query: `${slug}-copy`,
+      status: "draft",
+    });
+    assert.equal(filteredSearch.length, 1);
+    assert.equal(filteredSearch[0]?.id, duplicated.id);
+
     foreignFixture = await createForeignWorkspaceFixture();
     const foreignSheet = foreignFixture;
 
     const listedDuringForeignFixture = await listWorkspacePriceSheets(session);
     assert(!listedDuringForeignFixture.some((priceSheet) => priceSheet.id === foreignSheet.priceSheetId));
+
+    const searchedDuringForeignFixture = await listWorkspacePriceSheets(session, {
+      query: foreignSheet.slug,
+    });
+    assert(!searchedDuringForeignFixture.some((priceSheet) => priceSheet.id === foreignSheet.priceSheetId));
 
     await assertRejectsCrossWorkspaceAccess(async () => {
       await getWorkspacePriceSheetForEdit(session, foreignSheet.priceSheetId);

@@ -43,6 +43,11 @@ export interface PriceSheetListItem {
   publishedAt: Date | null;
 }
 
+export interface PriceSheetListFilters {
+  query?: string;
+  status?: PriceSheetStatus;
+}
+
 export interface PriceSheetItemView {
   id: string;
   name: string;
@@ -76,8 +81,8 @@ export interface PublishedPriceSheet {
   items: PriceSheetItemView[];
 }
 
-export async function listWorkspacePriceSheets(session: AppShellSession) {
-  const records = await listPriceSheetRecordsByWorkspace(session.currentWorkspace.id);
+export async function listWorkspacePriceSheets(session: AppShellSession, filters: PriceSheetListFilters = {}) {
+  const records = await listPriceSheetRecordsByWorkspace(session.currentWorkspace.id, filters);
 
   return records.map((record) => ({
     id: record.id,

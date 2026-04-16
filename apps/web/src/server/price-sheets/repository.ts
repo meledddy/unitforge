@@ -1,6 +1,6 @@
 import type { PriceSheetPublicSettings } from "@unitforge/db";
 import { priceSheetItems, priceSheets } from "@unitforge/db";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import {
   normalizePriceSheetContentLocale,
@@ -79,6 +79,11 @@ interface RawPriceSheetRecord {
   items: RawPriceSheetItemRecord[];
 }
 
+interface ListPriceSheetRecordsOptions {
+  query?: string;
+  status?: PriceSheetStatus;
+}
+
 function getDbOrThrow() {
   const db = getServerDb();
 
@@ -92,10 +97,31 @@ function getDbOrThrow() {
   return db;
 }
 
-export async function listPriceSheetRecordsByWorkspace(workspaceId: string) {
+export async function listPriceSheetRecordsByWorkspace(workspaceId: string, options: ListPriceSheetRecordsOptions = {}) {
   const db = getDbOrThrow();
+  const whereClauses = [eq(priceSheets.workspaceId, workspaceId)];
+  const normalizedQuery = options.query?.trim();
+
+  if (options.status) {
+    whereClauses.push(eq(priceSheets.status, options.status));
+  }
+
+  if (normalizedQuery) {
+    const queryPattern = `%${escapeLikeValue(normalizedQuery)}%`;
+    const searchClause = or(
+      ilike(priceSheets.title, queryPattern),
+      ilike(priceSheets.slug, queryPattern),
+      ilike(priceSheets.description, queryPattern),
+      sql<boolean>`${priceSheets.translations}::text ILIKE ${queryPattern}`,
+    );
+
+    if (searchClause) {
+      whereClauses.push(searchClause);
+    }
+  }
+
   const records = await db.query.priceSheets.findMany({
-    where: eq(priceSheets.workspaceId, workspaceId),
+    where: and(...whereClauses),
     with: {
       items: {
         orderBy: [asc(priceSheetItems.position)],
@@ -354,4 +380,8 @@ function mapPriceSheetRecord(record: RawPriceSheetRecord): PriceSheetRecord {
       updatedAt: item.updatedAt,
     })),
   };
+}
+
+function escapeLikeValue(value: string) {
+  return value.replace(/[\\%_]/g, "\\$&");
 }

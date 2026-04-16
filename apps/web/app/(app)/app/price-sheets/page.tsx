@@ -1,4 +1,4 @@
-import { Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import { Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn, Input } from "@unitforge/ui";
 import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
@@ -10,11 +10,29 @@ import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/pr
 
 export const dynamic = "force-dynamic";
 
-export default async function PriceSheetsPage() {
+const statusFilterValues = ["all", "published", "draft"] as const;
+
+type PriceSheetListStatusFilter = (typeof statusFilterValues)[number];
+
+interface PriceSheetsPageProps {
+  searchParams?: Promise<{
+    q?: string | string[];
+    status?: string | string[];
+  }>;
+}
+
+export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageProps) {
   const session = await requireCurrentAppShellSession();
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const searchQuery = getFirstQueryParamValue(resolvedSearchParams.q)?.trim() ?? "";
+  const activeStatusFilter = parseStatusFilter(getFirstQueryParamValue(resolvedSearchParams.status));
+  const hasActiveListTools = searchQuery.length > 0 || activeStatusFilter !== "all";
 
   try {
-    const priceSheets = await listWorkspacePriceSheets(session);
+    const priceSheets = await listWorkspacePriceSheets(session, {
+      query: searchQuery || undefined,
+      status: activeStatusFilter === "all" ? undefined : activeStatusFilter,
+    });
 
     return (
       <div className="space-y-8">
@@ -29,17 +47,74 @@ export default async function PriceSheetsPage() {
           }
         />
 
-        {priceSheets.length === 0 ? (
-          <PlaceholderPanel
-            title="No price sheets yet"
-            description="Create the first sheet for this workspace and publish it when it is ready."
-            actionHref="/app/price-sheets/new"
-            actionLabel="Create your first Price Sheet"
-          >
-            <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
-              Sheets stay empty until you add real content. Only the bootstrap operator account and workspace are seeded for local verification.
+        <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <form action="/app/price-sheets" className="flex flex-col gap-3 sm:flex-row sm:items-center" method="get">
+              <Input
+                className="h-11 min-w-0 sm:min-w-[280px]"
+                defaultValue={searchQuery}
+                name="q"
+                placeholder="Search by title, slug, description, or translation"
+                type="search"
+              />
+              {activeStatusFilter !== "all" ? <input name="status" type="hidden" value={activeStatusFilter} /> : null}
+              <Button className="w-full sm:w-auto" type="submit" variant="outline">
+                Search
+              </Button>
+              {hasActiveListTools ? (
+                <Link className={cn(buttonVariants({ size: "default", variant: "ghost" }), "w-full sm:w-auto")} href="/app/price-sheets">
+                  Reset
+                </Link>
+              ) : null}
+            </form>
+
+            <div className="flex flex-wrap gap-2">
+              {statusFilterValues.map((statusFilter) => (
+                <Link
+                  key={statusFilter}
+                  className={cn(
+                    buttonVariants({
+                      size: "sm",
+                      variant: activeStatusFilter === statusFilter ? "default" : "outline",
+                    }),
+                    "min-w-[84px]",
+                  )}
+                  href={buildPriceSheetsListHref({
+                    query: searchQuery,
+                    status: statusFilter,
+                  })}
+                >
+                  {getStatusFilterLabel(statusFilter)}
+                </Link>
+              ))}
             </div>
-          </PlaceholderPanel>
+          </div>
+        </div>
+
+        {priceSheets.length === 0 ? (
+          hasActiveListTools ? (
+            <PlaceholderPanel
+              title="No matching price sheets"
+              description="Try a different search or adjust the status filter for this workspace."
+              actionHref="/app/price-sheets"
+              actionLabel="Clear search and filters"
+            >
+              <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
+                Search matches title, slug, description, and translated sheet content within the current workspace only.
+              </div>
+            </PlaceholderPanel>
+          ) : (
+            <PlaceholderPanel
+              title="No price sheets yet"
+              description="Create the first sheet for this workspace and publish it when it is ready."
+              actionHref="/app/price-sheets/new"
+              actionLabel="Create your first Price Sheet"
+            >
+              <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
+                Sheets stay empty until you add real content. Only the bootstrap operator account and workspace are seeded for local verification.
+              </div>
+            </PlaceholderPanel>
+          )
         ) : (
           <div className="grid gap-4 sm:gap-5">
             {priceSheets.map((priceSheet) => {
@@ -118,5 +193,44 @@ export default async function PriceSheetsPage() {
       </div>
     );
   }
+}
+
+function getFirstQueryParamValue(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function parseStatusFilter(value?: string): PriceSheetListStatusFilter {
+  return value === "published" || value === "draft" ? value : "all";
+}
+
+function buildPriceSheetsListHref(input: {
+  query: string;
+  status: PriceSheetListStatusFilter;
+}) {
+  const params = new URLSearchParams();
+
+  if (input.query.trim().length > 0) {
+    params.set("q", input.query.trim());
+  }
+
+  if (input.status !== "all") {
+    params.set("status", input.status);
+  }
+
+  const queryString = params.toString();
+
+  return queryString.length > 0 ? `/app/price-sheets?${queryString}` : "/app/price-sheets";
+}
+
+function getStatusFilterLabel(status: PriceSheetListStatusFilter) {
+  if (status === "published") {
+    return "Published";
+  }
+
+  if (status === "draft") {
+    return "Draft";
+  }
+
+  return "All";
 }
 
