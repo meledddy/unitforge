@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { LampLoginShell } from "@/features/auth/lamp-login-shell";
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getCurrentAppShellSession } from "@/server/current-session";
 
 interface LoginPageProps {
@@ -10,7 +11,7 @@ interface LoginPageProps {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const session = await getCurrentAppShellSession();
+  const [session, locale] = await Promise.all([getCurrentAppShellSession(), getCurrentInterfaceLocale()]);
 
   if (session) {
     redirect("/app");
@@ -18,5 +19,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const { next } = await searchParams;
 
-  return <LampLoginShell next={next} />;
+  return <LampLoginShell locale={locale} next={next} />;
 }

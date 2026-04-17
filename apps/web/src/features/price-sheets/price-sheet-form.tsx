@@ -17,6 +17,8 @@ import {
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 
+import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { getMessages } from "@/i18n/messages";
 import type { PriceSheetFormActionState } from "@/server/price-sheets/actions";
 
 import {
@@ -33,6 +35,7 @@ import {
 
 interface PriceSheetFormProps {
   mode: "create" | "edit";
+  locale: InterfaceLocale;
   action: (
     previousState: PriceSheetFormActionState,
     formData: FormData,
@@ -48,7 +51,7 @@ const initialFormState: PriceSheetFormActionState = {
   status: "idle",
 };
 
-export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceSheetFormValues(), cancelHref }: PriceSheetFormProps) {
+export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyPriceSheetFormValues(), cancelHref }: PriceSheetFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialFormState);
   const [values, setValues] = useState(initialValues);
   const [hasEditedSlug, setHasEditedSlug] = useState(Boolean(initialValues.slug));
@@ -59,6 +62,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
   const secondaryLocale = getAlternatePriceSheetContentLocale(values.defaultContentLocale);
   const primaryLocaleLabel = getPriceSheetContentLocaleLabel(values.defaultContentLocale);
   const secondaryLocaleLabel = getPriceSheetContentLocaleLabel(secondaryLocale);
+  const messages = getMessages(locale);
+  const formCopy = messages.priceSheetForm;
 
   useEffect(() => {
     if (!state.fieldErrors) {
@@ -243,40 +248,40 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
     if (itemMatch) {
       const fieldLabels: Record<string, string> = {
-        description: "description",
-        name: "name",
-        price: "price",
-        secondaryDescription: "translated description",
-        secondaryName: "translated name",
-        secondarySection: "translated category / section",
-        section: "category / section",
+        description: formCopy.description.toLowerCase(),
+        name: formCopy.name.toLowerCase(),
+        price: formCopy.price.toLowerCase(),
+        secondaryDescription: formCopy.translatedDescription.toLowerCase(),
+        secondaryName: formCopy.translatedName.toLowerCase(),
+        secondarySection: formCopy.translatedCategory.toLowerCase(),
+        section: formCopy.category.toLowerCase(),
       };
       const itemIndex = Number(itemMatch[1]) + 1;
       const fieldKey = itemMatch[2] as keyof typeof fieldLabels;
 
-      return `Item ${itemIndex} ${fieldLabels[fieldKey] ?? "field"}`;
+      return `${formCopy.itemLabel} ${itemIndex} ${fieldLabels[fieldKey] ?? formCopy.title.toLowerCase()}`;
     }
 
     const topLevelLabels: Record<string, string> = {
-      contactEmail: "Contact email",
-      contactLabel: "Contact label",
-      contactPhone: "Phone or messaging handle",
-      currency: "Currency",
-      defaultContentLocale: "Default content locale",
-      description: "Description",
-      inquiryText: "Inquiry help text",
-      items: "Items",
-      primaryCtaLabel: "Primary CTA label",
-      publicInquiryState: "Public inquiry form",
-      secondaryDescription: "Translated description",
-      secondaryCtaLabel: "Secondary CTA label",
-      secondaryTitle: "Translated title",
-      slug: "Slug",
-      theme: "Theme",
-      title: "Title",
+      contactEmail: formCopy.contactEmail,
+      contactLabel: formCopy.contactLabel,
+      contactPhone: formCopy.contactPhone,
+      currency: formCopy.currency,
+      defaultContentLocale: formCopy.defaultContentLocale,
+      description: formCopy.description,
+      inquiryText: formCopy.inquiryText,
+      items: formCopy.itemsTitle,
+      primaryCtaLabel: formCopy.primaryCtaLabel,
+      publicInquiryState: formCopy.publicInquiryState,
+      secondaryDescription: formCopy.translatedDescription,
+      secondaryCtaLabel: formCopy.secondaryCtaLabel,
+      secondaryTitle: formCopy.translatedTitle,
+      slug: formCopy.slug,
+      theme: formCopy.theme,
+      title: formCopy.title,
     };
 
-    return topLevelLabels[path] ?? "Form";
+    return topLevelLabels[path] ?? formCopy.title;
   }
 
   function getFieldClasses(path: string) {
@@ -323,7 +328,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
       {fieldErrorEntries.length > 0 ? (
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <p className="text-sm font-medium text-destructive">Validation errors</p>
+          <p className="text-sm font-medium text-destructive">{formCopy.validationErrors}</p>
           <ul className="mt-2 space-y-1 text-sm text-destructive">
             {fieldErrorEntries.map(([path, message]) => (
               <li key={path}>
@@ -336,15 +341,12 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
       <Card>
         <CardHeader>
-          <CardTitle>{mode === "create" ? "Price Sheet details" : "Edit Price Sheet"}</CardTitle>
-          <CardDescription>
-            Set the default content locale, then add optional translation copy for the second language. The public page falls back to
-            the default content when a translation is missing.
-          </CardDescription>
+          <CardTitle>{mode === "create" ? formCopy.detailsTitleCreate : formCopy.detailsTitleEdit}</CardTitle>
+          <CardDescription>{formCopy.detailsDescription}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-5 sm:gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="default-content-locale">Default content locale</Label>
+            <Label htmlFor="default-content-locale">{formCopy.defaultContentLocale}</Label>
             <Select
               aria-invalid={Boolean(getFieldError("defaultContentLocale"))}
               className={getFieldClasses("defaultContentLocale")}
@@ -353,7 +355,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               onChange={(event) => updateDefaultContentLocale(event.target.value as PriceSheetContentLocale)}
             >
               <option value="en-US">English (en-US)</option>
-              <option value="ru-RU">Russian (ru-RU)</option>
+              <option value="ru-RU">Русский (ru-RU)</option>
             </Select>
             {getFieldError("defaultContentLocale") ? (
               <p className="text-sm text-destructive">{getFieldError("defaultContentLocale")}</p>
@@ -361,7 +363,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{formCopy.status}</Label>
             <Select
               aria-invalid={Boolean(getFieldError("status"))}
               className={getFieldClasses("status")}
@@ -369,13 +371,13 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               value={values.status}
               onChange={(event) => updateTopLevelField("status", event.target.value)}
             >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
+              <option value="draft">{messages.shared.draft}</option>
+              <option value="published">{messages.shared.published}</option>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="slug">Slug</Label>
+            <Label htmlFor="slug">{formCopy.slug}</Label>
             <Input
               aria-invalid={Boolean(getFieldError("slug"))}
               className={getFieldClasses("slug")}
@@ -387,7 +389,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="theme">Presentation theme</Label>
+            <Label htmlFor="theme">{formCopy.theme}</Label>
             <Select
               aria-invalid={Boolean(getFieldError("theme"))}
               className={getFieldClasses("theme")}
@@ -395,15 +397,15 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               value={values.theme}
               onChange={(event) => updateTopLevelField("theme", event.target.value)}
             >
-              <option value="amber">Amber</option>
-              <option value="slate">Slate</option>
-              <option value="stone">Stone</option>
+              <option value="amber">{formCopy.themeAmber}</option>
+              <option value="slate">{formCopy.themeSlate}</option>
+              <option value="stone">{formCopy.themeStone}</option>
             </Select>
             {getFieldError("theme") ? <p className="text-sm text-destructive">{getFieldError("theme")}</p> : null}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
+            <Label htmlFor="currency">{formCopy.currency}</Label>
             <Input
               aria-invalid={Boolean(getFieldError("currency"))}
               className={getFieldClasses("currency")}
@@ -416,13 +418,11 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           </div>
 
           <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:col-span-2">
-            <p className="text-sm font-medium">Public contact and CTA</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              These details appear on the public page. Leave any field blank to hide it cleanly.
-            </p>
+            <p className="text-sm font-medium">{formCopy.contactAndCtaTitle}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{formCopy.contactAndCtaDescription}</p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="contact-label">Business or contact label</Label>
+                <Label htmlFor="contact-label">{formCopy.contactLabel}</Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("contactLabel"))}
                   className={getFieldClasses("contactLabel")}
@@ -434,7 +434,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-email">Contact email</Label>
+                <Label htmlFor="contact-email">{formCopy.contactEmail}</Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("contactEmail"))}
                   className={getFieldClasses("contactEmail")}
@@ -447,7 +447,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-phone">Phone or messaging handle</Label>
+                <Label htmlFor="contact-phone">{formCopy.contactPhone}</Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("contactPhone"))}
                   className={getFieldClasses("contactPhone")}
@@ -459,7 +459,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="primary-cta-label">Primary CTA label</Label>
+                <Label htmlFor="primary-cta-label">{formCopy.primaryCtaLabel}</Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("primaryCtaLabel"))}
                   className={getFieldClasses("primaryCtaLabel")}
@@ -473,7 +473,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="public-inquiry-state">Public inquiry form</Label>
+                <Label htmlFor="public-inquiry-state">{formCopy.publicInquiryState}</Label>
                 <Select
                   aria-invalid={Boolean(getFieldError("publicInquiryState"))}
                   className={getFieldClasses("publicInquiryState")}
@@ -481,8 +481,8 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                   value={values.publicInquiryState}
                   onChange={(event) => updateTopLevelField("publicInquiryState", event.target.value)}
                 >
-                  <option value="enabled">Enabled</option>
-                  <option value="hidden">Hidden</option>
+                  <option value="enabled">{formCopy.publicInquiryEnabled}</option>
+                  <option value="hidden">{formCopy.publicInquiryHidden}</option>
                 </Select>
                 {getFieldError("publicInquiryState") ? (
                   <p className="text-sm text-destructive">{getFieldError("publicInquiryState")}</p>
@@ -490,7 +490,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="secondary-cta-label">Secondary CTA label</Label>
+                <Label htmlFor="secondary-cta-label">{formCopy.secondaryCtaLabel}</Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("secondaryCtaLabel"))}
                   className={getFieldClasses("secondaryCtaLabel")}
@@ -504,7 +504,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="inquiry-text">Public inquiry help text</Label>
+                <Label htmlFor="inquiry-text">{formCopy.inquiryText}</Label>
                 <Textarea
                   aria-invalid={Boolean(getFieldError("inquiryText"))}
                   className={getFieldClasses("inquiryText")}
@@ -520,14 +520,17 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
           <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:col-span-2">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium">Content editor</p>
-                <p className="text-sm text-muted-foreground">Primary content is required. Translation stays optional.</p>
+                <p className="text-sm font-medium">{formCopy.contentTitle}</p>
+                <p className="text-sm text-muted-foreground">{formCopy.translationHint}</p>
               </div>
               <EditorTabSwitcher
                 activeTab={sheetContentTab}
                 primaryHasErrors={hasSheetTabErrors("primary")}
+                primaryTabLabel={formCopy.primaryContentTab}
                 primaryLocaleLabel={primaryLocaleLabel}
                 secondaryLocaleLabel={secondaryLocaleLabel}
+                translationOptionalSuffix={formCopy.translationOptionalSuffix}
+                translationTabLabel={formCopy.translationTab}
                 translationHasErrors={hasSheetTabErrors("translation")}
                 onChange={setSheetContentTab}
               />
@@ -537,7 +540,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
               {sheetContentTab === "primary" ? (
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="space-y-2 lg:col-span-2">
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">{formCopy.title}</Label>
                     <Input
                       aria-invalid={Boolean(getFieldError("title"))}
                       className={getFieldClasses("title")}
@@ -549,7 +552,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                   </div>
 
                   <div className="space-y-2 lg:col-span-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">{formCopy.description}</Label>
                     <Textarea
                       aria-invalid={Boolean(getFieldError("description"))}
                       className={getFieldClasses("description")}
@@ -564,12 +567,12 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="space-y-2 lg:col-span-2">
                     <p className="text-sm text-muted-foreground">
-                      {secondaryLocaleLabel}. Leave these fields blank if you want the public page to use the primary content.
+                      {secondaryLocaleLabel}. {formCopy.translationHint}
                     </p>
                   </div>
 
                   <div className="space-y-2 lg:col-span-2">
-                    <Label htmlFor="secondary-title">Translated title</Label>
+                    <Label htmlFor="secondary-title">{formCopy.translatedTitle}</Label>
                     <Input
                       aria-invalid={Boolean(getFieldError("secondaryTitle"))}
                       className={getFieldClasses("secondaryTitle")}
@@ -581,7 +584,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                   </div>
 
                   <div className="space-y-2 lg:col-span-2">
-                    <Label htmlFor="secondary-description">Translated description</Label>
+                    <Label htmlFor="secondary-description">{formCopy.translatedDescription}</Label>
                     <Textarea
                       aria-invalid={Boolean(getFieldError("secondaryDescription"))}
                       className={getFieldClasses("secondaryDescription")}
@@ -604,11 +607,11 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <CardTitle>Items</CardTitle>
-              <CardDescription>Each item keeps shared fields separate from localized content.</CardDescription>
+              <CardTitle>{formCopy.itemsTitle}</CardTitle>
+              <CardDescription>{formCopy.itemsDescription}</CardDescription>
             </div>
             <Button className="w-full sm:w-auto" onClick={addItem} type="button" variant="outline">
-              Add item
+              {formCopy.addItem}
             </Button>
           </div>
         </CardHeader>
@@ -617,7 +620,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
             const isCollapsed = collapsedItems[index] ?? false;
             const activeItemTab = itemContentTabs[index] ?? "primary";
             const itemError = hasItemErrors(index);
-            const itemSummary = getItemSummary(item, values.currency, values.defaultContentLocale);
+            const itemSummary = getItemSummary(item, values.currency, locale, values.defaultContentLocale);
 
             return (
               <div
@@ -632,7 +635,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                     <div className="min-w-0 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                          Item {index + 1}
+                          {formCopy.itemLabel} {index + 1}
                         </span>
                         <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs font-medium text-muted-foreground">
                           {itemSummary.price}
@@ -644,7 +647,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                         ) : null}
                       </div>
                       <div className="space-y-1">
-                        <p className="truncate font-medium">{item.name.trim() || `Item ${index + 1}`}</p>
+                        <p className="truncate font-medium">{item.name.trim() || `${formCopy.itemLabel} ${index + 1}`}</p>
                         {isCollapsed ? <p className="text-sm text-muted-foreground">{itemSummary.description}</p> : null}
                       </div>
                     </div>
@@ -657,7 +660,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                         type="button"
                         variant="secondary"
                       >
-                        {isCollapsed ? "Expand" : "Collapse"}
+                        {isCollapsed ? formCopy.expand : formCopy.collapse}
                       </Button>
                       <Button
                         className="h-8 rounded-xl px-3"
@@ -666,7 +669,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                         type="button"
                         variant="outline"
                       >
-                        Duplicate
+                        {messages.shared.duplicate}
                       </Button>
                       <Button
                         className="h-8 rounded-xl px-3 text-muted-foreground"
@@ -675,7 +678,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                         type="button"
                         variant="ghost"
                       >
-                        Remove
+                        {formCopy.remove}
                       </Button>
                     </div>
                   </div>
@@ -684,10 +687,10 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                     <div className="grid gap-4 xl:grid-cols-[minmax(0,208px),minmax(0,1fr)]">
                       <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
                         <div className="space-y-0.5">
-                          <p className="text-sm font-medium">Shared fields</p>
+                          <p className="text-sm font-medium">{formCopy.sharedFields}</p>
                         </div>
                         <div className="mt-3 space-y-2">
-                          <Label htmlFor={`item-price-${index}`}>Price</Label>
+                          <Label htmlFor={`item-price-${index}`}>{formCopy.price}</Label>
                           <Input
                             aria-invalid={Boolean(getFieldError(`items.${index}.price`))}
                             className={getFieldClasses(`items.${index}.price`)}
@@ -707,12 +710,15 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
 
                       <div className="rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-sm font-medium">Localized content</p>
+                          <p className="text-sm font-medium">{formCopy.localizedContent}</p>
                           <EditorTabSwitcher
                             activeTab={activeItemTab}
                             primaryHasErrors={hasItemTabErrors(index, "primary")}
+                            primaryTabLabel={formCopy.primaryContentTab}
                             primaryLocaleLabel={primaryLocaleLabel}
                             secondaryLocaleLabel={secondaryLocaleLabel}
+                            translationOptionalSuffix={formCopy.translationOptionalSuffix}
+                            translationTabLabel={formCopy.translationTab}
                             translationHasErrors={hasItemTabErrors(index, "translation")}
                             onChange={(tab) => setItemContentTab(index, tab)}
                           />
@@ -722,7 +728,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                           {activeItemTab === "primary" ? (
                             <div className="grid gap-4 lg:grid-cols-2">
                               <div className="space-y-2">
-                                <Label htmlFor={`item-name-${index}`}>Name</Label>
+                                <Label htmlFor={`item-name-${index}`}>{formCopy.name}</Label>
                                 <Input
                                   aria-invalid={Boolean(getFieldError(`items.${index}.name`))}
                                   className={getFieldClasses(`items.${index}.name`)}
@@ -736,7 +742,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor={`item-section-${index}`}>Category / section</Label>
+                                <Label htmlFor={`item-section-${index}`}>{formCopy.category}</Label>
                                 <Input
                                   aria-invalid={Boolean(getFieldError(`items.${index}.section`))}
                                   className={getFieldClasses(`items.${index}.section`)}
@@ -750,7 +756,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                               </div>
 
                               <div className="space-y-2 lg:col-span-2">
-                                <Label htmlFor={`item-description-${index}`}>Description</Label>
+                                <Label htmlFor={`item-description-${index}`}>{formCopy.description}</Label>
                                 <Textarea
                                   aria-invalid={Boolean(getFieldError(`items.${index}.description`))}
                                   className={getFieldClasses(`items.${index}.description`)}
@@ -767,7 +773,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                           ) : (
                             <div className="grid gap-4 lg:grid-cols-2">
                               <div className="space-y-2">
-                                <Label htmlFor={`item-secondary-name-${index}`}>Translated name</Label>
+                                <Label htmlFor={`item-secondary-name-${index}`}>{formCopy.translatedName}</Label>
                                 <Input
                                   aria-invalid={Boolean(getFieldError(`items.${index}.secondaryName`))}
                                   className={getFieldClasses(`items.${index}.secondaryName`)}
@@ -781,7 +787,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor={`item-secondary-section-${index}`}>Translated category / section</Label>
+                                <Label htmlFor={`item-secondary-section-${index}`}>{formCopy.translatedCategory}</Label>
                                 <Input
                                   aria-invalid={Boolean(getFieldError(`items.${index}.secondarySection`))}
                                   className={getFieldClasses(`items.${index}.secondarySection`)}
@@ -795,7 +801,7 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
                               </div>
 
                               <div className="space-y-2 lg:col-span-2">
-                                <Label htmlFor={`item-secondary-description-${index}`}>Translated description</Label>
+                                <Label htmlFor={`item-secondary-description-${index}`}>{formCopy.translatedDescription}</Label>
                                 <Textarea
                                   aria-invalid={Boolean(getFieldError(`items.${index}.secondaryDescription`))}
                                   className={getFieldClasses(`items.${index}.secondaryDescription`)}
@@ -826,20 +832,20 @@ export function PriceSheetForm({ mode, action, initialValues = getEmptyPriceShee
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {mode === "create" ? (
           <Button className="w-full sm:w-auto" disabled={isPending} type="submit">
-            {isPending ? "Creating..." : "Create Price Sheet"}
+            {isPending ? formCopy.creating : formCopy.create}
           </Button>
         ) : (
           <>
             <Button className="w-full sm:w-auto" disabled={isPending} name="intent" type="submit" value="continue">
-              {isPending ? "Saving..." : "Save and continue"}
+              {isPending ? messages.shared.saving : formCopy.saveAndContinue}
             </Button>
             <Button className="w-full sm:w-auto" disabled={isPending} name="intent" type="submit" value="return" variant="outline">
-              {isPending ? "Saving..." : "Save and return"}
+              {isPending ? messages.shared.saving : formCopy.saveAndReturn}
             </Button>
           </>
         )}
         <Link className={cn(buttonVariants({ size: "default", variant: "outline" }), "w-full sm:w-auto")} href={cancelHref}>
-          Cancel
+          {formCopy.cancel}
         </Link>
       </div>
     </form>
@@ -858,22 +864,32 @@ function createInitialItemContentTabs(itemsLength: number) {
   return Array.from({ length: Math.max(itemsLength, 1) }, (): ContentEditorTab => "primary");
 }
 
-function getItemSummary(item: PriceSheetItemValues, currency: string, locale: PriceSheetContentLocale) {
-  const description = item.description.trim() || item.secondaryDescription.trim() || "No description yet";
+function getItemSummary(
+  item: PriceSheetItemValues,
+  currency: string,
+  interfaceLocale: InterfaceLocale,
+  contentLocale: PriceSheetContentLocale,
+) {
+  const description = item.description.trim() || item.secondaryDescription.trim() || getMessages(interfaceLocale).priceSheetForm.noDescriptionYet;
   const section = item.section.trim() || item.secondarySection.trim();
 
   return {
     description,
-    price: formatItemSummaryPrice(item.price, currency, locale),
+    price: formatItemSummaryPrice(item.price, currency, interfaceLocale, contentLocale),
     section,
   };
 }
 
-function formatItemSummaryPrice(value: string, currency: string, locale: PriceSheetContentLocale) {
+function formatItemSummaryPrice(
+  value: string,
+  currency: string,
+  interfaceLocale: InterfaceLocale,
+  contentLocale: PriceSheetContentLocale,
+) {
   const trimmedValue = value.trim();
 
   if (!trimmedValue) {
-    return "No price yet";
+    return getMessages(interfaceLocale).priceSheetForm.noPriceYet;
   }
 
   const amount = Number(trimmedValue);
@@ -883,7 +899,7 @@ function formatItemSummaryPrice(value: string, currency: string, locale: PriceSh
   }
 
   try {
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat(contentLocale, {
       style: "currency",
       currency,
     }).format(amount);
@@ -895,8 +911,11 @@ function formatItemSummaryPrice(value: string, currency: string, locale: PriceSh
 interface EditorTabSwitcherProps {
   activeTab: ContentEditorTab;
   onChange: (tab: ContentEditorTab) => void;
+  primaryTabLabel: string;
   primaryLocaleLabel: string;
   secondaryLocaleLabel: string;
+  translationOptionalSuffix: string;
+  translationTabLabel: string;
   primaryHasErrors?: boolean;
   translationHasErrors?: boolean;
 }
@@ -904,8 +923,11 @@ interface EditorTabSwitcherProps {
 function EditorTabSwitcher({
   activeTab,
   onChange,
+  primaryTabLabel,
   primaryLocaleLabel,
   secondaryLocaleLabel,
+  translationOptionalSuffix,
+  translationTabLabel,
   primaryHasErrors = false,
   translationHasErrors = false,
 }: EditorTabSwitcherProps) {
@@ -914,15 +936,15 @@ function EditorTabSwitcher({
       <EditorTabButton
         active={activeTab === "primary"}
         hasErrors={primaryHasErrors}
-        label="Primary content"
+        label={primaryTabLabel}
         localeLabel={primaryLocaleLabel}
         onClick={() => onChange("primary")}
       />
       <EditorTabButton
         active={activeTab === "translation"}
         hasErrors={translationHasErrors}
-        label="Translation"
-        localeLabel={`${secondaryLocaleLabel} optional`}
+        label={translationTabLabel}
+        localeLabel={`${secondaryLocaleLabel} ${translationOptionalSuffix}`}
         onClick={() => onChange("translation")}
       />
     </div>

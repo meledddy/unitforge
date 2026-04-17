@@ -4,6 +4,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
+import { getMessages } from "@/i18n/messages";
+
 import { AUTH_SESSION_COOKIE_NAME } from "./constants";
 import { authenticateUserByPassword, invalidateAuthSession } from "./service";
 import {
@@ -13,13 +16,14 @@ import {
 } from "./session";
 import type { SignInActionState } from "./sign-in-state";
 
-const signInSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-  next: z.string().optional(),
-});
-
-export async function signInAction(_previousState: SignInActionState, formData: FormData) {
+export async function signInAction(_previousState: SignInActionState, formData: FormData): Promise<SignInActionState> {
+  const locale = await getCurrentInterfaceLocale();
+  const messages = getMessages(locale);
+  const signInSchema = z.object({
+    email: z.string().trim().email(messages.auth.emailInvalid),
+    password: z.string().min(1, messages.auth.passwordRequired),
+    next: z.string().optional(),
+  });
   const parsedInput = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -29,7 +33,7 @@ export async function signInAction(_previousState: SignInActionState, formData: 
   if (!parsedInput.success) {
     return {
       status: "error",
-      message: "Check your email and password, then try again.",
+      message: messages.auth.validationMessage,
       fieldErrors: getSignInFieldErrors(parsedInput.error),
     } satisfies SignInActionState;
   }
@@ -41,10 +45,10 @@ export async function signInAction(_previousState: SignInActionState, formData: 
   } catch {
     return {
       status: "error",
-      message: "Email or password is incorrect.",
+      message: messages.auth.invalidCredentials,
       fieldErrors: {
-        email: "Check the credentials and try again.",
-        password: "Check the credentials and try again.",
+        email: messages.auth.credentialsRetry,
+        password: messages.auth.credentialsRetry,
       },
     } satisfies SignInActionState;
   }
@@ -52,7 +56,7 @@ export async function signInAction(_previousState: SignInActionState, formData: 
   redirect(getSafePostLoginRedirect(parsedInput.data.next));
 }
 
-export async function signOutAction() {
+export async function signOutAction(): Promise<void> {
   const cookieStore = await cookies();
   const sessionToken = getAuthSessionTokenFromCookie(cookieStore.get(AUTH_SESSION_COOKIE_NAME));
 

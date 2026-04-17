@@ -10,11 +10,13 @@ import {
 } from "@/features/price-sheets/localization";
 import { PublicPriceSheetLeadForm } from "@/features/price-sheets/public-price-sheet-lead-form";
 import { getPublicPriceSheetTheme, type PublicPriceSheetTheme } from "@/features/price-sheets/public-theme";
+import type { InterfaceLocale } from "@/i18n/interface-locale";
 import type { PublishedPriceSheet } from "@/server/price-sheets/service";
 
 interface PublicPriceSheetProps {
+  interfaceLocale: InterfaceLocale;
   priceSheet: PublishedPriceSheet;
-  requestedLanguage?: string;
+  requestedContentLanguage?: string;
 }
 
 interface PublicPriceSheetCopy {
@@ -105,13 +107,17 @@ const supportedLanguageOptions = [
   { value: "ru", label: "RU" },
 ] as const;
 
-export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceSheetProps) {
-  const interfaceLanguage = resolvePriceSheetInterfaceLanguage(requestedLanguage, priceSheet.defaultContentLocale);
-  const copy = publicPriceSheetCopy[interfaceLanguage];
-  const interfaceLocale = mapInterfaceLanguageToPriceSheetContentLocale(interfaceLanguage);
+export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContentLanguage }: PublicPriceSheetProps) {
+  const interfaceLanguage: PriceSheetInterfaceLanguage = interfaceLocale;
+  const copy = {
+    ...publicPriceSheetCopy[interfaceLanguage],
+    languageLabel: interfaceLanguage === "ru" ? "Язык контента" : "Content language",
+  };
+  const contentLanguage = resolvePriceSheetInterfaceLanguage(requestedContentLanguage, priceSheet.defaultContentLocale);
+  const contentLocale = mapInterfaceLanguageToPriceSheetContentLocale(contentLanguage);
   const localizedSheet = resolvePriceSheetContent({
     defaultContentLocale: priceSheet.defaultContentLocale,
-    requestedContentLocale: interfaceLocale,
+    requestedContentLocale: contentLocale,
     title: priceSheet.title,
     description: priceSheet.description,
     translations: priceSheet.translations,
@@ -119,7 +125,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
   const localizedItems = priceSheet.items.map((item) => {
     const localizedItem = resolvePriceSheetItemContent({
       defaultContentLocale: priceSheet.defaultContentLocale,
-      requestedContentLocale: interfaceLocale,
+      requestedContentLocale: contentLocale,
       name: item.name,
       description: item.description,
       section: item.section,
@@ -136,8 +142,8 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
   });
   const theme = getPublicPriceSheetTheme(priceSheet.theme);
   const sections = groupPriceSheetItems(localizedItems, copy);
-  const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
-  const introText = buildIntroText(priceSheet, sections.length, interfaceLocale);
+  const updatedAt = new Intl.DateTimeFormat(contentLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
+  const introText = buildIntroText(priceSheet, sections.length, interfaceLanguage, contentLocale);
   const summaryText = localizedSheet.description?.trim() || introText;
   const publicContactActions = getPublicContactActions(priceSheet, localizedSheet.title, interfaceLanguage);
   const hasPublicContactBlock =
@@ -164,7 +170,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
           >
             <span className={cn("px-2 text-xs font-medium uppercase tracking-[0.22em]", theme.languageLabelClassName)}>{copy.languageLabel}</span>
             {supportedLanguageOptions.map((option) => {
-              const isActive = option.value === interfaceLanguage;
+              const isActive = option.value === contentLanguage;
 
               return (
                 <Link
@@ -201,7 +207,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
             <div className="mt-6 flex flex-wrap gap-3">
               <MetricChip label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
               <MetricChip label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
-              <MetricChip label={copy.localeLabel} theme={theme} value={interfaceLocale} />
+              <MetricChip label={copy.localeLabel} theme={theme} value={contentLocale} />
               <MetricChip label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
               <MetricChip label={copy.updatedLabel} theme={theme} value={updatedAt} />
             </div>
@@ -217,7 +223,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
             </CardHeader>
             <CardContent className="space-y-4">
               <DetailRow label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
-              <DetailRow label={copy.localeLabel} theme={theme} value={interfaceLocale} />
+              <DetailRow label={copy.localeLabel} theme={theme} value={contentLocale} />
               <DetailRow label={copy.updatedLabel} theme={theme} value={updatedAt} />
               <DetailRow label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
               <DetailRow label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
@@ -268,7 +274,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
 
                       <div className="sm:text-right">
                         <p className={cn("text-xl font-semibold tracking-tight", theme.priceClassName)}>
-                          {formatPublicPrice(item.priceCents, priceSheet.currency, interfaceLocale)}
+                          {formatPublicPrice(item.priceCents, priceSheet.currency, contentLocale)}
                         </p>
                       </div>
                     </article>
@@ -337,7 +343,7 @@ export function PublicPriceSheet({ priceSheet, requestedLanguage }: PublicPriceS
           <PublicPriceSheetLeadForm
             inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
             interfaceLanguage={interfaceLanguage}
-            locale={interfaceLocale}
+            locale={contentLocale}
             priceSheetSlug={priceSheet.slug}
             theme={theme}
           />
@@ -413,10 +419,15 @@ function groupPriceSheetItems(items: LocalizedPublicPriceSheetItem[], copy: Publ
   })) satisfies PriceSheetSection[];
 }
 
-function buildIntroText(priceSheet: PublishedPriceSheet, sectionCount: number, interfaceLocale: string) {
-  const updatedAt = new Intl.DateTimeFormat(interfaceLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
+function buildIntroText(
+  priceSheet: PublishedPriceSheet,
+  sectionCount: number,
+  interfaceLanguage: PriceSheetInterfaceLanguage,
+  contentLocale: string,
+) {
+  const updatedAt = new Intl.DateTimeFormat(contentLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
 
-  if (interfaceLocale.startsWith("ru")) {
+  if (interfaceLanguage === "ru") {
     return `В прайс-листе ${priceSheet.items.length} позиций в ${sectionCount} разделах. Цены показаны в ${priceSheet.currency}, обновление от ${updatedAt}.`;
   }
 

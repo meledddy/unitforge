@@ -4,16 +4,20 @@ import { Button, Card, CardContent, CardHeader, CardTitle, cn, Input, Label } fr
 import Link from "next/link";
 import { useActionState } from "react";
 
+import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { getMessages } from "@/i18n/messages";
 import { signInAction } from "@/server/auth/actions";
 import { initialSignInActionState } from "@/server/auth/sign-in-state";
 
 interface SignInFormProps {
   enabled: boolean;
+  locale: InterfaceLocale;
   next?: string;
 }
 
-export function SignInForm({ enabled, next }: SignInFormProps) {
+export function SignInForm({ enabled, locale, next }: SignInFormProps) {
   const [state, formAction, isPending] = useActionState(signInAction, initialSignInActionState);
+  const messages = getMessages(locale);
 
   function getFieldError(field: "email" | "password") {
     return state.fieldErrors?.[field];
@@ -42,7 +46,7 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
           )}
         >
           <CardHeader className="space-y-3 p-7 sm:p-8">
-            <CardTitle className="text-4xl font-semibold tracking-tight text-stone-50">Welcome back</CardTitle>
+            <CardTitle className="text-4xl font-semibold tracking-tight text-stone-50">{messages.auth.welcomeBack}</CardTitle>
           </CardHeader>
           <CardContent className="p-7 pt-0 sm:p-8 sm:pt-0">
             <form action={formAction} className="space-y-4">
@@ -56,7 +60,7 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-stone-200/88" htmlFor="sign-in-email">
-                  Email
+                  {messages.auth.email}
                 </Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("email"))}
@@ -67,7 +71,7 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
                   disabled={!enabled || isPending}
                   id="sign-in-email"
                   name="email"
-                  placeholder="operator@unitforge.dev"
+                  placeholder={messages.auth.emailPlaceholder}
                   type="email"
                 />
                 {getFieldError("email") ? <p className="text-sm text-red-200">{getFieldError("email")}</p> : null}
@@ -75,7 +79,7 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-stone-200/88" htmlFor="sign-in-password">
-                  Password
+                  {messages.auth.password}
                 </Label>
                 <Input
                   aria-invalid={Boolean(getFieldError("password"))}
@@ -86,7 +90,7 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
                   disabled={!enabled || isPending}
                   id="sign-in-password"
                   name="password"
-                  placeholder="Enter your password"
+                  placeholder={messages.auth.passwordPlaceholder}
                   type="password"
                 />
                 {getFieldError("password") ? <p className="text-sm text-red-200">{getFieldError("password")}</p> : null}
@@ -98,10 +102,10 @@ export function SignInForm({ enabled, next }: SignInFormProps) {
                   disabled={!enabled || isPending}
                   type="submit"
                 >
-                  {isPending ? "Signing in..." : "Sign in"}
+                  {isPending ? messages.auth.signingIn : messages.auth.signIn}
                 </Button>
                 <Link className="block text-center text-sm text-stone-400 transition-colors hover:text-stone-100" href="/">
-                  Return to public site
+                  {messages.auth.returnToPublicSite}
                 </Link>
               </div>
             </form>

@@ -1,24 +1,26 @@
 import { Badge, Card, CardDescription, CardHeader, CardTitle } from "@unitforge/ui";
 
-export default function ImportMarginPage() {
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
+import { getMessages } from "@/i18n/messages";
+
+export default async function ImportMarginPage() {
+  const locale = await getCurrentInterfaceLocale();
+  const messages = getMessages(locale);
+
   return (
     <div className="space-y-8">
       <div className="space-y-3">
-        <Badge variant="secondary">Placeholder</Badge>
+        <Badge variant="secondary">{messages.importMargin.badge}</Badge>
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight">Import Margin</h2>
-          <p className="max-w-2xl text-muted-foreground">
-            This route is intentionally reserved for a future import margin workflow and ships without demo content.
-          </p>
+          <h2 className="text-3xl font-semibold tracking-tight">{messages.importMargin.title}</h2>
+          <p className="max-w-2xl text-muted-foreground">{messages.importMargin.description}</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Next step</CardTitle>
-          <CardDescription>
-            Add the domain model, ingestion flow, and reporting UI only when the product requirements are clear.
-          </CardDescription>
+          <CardTitle>{messages.importMargin.nextStepTitle}</CardTitle>
+          <CardDescription>{messages.importMargin.nextStepDescription}</CardDescription>
         </CardHeader>
       </Card>
     </div>

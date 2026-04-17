@@ -5,22 +5,28 @@ import { cn } from "@unitforge/ui";
 import type { MouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { InterfaceLanguageSwitcher } from "@/components/interface-language-switcher";
+import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { getMessages } from "@/i18n/messages";
+
 import { SignInForm } from "./sign-in-form";
 
 interface LampLoginShellProps {
+  locale: InterfaceLocale;
   next?: string;
 }
 
 const CORD_PULL_THRESHOLD = 56;
 const MAX_CORD_PULL = 96;
 
-export function LampLoginShell({ next }: LampLoginShellProps) {
+export function LampLoginShell({ locale, next }: LampLoginShellProps) {
   const [isLampOn, setIsLampOn] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [cordOffset, setCordOffset] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dragStartYRef = useRef<number | null>(null);
   const latestCordOffsetRef = useRef(0);
+  const messages = getMessages(locale);
 
   useEffect(() => {
     latestCordOffsetRef.current = cordOffset;
@@ -127,10 +133,19 @@ export function LampLoginShell({ next }: LampLoginShellProps) {
       <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-7xl gap-10 px-6 py-10 sm:px-10 lg:grid-cols-[1.02fr,0.88fr] lg:items-center lg:px-14">
         <div className="flex flex-col items-center justify-center gap-8 lg:items-start">
           <div className="space-y-4 text-center lg:text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-stone-400/75">Protected access</p>
+            <div className="flex items-center justify-center lg:justify-start">
+              <InterfaceLanguageSwitcher
+                className="border-white/10 bg-white/[0.03]"
+                inactiveClassName="text-stone-400 hover:bg-white/[0.06] hover:text-stone-50"
+                label={messages.shared.language}
+                labelClassName="text-stone-400/75"
+                locale={locale}
+              />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-stone-400/75">{messages.auth.protectedAccess}</p>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-tight text-stone-100 sm:text-5xl">Light up the workspace.</h1>
-              <p className="max-w-md text-sm leading-6 text-stone-400 sm:text-base">Reveal the Unitforge sign-in form.</p>
+              <h1 className="text-4xl font-semibold tracking-tight text-stone-100 sm:text-5xl">{messages.auth.title}</h1>
+              <p className="max-w-md text-sm leading-6 text-stone-400 sm:text-base">{messages.auth.description}</p>
             </div>
           </div>
 
@@ -176,7 +191,7 @@ export function LampLoginShell({ next }: LampLoginShellProps) {
                 />
                 <button
                   aria-describedby="lamp-cord-help"
-                  aria-label={isLampOn ? "Turn lamp off" : "Turn lamp on"}
+                  aria-label={isLampOn ? (locale === "ru" ? "Выключить лампу" : "Turn lamp off") : locale === "ru" ? "Включить лампу" : "Turn lamp on"}
                   aria-pressed={isLampOn}
                   className={cn(
                     "absolute left-1/2 top-[96px] h-7 w-7 -translate-x-1/2 transform-gpu rounded-full bg-[#d8a15f] shadow-[0_10px_24px_rgba(0,0,0,0.35)] outline-none touch-none select-none",
@@ -190,7 +205,7 @@ export function LampLoginShell({ next }: LampLoginShellProps) {
                   onClick={handleCordClick}
                   onPointerDown={handleCordPointerDown}
                 >
-                  <span className="sr-only">Pull the lamp cord to reveal the sign-in form</span>
+                  <span className="sr-only">{messages.auth.lampHint}</span>
                 </button>
               </div>
             </div>
@@ -198,13 +213,13 @@ export function LampLoginShell({ next }: LampLoginShellProps) {
         </div>
 
         <div className="flex items-center justify-center lg:justify-end">
-          <SignInForm enabled={isLampOn} next={next} />
+          <SignInForm enabled={isLampOn} locale={locale} next={next} />
         </div>
       </div>
 
       <audio ref={audioRef} className="hidden" preload="auto" src="/sounds/lamp-toggle.wav" />
       <p className="sr-only" id="lamp-cord-help">
-        Drag the cord down, or focus it and press Enter or Space to toggle the lamp.
+        {messages.auth.lampHelp}
       </p>
       <div className="pointer-events-none absolute left-6 top-6 text-xs font-medium uppercase tracking-[0.34em] text-stone-400/55 sm:left-10 sm:top-8 lg:left-14">
         {appConfig.name}

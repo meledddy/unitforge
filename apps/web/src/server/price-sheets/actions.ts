@@ -9,6 +9,8 @@ import {
   type PriceSheetStatus,
   toPriceSheetMutationInput,
 } from "@/features/price-sheets/validation";
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
+import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
 
 import { isPriceSheetServiceError } from "./errors";
@@ -31,21 +33,23 @@ export async function createPriceSheetAction(
   _previousState: PriceSheetFormActionState,
   formData: FormData,
 ) {
+  const locale = await getCurrentInterfaceLocale();
+  const messages = getMessages(locale);
   const payload = formData.get("payload");
 
   if (typeof payload !== "string") {
     return {
       status: "error",
-      message: "Form payload is missing.",
+      message: messages.priceSheetActions.payloadMissing,
     } satisfies PriceSheetFormActionState;
   }
 
-  const parsedPayload = parsePriceSheetFormPayload(payload);
+  const parsedPayload = parsePriceSheetFormPayload(payload, locale);
 
   if (!parsedPayload.success) {
     return {
       status: "error",
-      message: "Check the highlighted fields and try again.",
+      message: messages.priceSheetActions.retryValidation,
       fieldErrors: getPriceSheetFieldErrors(parsedPayload.error),
     } satisfies PriceSheetFormActionState;
   }
@@ -56,7 +60,7 @@ export async function createPriceSheetAction(
   try {
     priceSheet = await createWorkspacePriceSheet(session, toPriceSheetMutationInput(parsedPayload.data));
   } catch (error) {
-    return actionErrorState(error, "Price Sheet could not be created.");
+    return actionErrorState(locale, error, messages.priceSheetActions.createFailed);
   }
 
   revalidatePriceSheetPaths({
@@ -72,21 +76,23 @@ export async function updatePriceSheetAction(
   _previousState: PriceSheetFormActionState,
   formData: FormData,
 ) {
+  const locale = await getCurrentInterfaceLocale();
+  const messages = getMessages(locale);
   const payload = formData.get("payload");
 
   if (typeof payload !== "string") {
     return {
       status: "error",
-      message: "Form payload is missing.",
+      message: messages.priceSheetActions.payloadMissing,
     } satisfies PriceSheetFormActionState;
   }
 
-  const parsedPayload = parsePriceSheetFormPayload(payload);
+  const parsedPayload = parsePriceSheetFormPayload(payload, locale);
 
   if (!parsedPayload.success) {
     return {
       status: "error",
-      message: "Check the highlighted fields and try again.",
+      message: messages.priceSheetActions.retryValidation,
       fieldErrors: getPriceSheetFieldErrors(parsedPayload.error),
     } satisfies PriceSheetFormActionState;
   }
@@ -100,7 +106,7 @@ export async function updatePriceSheetAction(
     existingPriceSheet = await getWorkspacePriceSheetForEdit(session, priceSheetId);
     priceSheet = await updateWorkspacePriceSheet(session, priceSheetId, toPriceSheetMutationInput(parsedPayload.data));
   } catch (error) {
-    return actionErrorState(error, "Price Sheet could not be updated.");
+    return actionErrorState(locale, error, messages.priceSheetActions.updateFailed);
   }
 
   revalidatePriceSheetPaths({
@@ -118,7 +124,7 @@ export async function updatePriceSheetAction(
 
   return {
     status: "success",
-    message: "Changes saved. Continue editing or publish when ready.",
+    message: messages.priceSheetActions.saveSuccess,
   } satisfies PriceSheetFormActionState;
 }
 
@@ -181,12 +187,14 @@ function revalidatePriceSheetPaths(input: {
   revalidatePath(`/price-sheets/${input.slug}`);
 }
 
-function actionErrorState(error: unknown, fallbackMessage: string) {
+function actionErrorState(locale: "en" | "ru", error: unknown, fallbackMessage: string) {
+  const messages = getMessages(locale);
+
   if (isPriceSheetServiceError(error)) {
     if (error.code === "SLUG_CONFLICT") {
       return {
         status: "error",
-        message: "Choose a different slug.",
+        message: messages.priceSheetActions.chooseDifferentSlug,
         fieldErrors: {
           slug: error.message,
         },

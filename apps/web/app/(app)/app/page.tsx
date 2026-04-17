@@ -4,20 +4,34 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
+import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
 
 export default async function DashboardPage() {
-  const session = await requireCurrentAppShellSession();
+  const [session, locale] = await Promise.all([requireCurrentAppShellSession(), getCurrentInterfaceLocale()]);
+  const messages = getMessages(locale);
+  const localizedProductSurfaces = productSurfaces.map((surface) => {
+    if (surface.href === "/app/price-sheets") {
+      return locale === "ru"
+        ? { ...surface, title: "Прайс-листы", description: "Данные ценообразования в рамках workspace со схемой, готовой для Drizzle-запросов." }
+        : surface;
+    }
+
+    return locale === "ru"
+      ? { ...surface, title: "Import Margin", description: "Маршрут-заполнитель, зарезервированный для будущего import margin workflow." }
+      : surface;
+  });
 
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Authenticated app shell"
-        title="Workspace overview"
-        description="The first functional slice now runs behind real login, session handling, and workspace-scoped data access."
+        eyebrow={messages.dashboard.eyebrow}
+        title={messages.dashboard.title}
+        description={messages.dashboard.description}
         actions={
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/app/settings">
-            Review settings
+            {messages.dashboard.settingsCta}
           </Link>
         }
       />
@@ -25,8 +39,8 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>Current user</CardTitle>
-            <CardDescription>The authenticated operator account now drives protected app access.</CardDescription>
+            <CardTitle>{messages.dashboard.currentUserTitle}</CardTitle>
+            <CardDescription>{messages.dashboard.currentUserDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentUser.name}</p>
@@ -37,37 +51,37 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Current workspace</CardTitle>
-            <CardDescription>The current workspace comes from the authenticated membership context.</CardDescription>
+            <CardTitle>{messages.dashboard.currentWorkspaceTitle}</CardTitle>
+            <CardDescription>{messages.dashboard.currentWorkspaceDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentWorkspace.name}</p>
             <p>{session.currentWorkspace.slug}</p>
-            <p>Workspace-scoped queries and billing ownership now resolve from the signed-in user session.</p>
+            <p>{messages.dashboard.currentWorkspaceBody}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Billing status</CardTitle>
-            <CardDescription>Stripe is scaffolded, but final checkout and webhook handling are intentionally deferred.</CardDescription>
+            <CardTitle>{messages.dashboard.billingTitle}</CardTitle>
+            <CardDescription>{messages.dashboard.billingDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium capitalize text-foreground">{session.subscription?.status ?? "Unconfigured"}</p>
-            <p>Plan: {session.subscription?.plan ?? "Not assigned"}</p>
-            <p>Provider: {session.subscription?.provider ?? "Not configured"}</p>
+            <p className="font-medium capitalize text-foreground">{session.subscription?.status ?? messages.dashboard.unconfigured}</p>
+            <p>{messages.dashboard.plan}: {session.subscription?.plan ?? messages.dashboard.notAssigned}</p>
+            <p>{messages.dashboard.provider}: {session.subscription?.provider ?? messages.dashboard.notConfigured}</p>
           </CardContent>
         </Card>
       </div>
 
       <PlaceholderPanel
-        title="Reserved product surfaces"
-        description="The workspace already has clear seams for product-specific operations without introducing fake application data."
+        title={messages.dashboard.reservedTitle}
+        description={messages.dashboard.reservedDescription}
         actionHref="/app/price-sheets"
-        actionLabel="Open price sheets"
+        actionLabel={messages.dashboard.openPriceSheets}
       >
         <div className="grid gap-4 md:grid-cols-2">
-          {productSurfaces.map((surface) => (
+          {localizedProductSurfaces.map((surface) => (
             <div key={surface.href} className="rounded-3xl border border-border/70 bg-background/70 p-5">
               <p className="font-medium">{surface.title}</p>
               <p className="mt-2 text-sm text-muted-foreground">{surface.description}</p>

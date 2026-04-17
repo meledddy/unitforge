@@ -4,6 +4,9 @@ import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
+import { getInterfaceNumberLocale } from "@/i18n/interface-locale";
+import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
+import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
 import { duplicatePriceSheetAction, setPriceSheetStatusAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/price-sheets/service";
@@ -22,11 +25,13 @@ interface PriceSheetsPageProps {
 }
 
 export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageProps) {
-  const session = await requireCurrentAppShellSession();
+  const [session, locale] = await Promise.all([requireCurrentAppShellSession(), getCurrentInterfaceLocale()]);
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const searchQuery = getFirstQueryParamValue(resolvedSearchParams.q)?.trim() ?? "";
   const activeStatusFilter = parseStatusFilter(getFirstQueryParamValue(resolvedSearchParams.status));
   const hasActiveListTools = searchQuery.length > 0 || activeStatusFilter !== "all";
+  const messages = getMessages(locale);
+  const dateTimeLocale = getInterfaceNumberLocale(locale);
 
   try {
     const priceSheets = await listWorkspacePriceSheets(session, {
@@ -37,12 +42,12 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
     return (
       <div className="space-y-8">
         <PageHeader
-          eyebrow="Product area"
-          title="Price sheets"
-          description="Create and manage public-facing price sheets for the current workspace."
+          eyebrow={messages.priceSheets.eyebrow}
+          title={messages.priceSheets.listTitle}
+          description={messages.priceSheets.listDescription}
           actions={
             <Link className={cn(buttonVariants({ size: "sm" }), "w-full sm:w-auto")} href="/app/price-sheets/new">
-              New Price Sheet
+              {messages.priceSheets.newButton}
             </Link>
           }
         />
@@ -54,16 +59,16 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                 className="h-11 min-w-0 sm:min-w-[280px]"
                 defaultValue={searchQuery}
                 name="q"
-                placeholder="Search by title, slug, description, or translation"
+                placeholder={messages.priceSheets.searchPlaceholder}
                 type="search"
               />
               {activeStatusFilter !== "all" ? <input name="status" type="hidden" value={activeStatusFilter} /> : null}
               <Button className="w-full sm:w-auto" type="submit" variant="outline">
-                Search
+                {messages.shared.search}
               </Button>
               {hasActiveListTools ? (
                 <Link className={cn(buttonVariants({ size: "default", variant: "ghost" }), "w-full sm:w-auto")} href="/app/price-sheets">
-                  Reset
+                  {messages.shared.reset}
                 </Link>
               ) : null}
             </form>
@@ -84,7 +89,7 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                     status: statusFilter,
                   })}
                 >
-                  {getStatusFilterLabel(statusFilter)}
+                  {getStatusFilterLabel(locale, statusFilter)}
                 </Link>
               ))}
             </div>
@@ -94,24 +99,24 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
         {priceSheets.length === 0 ? (
           hasActiveListTools ? (
             <PlaceholderPanel
-              title="No matching price sheets"
-              description="Try a different search or adjust the status filter for this workspace."
+              title={messages.priceSheets.noMatchingTitle}
+              description={messages.priceSheets.noMatchingDescription}
               actionHref="/app/price-sheets"
-              actionLabel="Clear search and filters"
+              actionLabel={messages.priceSheets.clearSearchAndFilters}
             >
               <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
-                Search matches title, slug, description, and translated sheet content within the current workspace only.
+                {messages.priceSheets.noMatchingHint}
               </div>
             </PlaceholderPanel>
           ) : (
             <PlaceholderPanel
-              title="No price sheets yet"
-              description="Create the first sheet for this workspace and publish it when it is ready."
+              title={messages.priceSheets.emptyTitle}
+              description={messages.priceSheets.emptyDescription}
               actionHref="/app/price-sheets/new"
-              actionLabel="Create your first Price Sheet"
+              actionLabel={messages.priceSheets.firstSheetCta}
             >
               <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 text-sm text-muted-foreground">
-                Sheets stay empty until you add real content. Only the bootstrap operator account and workspace are seeded for local verification.
+                {messages.priceSheets.emptyHint}
               </div>
             </PlaceholderPanel>
           )
@@ -119,7 +124,7 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
           <div className="grid gap-4 sm:gap-5">
             {priceSheets.map((priceSheet) => {
               const nextStatus = priceSheet.status === "published" ? "draft" : "published";
-              const statusActionLabel = priceSheet.status === "published" ? "Unpublish" : "Publish";
+              const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
 
               return (
                 <Card key={priceSheet.id}>
@@ -127,8 +132,8 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <PriceSheetStatusBadge status={priceSheet.status} />
-                          <p className="text-sm text-muted-foreground">{priceSheet.itemCount} items</p>
+                          <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
+                          <p className="text-sm text-muted-foreground">{priceSheet.itemCount} {messages.priceSheets.itemsCount}</p>
                         </div>
                         <div>
                           <CardTitle>{priceSheet.title}</CardTitle>
@@ -153,7 +158,7 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                         </form>
                         <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
                           <Button className="w-full sm:w-auto" type="submit" variant="outline">
-                            Duplicate
+                            {messages.shared.duplicate}
                           </Button>
                         </form>
                         {priceSheet.status === "published" ? (
@@ -161,18 +166,22 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                             className={cn(buttonVariants({ size: "default", variant: "outline" }), "w-full sm:w-auto")}
                             href={`/price-sheets/${priceSheet.slug}`}
                           >
-                            Public page
+                            {messages.priceSheets.publicPage}
                           </Link>
                         ) : null}
                         <Link className={cn(buttonVariants({ size: "default" }), "w-full sm:w-auto")} href={`/app/price-sheets/${priceSheet.id}`}>
-                          Edit
+                          {messages.priceSheets.editSheet}
                         </Link>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-                    <p>Updated {priceSheet.updatedAt.toLocaleString()}</p>
-                    <p>{priceSheet.publishedAt ? `Published ${priceSheet.publishedAt.toLocaleString()}` : "Not yet published"}</p>
+                    <p>{messages.priceSheets.updatedPrefix} {priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</p>
+                    <p>
+                      {priceSheet.publishedAt
+                        ? `${messages.priceSheets.publishedPrefix} ${priceSheet.publishedAt.toLocaleString(dateTimeLocale)}`
+                        : messages.priceSheets.notYetPublished}
+                    </p>
                   </CardContent>
                 </Card>
               );
@@ -185,11 +194,11 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
     return (
       <div className="space-y-8">
         <PageHeader
-          eyebrow="Product area"
-          title="Price sheets"
-          description="The workspace shell is ready, but the Price Sheets data layer could not be reached."
+          eyebrow={messages.priceSheets.eyebrow}
+          title={messages.priceSheets.listTitle}
+          description={messages.priceSheets.listErrorDescription}
         />
-        <PlaceholderPanel title="Price Sheets unavailable" description={getPriceSheetErrorMessage(error)} />
+        <PlaceholderPanel title={messages.priceSheets.unavailableTitle} description={getPriceSheetErrorMessage(error)} />
       </div>
     );
   }
@@ -222,15 +231,17 @@ function buildPriceSheetsListHref(input: {
   return queryString.length > 0 ? `/app/price-sheets?${queryString}` : "/app/price-sheets";
 }
 
-function getStatusFilterLabel(status: PriceSheetListStatusFilter) {
+function getStatusFilterLabel(locale: "en" | "ru", status: PriceSheetListStatusFilter) {
+  const messages = getMessages(locale);
+
   if (status === "published") {
-    return "Published";
+    return messages.priceSheets.filterPublished;
   }
 
   if (status === "draft") {
-    return "Draft";
+    return messages.priceSheets.filterDraft;
   }
 
-  return "All";
+  return messages.priceSheets.filterAll;
 }
 

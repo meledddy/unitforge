@@ -26,6 +26,7 @@
       "@/components/*": ["apps/web/src/components/*"],
       "@/env": ["apps/web/src/env.ts"],
       "@/features/*": ["apps/web/src/features/*"],
+      "@/i18n/*": ["apps/web/src/i18n/*"],
       "@/server/*": ["apps/web/src/server/*"]
     }
   }

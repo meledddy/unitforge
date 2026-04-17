@@ -6,36 +6,46 @@ import { Avatar, Badge, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { getMessages } from "@/i18n/messages";
 import type { AppShellSession } from "@/server/current-session";
 
 interface AppSidebarProps {
   session: AppShellSession;
+  locale: InterfaceLocale;
 }
 
-export function AppSidebar({ session }: AppSidebarProps) {
+export function AppSidebar({ session, locale }: AppSidebarProps) {
   const pathname = usePathname();
+  const messages = getMessages(locale);
   const subscriptionLabel = session.subscription
     ? `${session.subscription.plan} / ${session.subscription.status}`
-    : "Billing not configured";
+    : messages.appShell.billingNotConfigured;
 
   return (
     <aside className="border-b border-border/70 bg-card/80 lg:min-h-screen lg:w-80 lg:border-b-0 lg:border-r">
       <div className="flex h-full flex-col gap-8 p-6">
         <div className="space-y-3">
-          <Badge variant="secondary">Authenticated area</Badge>
+          <Badge variant="secondary">{messages.appShell.sidebarBadge}</Badge>
           <div>
             <p className="text-lg font-semibold">{session.currentWorkspace.name}</p>
             <p className="text-sm text-muted-foreground">{session.currentWorkspace.slug}</p>
           </div>
           <div className="rounded-3xl border border-border/70 bg-background/80 p-4">
             <p className="font-medium">{appConfig.name}</p>
-            <p className="mt-2 text-sm text-muted-foreground">Shared operating shell for the first functional SaaS slice.</p>
+            <p className="mt-2 text-sm text-muted-foreground">{messages.appShell.sidebarDescription}</p>
           </div>
         </div>
 
         <nav className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
           {appNavigation.map((item) => {
             const isActive = isAppNavigationItemActive(item.href, pathname);
+            const localizedItem =
+              item.href === "/app"
+                ? messages.appShell.nav.overview
+                : item.href === "/app/price-sheets"
+                  ? messages.appShell.nav.priceSheets
+                  : messages.appShell.nav.settings;
 
             return (
               <Link
@@ -48,9 +58,9 @@ export function AppSidebar({ session }: AppSidebarProps) {
                     : "border-border/70 bg-background text-muted-foreground hover:text-foreground",
                 )}
               >
-                <p className="text-sm font-medium">{item.label}</p>
+                <p className="text-sm font-medium">{localizedItem.label}</p>
                 <p className={cn("mt-1 text-xs", isActive ? "text-primary-foreground/80" : "text-muted-foreground")}>
-                  {item.description}
+                  {localizedItem.description}
                 </p>
               </Link>
             );

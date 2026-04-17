@@ -1,6 +1,9 @@
 import type { PriceSheetPublicSettings } from "@unitforge/db";
 import { z } from "zod";
 
+import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { getMessages } from "@/i18n/messages";
+
 import type { PriceSheetContentLocale, PriceSheetItemTranslations, PriceSheetTheme, PriceSheetTranslations } from "./localization";
 import {
   getAlternatePriceSheetContentLocale,
@@ -18,76 +21,71 @@ export const priceSheetPublicInquiryStateSchema = z.enum(["enabled", "hidden"]);
 
 const pricePattern = /^\d+(?:\.\d{1,2})?$/;
 
-export const priceSheetItemFormSchema = z
-  .object({
-    id: z.string().uuid().optional(),
-    name: z.string().trim().min(1, "Item name is required.").max(160, "Item name is too long."),
-    description: z.string().trim().max(600, "Description is too long."),
-    section: z.string().trim().max(120, "Category / section is too long."),
-    secondaryName: z.string().trim().max(160, "Translated item name is too long."),
-    secondaryDescription: z.string().trim().max(600, "Translated description is too long."),
-    secondarySection: z.string().trim().max(120, "Translated category / section is too long."),
-    price: z
-      .string()
-      .trim()
-      .min(1, "Price is required.")
-      .refine((value) => pricePattern.test(value), "Price must be a valid amount."),
-  })
-  .superRefine((value, ctx) => {
-    if ((value.secondaryDescription.length > 0 || value.secondarySection.length > 0) && value.secondaryName.length === 0) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Translated item name is required when adding translated item copy.",
-        path: ["secondaryName"],
-      });
-    }
-  });
+export function getPriceSheetItemFormSchema(locale: InterfaceLocale) {
+  const copy = getMessages(locale).priceSheetValidation;
 
-export const priceSheetFormSchema = z
-  .object({
-    title: z.string().trim().min(1, "Title is required.").max(120, "Title is too long."),
-    description: z.string().trim().max(600, "Description is too long."),
-    secondaryTitle: z.string().trim().max(120, "Translated title is too long."),
-    secondaryDescription: z.string().trim().max(600, "Translated description is too long."),
-    contactLabel: z.string().trim().max(120, "Contact label is too long."),
-    contactEmail: z
-      .string()
-      .trim()
-      .max(160, "Contact email is too long.")
-      .refine((value) => value.length === 0 || z.string().email().safeParse(value).success, "Enter a valid contact email."),
-    contactPhone: z.string().trim().max(120, "Phone or messaging handle is too long."),
-    primaryCtaLabel: z.string().trim().max(48, "Primary CTA label is too long."),
-    secondaryCtaLabel: z.string().trim().max(48, "Secondary CTA label is too long."),
-    inquiryText: z.string().trim().max(320, "Inquiry help text is too long."),
-    publicInquiryState: priceSheetPublicInquiryStateSchema,
-    slug: z
-      .string()
-      .trim()
-      .min(1, "Slug is required.")
-      .max(160, "Slug is too long.")
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must use lowercase letters, numbers, and hyphens."),
-    status: priceSheetStatusSchema,
-    currency: z
-      .string()
-      .trim()
-      .length(3, "Currency must be a 3-letter ISO code.")
-      .transform((value) => value.toUpperCase()),
-    defaultContentLocale: priceSheetContentLocaleSchema,
-    theme: priceSheetThemeSchema,
-    items: z.array(priceSheetItemFormSchema).min(1, "Add at least one item."),
-  })
-  .superRefine((value, ctx) => {
-    if (value.secondaryDescription.length > 0 && value.secondaryTitle.length === 0) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Translated title is required when adding translated description copy.",
-        path: ["secondaryTitle"],
-      });
-    }
-  });
+  return z
+    .object({
+      id: z.string().uuid().optional(),
+      name: z.string().trim().min(1, copy.itemNameRequired).max(160, copy.itemNameLong),
+      description: z.string().trim().max(600, copy.descriptionLong),
+      section: z.string().trim().max(120, copy.sectionLong),
+      secondaryName: z.string().trim().max(160, copy.translatedItemNameLong),
+      secondaryDescription: z.string().trim().max(600, copy.translatedDescriptionLong),
+      secondarySection: z.string().trim().max(120, copy.translatedSectionLong),
+      price: z.string().trim().min(1, copy.priceRequired).refine((value) => pricePattern.test(value), copy.priceInvalid),
+    })
+    .superRefine((value, ctx) => {
+      if ((value.secondaryDescription.length > 0 || value.secondarySection.length > 0) && value.secondaryName.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: copy.translatedItemNameRequired,
+          path: ["secondaryName"],
+        });
+      }
+    });
+}
+
+export function getPriceSheetFormSchema(locale: InterfaceLocale) {
+  const copy = getMessages(locale).priceSheetValidation;
+
+  return z
+    .object({
+      title: z.string().trim().min(1, copy.titleRequired).max(120, copy.titleLong),
+      description: z.string().trim().max(600, copy.descriptionLong),
+      secondaryTitle: z.string().trim().max(120, copy.translatedTitleLong),
+      secondaryDescription: z.string().trim().max(600, copy.translatedDescriptionLong),
+      contactLabel: z.string().trim().max(120, copy.contactLabelLong),
+      contactEmail: z
+        .string()
+        .trim()
+        .max(160, copy.contactEmailLong)
+        .refine((value) => value.length === 0 || z.string().email().safeParse(value).success, copy.contactEmailInvalid),
+      contactPhone: z.string().trim().max(120, copy.contactPhoneLong),
+      primaryCtaLabel: z.string().trim().max(48, copy.primaryCtaLong),
+      secondaryCtaLabel: z.string().trim().max(48, copy.secondaryCtaLong),
+      inquiryText: z.string().trim().max(320, copy.inquiryTextLong),
+      publicInquiryState: priceSheetPublicInquiryStateSchema,
+      slug: z.string().trim().min(1, copy.slugRequired).max(160, copy.slugLong).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, copy.slugFormat),
+      status: priceSheetStatusSchema,
+      currency: z.string().trim().length(3, copy.currencyCode).transform((value) => value.toUpperCase()),
+      defaultContentLocale: priceSheetContentLocaleSchema,
+      theme: priceSheetThemeSchema,
+      items: z.array(getPriceSheetItemFormSchema(locale)).min(1, copy.addOneItem),
+    })
+    .superRefine((value, ctx) => {
+      if (value.secondaryDescription.length > 0 && value.secondaryTitle.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: copy.translatedTitleRequired,
+          path: ["secondaryTitle"],
+        });
+      }
+    });
+}
 
 export type PriceSheetStatus = z.infer<typeof priceSheetStatusSchema>;
-export type PriceSheetFormValues = z.input<typeof priceSheetFormSchema>;
+export type PriceSheetFormValues = z.input<ReturnType<typeof getPriceSheetFormSchema>>;
 
 export interface PriceSheetMutationInput {
   title: string;
@@ -152,16 +150,16 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
   };
 }
 
-export function parsePriceSheetFormPayload(payload: string) {
+export function parsePriceSheetFormPayload(payload: string, locale: InterfaceLocale = "en") {
   try {
-    return priceSheetFormSchema.safeParse(JSON.parse(payload));
+    return getPriceSheetFormSchema(locale).safeParse(JSON.parse(payload));
   } catch {
     return {
       success: false as const,
       error: new z.ZodError([
         {
           code: "custom",
-          message: "Form payload could not be read.",
+          message: getMessages(locale).priceSheetValidation.payloadUnreadable,
           path: [],
         },
       ]),
@@ -170,7 +168,7 @@ export function parsePriceSheetFormPayload(payload: string) {
 }
 
 export function toPriceSheetMutationInput(values: PriceSheetFormValues): PriceSheetMutationInput {
-  const parsed = priceSheetFormSchema.parse(values);
+  const parsed = getPriceSheetFormSchema("en").parse(values);
   const secondaryLocale = getAlternatePriceSheetContentLocale(parsed.defaultContentLocale);
 
   return {
