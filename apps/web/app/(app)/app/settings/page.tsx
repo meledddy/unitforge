@@ -1,4 +1,3 @@
-import { getStripeScaffoldState } from "@unitforge/billing";
 import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 
@@ -6,24 +5,72 @@ import { getMembershipRoleLabel, getSubscriptionStatusLabel } from "@/components
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
-import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
+
+const settingsContent = {
+  en: {
+    eyebrow: "Workspace settings",
+    title: "Settings",
+    description: "Review the active workspace, account context, and billing state from one page.",
+    pricingCta: "View pricing",
+    workspaceTitle: "Workspace profile",
+    workspaceDescription: "Name and workspace handle used across the protected app.",
+    currentUserTitle: "Current access",
+    currentUserDescription: "The signed-in account and role for this workspace.",
+    currentUserBody: "Use this view to confirm who is currently working in the workspace before updating live pricing.",
+    subscriptionTitle: "Billing status",
+    subscriptionDescription: "Current billing and access state for this workspace.",
+    unconfigured: "Managed manually",
+    plan: "Plan",
+    notAssigned: "Not assigned",
+    status: "Status",
+    billingTitle: "Billing and access",
+    billingDescription: "Pilot billing is intentionally simple while self-serve checkout is prepared.",
+    setupTitle: "Current setup",
+    setupDescription: "Early access workspaces are handled directly so teams can start using the live pricing workflow without extra setup friction.",
+    nextStepTitle: "Next step",
+    nextStepDescription: "If you need to change plan or access terms, coordinate it directly during the pilot period.",
+  },
+  ru: {
+    eyebrow: "Настройки рабочего пространства",
+    title: "Настройки",
+    description: "Проверьте активное рабочее пространство, текущий доступ и состояние биллинга на одной странице.",
+    pricingCta: "Посмотреть тарифы",
+    workspaceTitle: "Профиль рабочего пространства",
+    workspaceDescription: "Название и адрес рабочего пространства, которые используются во всем защищенном приложении.",
+    currentUserTitle: "Текущий доступ",
+    currentUserDescription: "Учетная запись и роль, с которыми вы сейчас работаете в этом рабочем пространстве.",
+    currentUserBody: "Эта страница помогает быстро проверить, кто работает в пространстве, перед обновлением публичных цен.",
+    subscriptionTitle: "Статус биллинга",
+    subscriptionDescription: "Текущее состояние биллинга и доступа для этого рабочего пространства.",
+    unconfigured: "Настраивается вручную",
+    plan: "План",
+    notAssigned: "Не назначен",
+    status: "Статус",
+    billingTitle: "Биллинг и доступ",
+    billingDescription: "На пилотном этапе биллинг остается простым, пока готовится самостоятельная оплата.",
+    setupTitle: "Текущий формат",
+    setupDescription: "Рабочие пространства раннего доступа подключаются напрямую, чтобы команды могли начать пользоваться живым ценовым сценарием без лишних шагов.",
+    nextStepTitle: "Следующий шаг",
+    nextStepDescription: "Если нужно изменить план или условия доступа, это согласуется напрямую в рамках пилотного периода.",
+  },
+} as const;
 
 export default async function SettingsPage() {
   const [session, locale] = await Promise.all([requireCurrentAppShellSession(), getCurrentInterfaceLocale()]);
-  const stripe = getStripeScaffoldState(process.env);
-  const messages = getMessages(locale);
+  const copy = settingsContent[locale];
   const userDisplayName = session.currentUser.name || session.currentUser.email;
+  const subscriptionStatus = session.subscription ? getSubscriptionStatusLabel(locale, session.subscription.status) : copy.unconfigured;
 
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow={messages.settingsPage.eyebrow}
-        title={messages.settingsPage.title}
-        description={messages.settingsPage.description}
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
         actions={
           <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }))} href="/pricing">
-            {messages.settingsPage.pricingCta}
+            {copy.pricingCta}
           </Link>
         }
       />
@@ -31,8 +78,8 @@ export default async function SettingsPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>{messages.settingsPage.workspaceTitle}</CardTitle>
-            <CardDescription>{messages.settingsPage.workspaceDescription}</CardDescription>
+            <CardTitle>{copy.workspaceTitle}</CardTitle>
+            <CardDescription>{copy.workspaceDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{session.currentWorkspace.name}</p>
@@ -43,48 +90,41 @@ export default async function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{messages.settingsPage.currentUserTitle}</CardTitle>
-            <CardDescription>{messages.settingsPage.currentUserDescription}</CardDescription>
+            <CardTitle>{copy.currentUserTitle}</CardTitle>
+            <CardDescription>{copy.currentUserDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{userDisplayName}</p>
             <p>{session.currentUser.email}</p>
-            <p>{messages.settingsPage.currentUserBody}</p>
+            <p>{copy.currentUserBody}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>{messages.settingsPage.subscriptionTitle}</CardTitle>
-            <CardDescription>{messages.settingsPage.subscriptionDescription}</CardDescription>
+            <CardTitle>{copy.subscriptionTitle}</CardTitle>
+            <CardDescription>{copy.subscriptionDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p className="font-medium text-foreground">
-              {session.subscription ? getSubscriptionStatusLabel(locale, session.subscription.status) : messages.settingsPage.unconfigured}
+              {copy.status}: {subscriptionStatus}
             </p>
             <p>
-              {messages.settingsPage.plan}: {session.subscription?.plan ?? messages.settingsPage.notAssigned}
-            </p>
-            <p>
-              {messages.settingsPage.provider}: {session.subscription?.provider ?? messages.settingsPage.notConfigured}
+              {copy.plan}: {session.subscription?.plan ?? copy.notAssigned}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <PlaceholderPanel title={messages.settingsPage.stripeTitle} description={messages.settingsPage.stripeDescription}>
+      <PlaceholderPanel title={copy.billingTitle} description={copy.billingDescription}>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-3xl border border-border/70 bg-background/70 p-4">
-            <p className="font-medium">{messages.settingsPage.configurationTitle}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {stripe.configured ? messages.settingsPage.configurationReady : messages.settingsPage.configurationMissing}
-            </p>
+            <p className="font-medium">{copy.setupTitle}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{copy.setupDescription}</p>
           </div>
           <div className="rounded-3xl border border-border/70 bg-background/70 p-4">
-            <p className="font-medium">{messages.settingsPage.missingKeysTitle}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {stripe.missingKeys.length > 0 ? stripe.missingKeys.join(", ") : messages.shared.none}
-            </p>
+            <p className="font-medium">{copy.nextStepTitle}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{copy.nextStepDescription}</p>
           </div>
         </div>
       </PlaceholderPanel>

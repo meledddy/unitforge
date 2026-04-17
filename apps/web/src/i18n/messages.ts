@@ -255,7 +255,7 @@ const appShellMessages = {
     nav: {
       overview: {
         label: "Overview",
-        description: "Workspace status, product surfaces, and rollout readiness.",
+        description: "Workspace summary and active tools.",
       },
       priceSheets: {
         label: "Price Sheets",
@@ -263,7 +263,7 @@ const appShellMessages = {
       },
       settings: {
         label: "Settings",
-        description: "Workspace defaults, billing, and integrations.",
+        description: "Workspace preferences and billing.",
       },
     },
   },
@@ -275,7 +275,7 @@ const appShellMessages = {
     nav: {
       overview: {
         label: "Обзор",
-        description: "Статус рабочего пространства и готовность к запуску.",
+        description: "Сводка по рабочему пространству и активным инструментам.",
       },
       priceSheets: {
         label: "Прайс-листы",
@@ -283,7 +283,7 @@ const appShellMessages = {
       },
       settings: {
         label: "Настройки",
-        description: "Параметры рабочего пространства, биллинг и интеграции.",
+        description: "Параметры рабочего пространства и биллинг.",
       },
     },
   },
