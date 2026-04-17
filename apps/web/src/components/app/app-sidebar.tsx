@@ -6,6 +6,7 @@ import { Avatar, Badge, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { getMembershipRoleLabel, getSubscriptionSummaryLabel } from "@/components/app/app-shell-labels";
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import { getMessages } from "@/i18n/messages";
 import type { AppShellSession } from "@/server/current-session";
@@ -18,9 +19,9 @@ interface AppSidebarProps {
 export function AppSidebar({ session, locale }: AppSidebarProps) {
   const pathname = usePathname();
   const messages = getMessages(locale);
-  const subscriptionLabel = session.subscription
-    ? `${session.subscription.plan} / ${session.subscription.status}`
-    : messages.appShell.billingNotConfigured;
+  const userDisplayName = session.currentUser.name || session.currentUser.email;
+  const subscriptionLabel = getSubscriptionSummaryLabel(locale, session.subscription);
+  const roleLabel = getMembershipRoleLabel(locale, session.membership.role);
 
   return (
     <aside className="border-b border-border/70 bg-card/80 lg:min-h-screen lg:w-80 lg:border-b-0 lg:border-r">
@@ -69,14 +70,14 @@ export function AppSidebar({ session, locale }: AppSidebarProps) {
 
         <div className="mt-auto rounded-3xl border border-border/70 bg-background/80 p-4">
           <div className="flex items-center gap-3">
-            <Avatar name={session.currentUser.name} />
+            <Avatar name={userDisplayName} />
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{session.currentUser.name}</p>
+              <p className="truncate text-sm font-medium">{userDisplayName}</p>
               <p className="truncate text-xs text-muted-foreground">{session.currentUser.email}</p>
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Badge variant="outline">{session.membership.role}</Badge>
+            <Badge variant="outline">{roleLabel}</Badge>
             <Badge variant="outline">{subscriptionLabel}</Badge>
           </div>
         </div>

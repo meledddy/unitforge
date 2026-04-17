@@ -41,7 +41,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
     ]);
     const nextStatus = priceSheet.status === "published" ? "draft" : "published";
     const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
-    const leadCountLabel = `${leads.length} ${leads.length === 1 ? messages.priceSheets.leadSingle : messages.priceSheets.leadPlural}`;
+    const leadCountLabel = `${messages.priceSheets.leadCountLabel}: ${leads.length}`;
 
     return (
       <div className="space-y-8">

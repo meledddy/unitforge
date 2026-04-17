@@ -162,7 +162,7 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, publicUrl,
 function formatLeadCount(locale: InterfaceLocale, count: number) {
   const messages = getMessages(locale);
 
-  return `${count} ${count === 1 ? messages.priceSheets.leadSingle : messages.priceSheets.leadPlural}`;
+  return `${messages.priceSheets.leadCountLabel}: ${count}`;
 }
 
 function getLeadIntakeLabel(locale: InterfaceLocale, status: "draft" | "published", inquiryEnabled: boolean) {

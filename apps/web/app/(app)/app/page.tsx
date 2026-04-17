@@ -2,6 +2,7 @@ import { productSurfaces } from "@unitforge/core";
 import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 
+import { getMembershipRoleLabel, getSubscriptionStatusLabel } from "@/components/app/app-shell-labels";
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
@@ -11,15 +12,24 @@ import { requireCurrentAppShellSession } from "@/server/current-session";
 export default async function DashboardPage() {
   const [session, locale] = await Promise.all([requireCurrentAppShellSession(), getCurrentInterfaceLocale()]);
   const messages = getMessages(locale);
+  const userDisplayName = session.currentUser.name || session.currentUser.email;
   const localizedProductSurfaces = productSurfaces.map((surface) => {
     if (surface.href === "/app/price-sheets") {
       return locale === "ru"
-        ? { ...surface, title: "Прайс-листы", description: "Данные ценообразования в рамках workspace со схемой, готовой для Drizzle-запросов." }
+        ? {
+            ...surface,
+            title: "Прайс-листы",
+            description: "Данные ценообразования в рамках рабочего пространства со схемой, готовой для Drizzle-запросов.",
+          }
         : surface;
     }
 
     return locale === "ru"
-      ? { ...surface, title: "Import Margin", description: "Маршрут-заполнитель, зарезервированный для будущего import margin workflow." }
+      ? {
+          ...surface,
+          title: "Import Margin",
+          description: "Маршрут-заполнитель, зарезервированный для будущего сценария Import Margin.",
+        }
       : surface;
   });
 
@@ -43,9 +53,9 @@ export default async function DashboardPage() {
             <CardDescription>{messages.dashboard.currentUserDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">{session.currentUser.name}</p>
+            <p className="font-medium text-foreground">{userDisplayName}</p>
             <p>{session.currentUser.email}</p>
-            <Badge variant="outline">{session.membership.role}</Badge>
+            <Badge variant="outline">{getMembershipRoleLabel(locale, session.membership.role)}</Badge>
           </CardContent>
         </Card>
 
@@ -67,9 +77,15 @@ export default async function DashboardPage() {
             <CardDescription>{messages.dashboard.billingDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p className="font-medium capitalize text-foreground">{session.subscription?.status ?? messages.dashboard.unconfigured}</p>
-            <p>{messages.dashboard.plan}: {session.subscription?.plan ?? messages.dashboard.notAssigned}</p>
-            <p>{messages.dashboard.provider}: {session.subscription?.provider ?? messages.dashboard.notConfigured}</p>
+            <p className="font-medium text-foreground">
+              {session.subscription ? getSubscriptionStatusLabel(locale, session.subscription.status) : messages.dashboard.unconfigured}
+            </p>
+            <p>
+              {messages.dashboard.plan}: {session.subscription?.plan ?? messages.dashboard.notAssigned}
+            </p>
+            <p>
+              {messages.dashboard.provider}: {session.subscription?.provider ?? messages.dashboard.notConfigured}
+            </p>
           </CardContent>
         </Card>
       </div>
