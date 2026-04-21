@@ -50,8 +50,10 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           title={priceSheet.title}
           description={messages.priceSheets.editDescription}
           actions={
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="outline">{leadCountLabel}</Badge>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Badge className="h-8 rounded-full px-3" variant="secondary">
+                {leadCountLabel}
+              </Badge>
               <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href="#sheet-leads">
                 {messages.priceSheets.leadsLink}
               </Link>
@@ -95,16 +97,32 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
-                  <span className="text-sm text-muted-foreground">{priceSheet.itemCount} {messages.priceSheets.itemsCount}</span>
+                  <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
+                    {priceSheet.itemCount} {messages.priceSheets.itemsCount}
+                  </span>
                 </div>
 
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>{messages.priceSheets.slugLabel}: {priceSheet.slug}</p>
-                  <p>{messages.priceSheets.themeLabel}: {priceSheet.theme}</p>
-                  <p>{messages.priceSheets.currencyLabel}: {priceSheet.currency}</p>
-                  <p>{messages.priceSheets.defaultLocaleLabel}: {priceSheet.defaultContentLocale}</p>
-                  {priceSheet.description ? <p>{messages.priceSheets.descriptionLabel}: {priceSheet.description}</p> : null}
-                  <p>{messages.shared.updated}: {priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</p>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.priceSheets.slugLabel}</span>
+                    <span className="font-mono text-xs uppercase tracking-[0.18em] text-foreground">/{priceSheet.slug}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.priceSheets.themeLabel}</span>
+                    <span className="text-foreground">{priceSheet.theme}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.priceSheets.currencyLabel}</span>
+                    <span className="text-foreground">{priceSheet.currency}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.priceSheets.defaultLocaleLabel}</span>
+                    <span className="text-foreground">{priceSheet.defaultContentLocale}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.shared.updated}</span>
+                    <span className="text-right text-foreground">{priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</span>
+                  </div>
                 </div>
 
                 <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, `/app/price-sheets/${priceSheet.id}`)}>

@@ -130,46 +130,48 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                 <Card key={priceSheet.id}>
                   <CardHeader>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
-                          <p className="text-sm text-muted-foreground">{priceSheet.itemCount} {messages.priceSheets.itemsCount}</p>
-                        </div>
-                        <div>
-                          <CardTitle>{priceSheet.title}</CardTitle>
-                          <CardDescription>
-                            <span className="font-mono text-xs uppercase tracking-[0.18em]">{priceSheet.slug}</span>
-                            {" / "}
+                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
+                            {priceSheet.itemCount} {messages.priceSheets.itemsCount}
+                          </span>
+                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
                             {priceSheet.currency}
-                            {" / "}
-                            {priceSheet.defaultContentLocale}
-                            {" / "}
-                            {priceSheet.theme}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          <CardTitle>{priceSheet.title}</CardTitle>
+                          <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span>{messages.priceSheets.slugLabel}:</span>
+                            <span className="font-mono text-xs uppercase tracking-[0.18em]">/{priceSheet.slug}</span>
+                            <span aria-hidden="true" className="text-border">•</span>
+                            <span>{priceSheet.defaultContentLocale}</span>
                           </CardDescription>
-                          {priceSheet.description ? <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{priceSheet.description}</p> : null}
+                          {priceSheet.description ? <p className="max-w-2xl text-sm text-muted-foreground">{priceSheet.description}</p> : null}
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                         <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, "/app/price-sheets")}>
-                          <Button className="w-full sm:w-auto" type="submit" variant="outline">
+                          <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
                             {statusActionLabel}
                           </Button>
                         </form>
                         <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
-                          <Button className="w-full sm:w-auto" type="submit" variant="outline">
+                          <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
                             {messages.shared.duplicate}
                           </Button>
                         </form>
                         {priceSheet.status === "published" ? (
                           <Link
-                            className={cn(buttonVariants({ size: "default", variant: "outline" }), "w-full sm:w-auto")}
+                            className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")}
                             href={`/price-sheets/${priceSheet.slug}`}
                           >
                             {messages.priceSheets.publicPage}
                           </Link>
                         ) : null}
-                        <Link className={cn(buttonVariants({ size: "default" }), "w-full sm:w-auto")} href={`/app/price-sheets/${priceSheet.id}`}>
+                        <Link className={cn(buttonVariants({ size: "sm" }), "w-full sm:w-auto")} href={`/app/price-sheets/${priceSheet.id}`}>
                           {messages.priceSheets.editSheet}
                         </Link>
                       </div>
