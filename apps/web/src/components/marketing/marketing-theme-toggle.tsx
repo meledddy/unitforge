@@ -65,7 +65,7 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
       aria-label={label}
       aria-pressed={mounted ? theme === "dark" : false}
       className={cn(
-        "group relative inline-flex h-11 w-[4.65rem] shrink-0 items-center rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[hsl(var(--marketing-surface)/0.78)] p-[3px] text-[hsl(var(--marketing-foreground-soft))] shadow-[0_20px_46px_-34px_hsl(var(--marketing-shadow)/0.28)] transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[hsl(var(--marketing-border-strong)/0.56)] hover:shadow-[0_24px_52px_-34px_hsl(var(--marketing-shadow)/0.36)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+        "marketing-focus-ring group relative inline-flex h-11 w-[4.65rem] shrink-0 items-center rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[hsl(var(--marketing-surface)/0.78)] p-[3px] text-[hsl(var(--marketing-foreground-soft))] shadow-[0_20px_46px_-34px_hsl(var(--marketing-shadow)/0.28)] transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[hsl(var(--marketing-border-strong)/0.56)] hover:shadow-[0_24px_52px_-34px_hsl(var(--marketing-shadow)/0.36)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
         className,
       )}
       type="button"
@@ -73,7 +73,7 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,hsl(var(--marketing-glow)/0.16),transparent_60%)] opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_top,hsl(var(--marketing-glow)/0.12),transparent_60%)] opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
       />
       <span
         aria-hidden="true"

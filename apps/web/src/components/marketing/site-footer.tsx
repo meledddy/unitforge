@@ -8,15 +8,15 @@ const footerContent = {
   en: {
     description: "One clean public page for services, prices, and new requests.",
     links: [
-      { href: "/#showcase", label: "How it works" },
-      { href: "/#offer", label: "Price" },
+      { href: "/#showcase", label: "Example" },
+      { href: "/#offer", label: "Pricing" },
       { href: "/login", label: "Sign in" },
     ],
   },
   ru: {
-    description: "Одна аккуратная публичная страница для услуг, цен и новых заявок.",
+    description: "Одна аккуратная страница для услуг, цен и заявок.",
     links: [
-      { href: "/#showcase", label: "Как это работает" },
+      { href: "/#showcase", label: "Пример" },
       { href: "/#offer", label: "Цена" },
       { href: "/login", label: "Войти" },
     ],
@@ -28,7 +28,7 @@ export async function SiteFooter() {
   const copy = footerContent[locale];
 
   return (
-    <footer className="border-t border-[hsl(var(--marketing-border)/0.55)] bg-[hsl(var(--marketing-header)/0.74)] backdrop-blur">
+    <footer className="border-t border-[hsl(var(--marketing-border)/0.5)] bg-[hsl(var(--marketing-header)/0.68)] backdrop-blur">
       <div className="container flex flex-col gap-6 py-8 text-sm text-[hsl(var(--marketing-foreground-soft))] lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3">
           <BrandMark className="mt-0.5 h-8 w-8 text-[hsl(var(--marketing-accent))]" />
@@ -42,7 +42,7 @@ export async function SiteFooter() {
             {copy.links.map((item) => (
               <Link
                 key={item.href}
-                className="rounded-full px-3 py-1.5 transition-colors hover:bg-[hsl(var(--marketing-surface-muted))] hover:text-[hsl(var(--marketing-foreground))]"
+                className="marketing-focus-ring rounded-full px-3 py-1.5 transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:bg-[hsl(var(--marketing-surface-muted))] hover:text-[hsl(var(--marketing-foreground))] motion-reduce:transition-none"
                 href={item.href}
               >
                 {item.label}

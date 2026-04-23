@@ -14,11 +14,11 @@ const surfaceTransitionClassName =
 const landingContent = {
   en: {
     badge: "For service businesses",
-    title: "Show services clearly and receive new requests in one place",
-    description: "One clean public page with prices, work examples, and a request form. Everything stays under your brand.",
+    title: "Publish services and receive requests",
+    description: "Create one polished public page with prices, work examples, and a request form. Everything stays under your brand.",
     primaryCta: "Start free",
-    secondaryCta: "See a sample",
-    trustPoints: ["No card", "Ready in minutes", "Cancel anytime"],
+    secondaryCta: "View example",
+    trustPoints: ["No card required", "Ready in minutes", "Cancel anytime"],
     showcaseEyebrow: "Your public page",
     showcaseTitle: "Services and prices",
     showcaseBadge: "Under your brand",
@@ -27,9 +27,9 @@ const landingContent = {
       { name: "Ongoing support", price: "from $150 / month" },
       { name: "SEO review", price: "from $100" },
     ],
-    showcaseCta: "Send request",
-    showcaseResponse: "Clients can send a request right away",
-    showcaseDelivery: "Every request lands in one calm inbox.",
+    showcaseCta: "Send a request",
+    showcaseResponse: "Clients can request a quote right away",
+    showcaseDelivery: "Every request lands in one calm workspace.",
     showcaseMetricLabel: "Requests this week",
     showcaseMetricValue: "12",
     showcaseMetricMeta: "All from the public page",
@@ -37,7 +37,7 @@ const landingContent = {
     requestMeta: "Kitchen renovation • 2 min ago",
     requestBody: "Asked for an estimate and a call today.",
     benefitsEyebrow: "What you get",
-    benefitsTitle: "Everything you need to launch a page clients understand.",
+    benefitsTitle: "A clear page clients understand right away.",
     benefitsDescription: "No complex setup. Just clear services, incoming requests, and simple updates when prices change.",
     capabilities: [
       {
@@ -54,10 +54,10 @@ const landingContent = {
       },
     ],
     pricingEyebrow: "Simple price",
-    pricingLead: "Start with one branded page, request forms, and the essentials to start receiving enquiries quickly.",
+    pricingLead: "Start with one branded page, request forms, and everything needed to receive your first requests.",
     pricingSuffix: "/ month",
-    planDescription: "Everything you need to present services clearly and start receiving requests.",
-    pricingHighlights: ["Best for one public service page", "Setup help included"],
+    planDescription: "Present your services clearly and start receiving requests.",
+    pricingHighlights: ["Built for one public service page", "Launch help included"],
     pricingCta: "Try for free",
     pricingTrial: "14 days free, no card",
     planFeatures: [
@@ -85,55 +85,55 @@ const landingContent = {
     ],
   },
   ru: {
-    badge: "Для сервисных бизнесов",
-    title: "Покажите услуги и получайте новые заявки в одном месте",
+    badge: "Для сервисного бизнеса",
+    title: "Покажите услуги и принимайте заявки",
     description: "Одна аккуратная публичная страница с ценами, примерами работ и формой заявки. Всё под вашим брендом.",
-    primaryCta: "Запустить бесплатно",
+    primaryCta: "Начать бесплатно",
     secondaryCta: "Посмотреть пример",
-    trustPoints: ["Без карты", "Запуск за минуты", "Отмена в любой момент"],
-    showcaseEyebrow: "Ваша публичная страница",
+    trustPoints: ["Без карты", "Старт за несколько минут", "Отмена в любой момент"],
+    showcaseEyebrow: "Публичная страница",
     showcaseTitle: "Услуги и цены",
-    showcaseBadge: "Под вашим брендом",
+    showcaseBadge: "Ваш бренд",
     showcaseItems: [
       { name: "Разработка сайта", price: "от 49 000 ₽" },
       { name: "Поддержка и обновления", price: "от 15 000 ₽ / мес" },
       { name: "SEO-аудит", price: "от 10 000 ₽" },
     ],
     showcaseCta: "Оставить заявку",
-    showcaseResponse: "Клиент может оставить заявку сразу на странице",
-    showcaseDelivery: "Каждая заявка попадает в одно спокойное место.",
-    showcaseMetricLabel: "Заявок за неделю",
+    showcaseResponse: "Клиент оставляет заявку прямо на странице",
+    showcaseDelivery: "Все обращения приходят в один удобный кабинет.",
+    showcaseMetricLabel: "Заявки за неделю",
     showcaseMetricValue: "12",
-    showcaseMetricMeta: "Все пришли с публичной страницы",
+    showcaseMetricMeta: "Все с публичной страницы",
     requestTitle: "Новая заявка",
     requestMeta: "Кухня под ключ • 2 минуты назад",
-    requestBody: "Попросили смету и звонок сегодня.",
+    requestBody: "Нужна смета и звонок сегодня.",
     benefitsEyebrow: "Что входит",
-    benefitsTitle: "Всё, чтобы быстро запустить страницу, которую клиент понимает с первого взгляда.",
-    benefitsDescription: "Без лишней настройки. Только понятные услуги, входящие заявки и простые обновления.",
+    benefitsTitle: "Страница, которую клиент понимает сразу.",
+    benefitsDescription: "Без сложной настройки: услуги, заявки и быстрые обновления цен в одном месте.",
     capabilities: [
       {
-        title: "Понятная публичная страница",
-        description: "Услуги, цены и примеры работ в формате, который клиенту легко просмотреть.",
+        title: "Понятная страница",
+        description: "Услуги, цены и примеры работ в понятном для клиента формате.",
       },
       {
         title: "Заявки в одном месте",
-        description: "Каждая заявка попадает в одно спокойное место, а не теряется в переписках и почте.",
+        description: "Все заявки попадают в один кабинет, а не теряются в переписках и почте.",
       },
       {
-        title: "Легко поддерживать в порядке",
-        description: "Меняйте цены и услуги без переделки страницы каждый раз, когда что-то обновилось.",
+        title: "Легко обновлять",
+        description: "Меняйте цены и услуги без переделки страницы каждый раз.",
       },
     ],
     pricingEyebrow: "Простая цена",
-    pricingLead: "Стартуйте с одной брендированной страницы, формой заявки и всем, что нужно для первых обращений.",
+    pricingLead: "Начните с одной страницы под вашим брендом, формы заявки и всего, что нужно для первых обращений.",
     pricingSuffix: "/ мес",
-    planDescription: "Всё, чтобы спокойно показать услуги и начать получать заявки.",
-    pricingHighlights: ["Подходит для одной публичной страницы", "Поможем с запуском"],
+    planDescription: "Покажите услуги понятно и начните получать заявки.",
+    pricingHighlights: ["Для одной публичной страницы", "Поможем запустить"],
     pricingCta: "Попробовать бесплатно",
     pricingTrial: "14 дней бесплатно, без карты",
     planFeatures: [
-      "Одна публичная страница с вашими услугами",
+      "Страница с вашими услугами",
       "Форма заявки и уведомления",
       "Отзывы и примеры работ",
       "Ваш логотип и домен",
@@ -143,16 +143,16 @@ const landingContent = {
     supportEyebrow: "В каждом аккаунте",
     supportItems: [
       {
-        title: "14 дней бесплатно",
+        title: "Без риска",
         description: "Начните без риска и отмените в любой момент.",
       },
       {
         title: "Заявки под защитой",
-        description: "Все обращения клиентов остаются в одном защищённом месте.",
+        description: "Обращения клиентов остаются в одном защищённом месте.",
       },
       {
-        title: "Помощь со стартом",
-        description: "Подскажем, как собрать первую страницу и быстро запуститься.",
+        title: "Поможем на старте",
+        description: "Подскажем, как собрать первую страницу и запуститься.",
       },
     ],
   },
@@ -185,8 +185,8 @@ export default async function LandingPage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_top,hsl(var(--marketing-glow)/0.12),transparent_58%)]" />
       <div className="pointer-events-none absolute left-1/2 top-[13rem] h-[19rem] w-[19rem] -translate-x-1/2 rounded-full bg-[hsl(var(--marketing-glow)/0.1)] blur-3xl sm:h-[24rem] sm:w-[24rem]" />
 
-      <section className="container relative py-12 sm:py-16 lg:py-24">
-        <div className="grid gap-12 xl:grid-cols-[minmax(0,0.86fr),minmax(0,1.14fr)] xl:items-center xl:gap-14">
+      <section className="container relative py-10 sm:py-16 lg:py-[5.5rem]">
+        <div className="grid gap-12 xl:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)] xl:items-center xl:gap-14">
           <div className="space-y-8">
             <MarketingReveal delay={40}>
               <Badge
@@ -202,12 +202,12 @@ export default async function LandingPage() {
 
             <div className="space-y-5">
               <MarketingReveal delay={100}>
-                <h1 className="max-w-4xl font-serif text-[3.15rem] font-medium leading-[0.9] tracking-[-0.055em] text-[hsl(var(--marketing-foreground))] sm:text-[4.45rem] lg:text-[5.25rem]">
+                <h1 className="max-w-4xl text-balance font-serif text-[2.75rem] font-medium leading-[0.94] tracking-[-0.055em] text-[hsl(var(--marketing-foreground))] sm:text-[4.05rem] lg:text-[4.9rem]">
                   {copy.title}
                 </h1>
               </MarketingReveal>
               <MarketingReveal delay={170} variant="quiet">
-                <p className="max-w-xl text-lg leading-8 text-[hsl(var(--marketing-foreground-soft))] sm:text-[1.45rem] sm:leading-8">
+                <p className="max-w-xl text-[1.05rem] leading-7 text-[hsl(var(--marketing-foreground-soft))] sm:text-[1.35rem] sm:leading-8">
                   {copy.description}
                 </p>
               </MarketingReveal>
@@ -218,7 +218,7 @@ export default async function LandingPage() {
                 <Link
                   className={cn(
                     buttonVariants({ size: "lg" }),
-                    "h-14 rounded-full border border-[hsl(var(--marketing-border-strong)/0.32)] bg-[hsl(var(--marketing-primary))] px-7 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_28px_60px_-30px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_34px_70px_-28px_hsl(var(--marketing-shadow)/0.48)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+                    "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.32)] bg-[hsl(var(--marketing-primary))] px-7 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_28px_60px_-30px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_34px_70px_-28px_hsl(var(--marketing-shadow)/0.48)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none sm:w-auto",
                   )}
                   href={primaryCtaHref}
                 >
@@ -227,7 +227,7 @@ export default async function LandingPage() {
                 <Link
                   className={cn(
                     buttonVariants({ size: "lg", variant: "outline" }),
-                    "group h-14 rounded-full border-[hsl(var(--marketing-border-strong)/0.4)] bg-[hsl(var(--marketing-surface)/0.68)] px-6 text-base font-medium text-[hsl(var(--marketing-foreground))] shadow-[0_20px_42px_-34px_hsl(var(--marketing-shadow)/0.16)] transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:shadow-[0_24px_44px_-32px_hsl(var(--marketing-shadow)/0.22)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+                    "marketing-focus-ring group h-14 w-full rounded-full border-[hsl(var(--marketing-border-strong)/0.4)] bg-[hsl(var(--marketing-surface)/0.68)] px-6 text-base font-medium text-[hsl(var(--marketing-foreground))] shadow-[0_20px_42px_-34px_hsl(var(--marketing-shadow)/0.16)] transition-[transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:shadow-[0_24px_44px_-32px_hsl(var(--marketing-shadow)/0.22)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none sm:w-auto",
                   )}
                   href="/#showcase"
                 >
@@ -258,7 +258,7 @@ export default async function LandingPage() {
 
             <div
               className={cn(
-                "group/hero relative overflow-hidden rounded-[2.5rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface)),hsl(var(--marketing-surface-muted)))] p-5 shadow-[0_36px_90px_-48px_hsl(var(--marketing-shadow)/0.36)] will-change-transform sm:p-7 lg:hover:-translate-y-[3px] lg:hover:shadow-[0_42px_96px_-44px_hsl(var(--marketing-shadow)/0.42)]",
+                "group/hero relative overflow-hidden rounded-[2rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface)),hsl(var(--marketing-surface-muted)))] p-4 shadow-[0_36px_90px_-48px_hsl(var(--marketing-shadow)/0.36)] will-change-transform sm:rounded-[2.5rem] sm:p-7 lg:hover:-translate-y-[2px] lg:hover:shadow-[0_42px_96px_-44px_hsl(var(--marketing-shadow)/0.42)]",
                 surfaceTransitionClassName,
               )}
             >
@@ -303,12 +303,12 @@ export default async function LandingPage() {
                       <div
                         key={item.name}
                         className={cn(
-                          "flex items-center justify-between gap-4 px-5 py-4 text-sm sm:text-base",
+                          "flex items-start justify-between gap-4 px-5 py-4 text-sm sm:text-base",
                           index !== copy.showcaseItems.length - 1 && "border-b border-[hsl(var(--marketing-border)/0.52)]",
                         )}
                       >
-                        <span className="font-medium text-[hsl(var(--marketing-foreground))]">{item.name}</span>
-                        <span className="text-[hsl(var(--marketing-foreground-soft))]">{item.price}</span>
+                        <span className="min-w-0 font-medium text-[hsl(var(--marketing-foreground))]">{item.name}</span>
+                        <span className="shrink-0 text-right text-[hsl(var(--marketing-foreground-soft))]">{item.price}</span>
                       </div>
                     ))}
                   </div>
@@ -324,7 +324,7 @@ export default async function LandingPage() {
                         <p className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">{copy.showcaseResponse}</p>
                         <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">{copy.showcaseDelivery}</p>
                       </div>
-                      <div className="flex h-12 items-center justify-center gap-3 rounded-full border border-[hsl(var(--marketing-border-strong)/0.36)] bg-[linear-gradient(135deg,hsl(var(--marketing-accent-soft)),hsl(var(--marketing-accent)/0.62))] px-5 text-base font-semibold text-[hsl(var(--marketing-foreground))] shadow-[0_18px_42px_-26px_hsl(var(--marketing-shadow)/0.26)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] motion-reduce:transition-none">
+                      <div className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[hsl(var(--marketing-border-strong)/0.36)] bg-[linear-gradient(135deg,hsl(var(--marketing-accent-soft)),hsl(var(--marketing-accent)/0.62))] px-5 text-base font-semibold text-[hsl(var(--marketing-foreground))] shadow-[0_18px_42px_-26px_hsl(var(--marketing-shadow)/0.26)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] motion-reduce:transition-none sm:w-auto">
                         <span>{copy.showcaseCta}</span>
                         <MarketingIcon className="h-4 w-4" name="send" />
                       </div>
@@ -334,7 +334,7 @@ export default async function LandingPage() {
 
                 <div
                   className={cn(
-                    "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.84)] p-5 shadow-[0_20px_48px_-34px_hsl(var(--marketing-shadow)/0.24)] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:translate-y-1 lg:group-hover/hero:translate-y-[6px] lg:group-hover/hero:shadow-[0_24px_56px_-30px_hsl(var(--marketing-shadow)/0.3)]",
+                    "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.84)] p-5 shadow-[0_20px_48px_-34px_hsl(var(--marketing-shadow)/0.24)] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:translate-y-1 lg:group-hover/hero:translate-y-[3px] lg:group-hover/hero:shadow-[0_24px_56px_-30px_hsl(var(--marketing-shadow)/0.3)]",
                     surfaceTransitionClassName,
                   )}
                 >
@@ -376,13 +376,13 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="container relative py-12 sm:py-16" id="benefits">
+      <section className="container relative py-10 sm:py-14" id="benefits">
         <div className="grid gap-10 xl:grid-cols-[minmax(0,0.7fr),minmax(0,1.3fr)] xl:items-start xl:gap-12">
           <MarketingReveal className="max-w-xl space-y-4" variant="quiet">
             <p className="font-mono text-xs font-medium uppercase tracking-[0.28em] text-[hsl(var(--marketing-foreground-muted))]">
               {copy.benefitsEyebrow}
             </p>
-            <h2 className="max-w-2xl text-balance text-[2.5rem] font-semibold tracking-[-0.06em] text-[hsl(var(--marketing-foreground))] sm:text-[3.15rem]">
+            <h2 className="max-w-2xl text-balance text-[2.15rem] font-semibold leading-[1.04] tracking-[-0.06em] text-[hsl(var(--marketing-foreground))] sm:text-[2.9rem]">
               {copy.benefitsTitle}
             </h2>
             <p className="max-w-lg text-base leading-7 text-[hsl(var(--marketing-foreground-soft))] sm:text-lg sm:leading-8">
@@ -395,7 +395,7 @@ export default async function LandingPage() {
               <MarketingReveal key={capability.title} className="h-full" delay={80 + index * 70} variant="quiet">
                 <article
                   className={cn(
-                    "group h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.62)] bg-[hsl(var(--marketing-surface)/0.44)] p-6 shadow-[0_18px_48px_-44px_hsl(var(--marketing-shadow)/0.24)] backdrop-blur-sm lg:hover:-translate-y-[3px] lg:hover:border-[hsl(var(--marketing-border-strong)/0.5)] lg:hover:bg-[hsl(var(--marketing-surface)/0.64)] lg:hover:shadow-[0_26px_56px_-40px_hsl(var(--marketing-shadow)/0.28)]",
+                    "group h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.62)] bg-[hsl(var(--marketing-surface)/0.42)] p-5 shadow-[0_18px_48px_-44px_hsl(var(--marketing-shadow)/0.22)] backdrop-blur-sm sm:p-6 lg:hover:-translate-y-[2px] lg:hover:border-[hsl(var(--marketing-border-strong)/0.48)] lg:hover:bg-[hsl(var(--marketing-surface)/0.6)] lg:hover:shadow-[0_24px_52px_-42px_hsl(var(--marketing-shadow)/0.26)]",
                     surfaceTransitionClassName,
                   )}
                 >
@@ -416,10 +416,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="container relative py-12 sm:py-16" id="offer">
+      <section className="container relative py-10 sm:py-16" id="offer">
         <MarketingReveal
           className={cn(
-            "relative overflow-hidden rounded-[2.7rem] border border-[hsl(var(--marketing-pricing-edge)/0.72)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface)),hsl(var(--marketing-pricing-surface))_46%,hsl(var(--marketing-surface)))] px-6 py-7 shadow-[0_42px_110px_-56px_hsl(var(--marketing-shadow)/0.38)] sm:px-8 sm:py-9",
+            "relative overflow-hidden rounded-[2.2rem] border border-[hsl(var(--marketing-pricing-edge)/0.72)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface)),hsl(var(--marketing-pricing-surface))_46%,hsl(var(--marketing-surface)))] px-5 py-6 shadow-[0_42px_110px_-56px_hsl(var(--marketing-shadow)/0.38)] sm:rounded-[2.7rem] sm:px-8 sm:py-9 lg:p-10",
             surfaceTransitionClassName,
           )}
           variant="pricing"
@@ -445,7 +445,7 @@ export default async function LandingPage() {
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                   <div className="space-y-3">
                     <div className="flex items-end gap-2">
-                      <p className="text-[4rem] font-semibold leading-none tracking-[-0.08em] text-[hsl(var(--marketing-foreground))]">{planPrice}</p>
+                      <p className="text-[3.45rem] font-semibold leading-none tracking-[-0.08em] text-[hsl(var(--marketing-foreground))] sm:text-[4rem]">{planPrice}</p>
                       <p className="pb-2 text-lg text-[hsl(var(--marketing-foreground-soft))]">{copy.pricingSuffix}</p>
                     </div>
                     <p className="max-w-md text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">{copy.planDescription}</p>
@@ -455,7 +455,7 @@ export default async function LandingPage() {
                     <Link
                       className={cn(
                         buttonVariants({ size: "lg" }),
-                        "h-14 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.03] hover:shadow-[0_30px_66px_-28px_hsl(var(--marketing-shadow)/0.5)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+                        "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.03] hover:shadow-[0_30px_66px_-28px_hsl(var(--marketing-shadow)/0.5)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none sm:w-auto",
                       )}
                       href={primaryCtaHref}
                     >
@@ -481,12 +481,12 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid content-start gap-3 sm:grid-cols-2 xl:pt-2">
               {copy.planFeatures.map((feature, index) => (
                 <MarketingReveal key={feature} delay={110 + index * 45} variant="quiet">
                   <div
                     className={cn(
-                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.76)] px-4 py-4 shadow-[0_18px_42px_-38px_hsl(var(--marketing-shadow)/0.18)]",
+                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.74)] px-4 py-4 shadow-[0_18px_42px_-38px_hsl(var(--marketing-shadow)/0.16)]",
                       surfaceTransitionClassName,
                     )}
                   >
@@ -504,10 +504,10 @@ export default async function LandingPage() {
         </MarketingReveal>
       </section>
 
-      <section className="container relative py-10 sm:py-14" id="support">
+      <section className="container relative py-8 sm:py-12" id="support">
         <MarketingReveal
           className={cn(
-            "rounded-[2rem] border border-[hsl(var(--marketing-border)/0.62)] bg-[hsl(var(--marketing-surface)/0.52)] px-5 py-6 shadow-[0_24px_60px_-48px_hsl(var(--marketing-shadow)/0.2)] backdrop-blur-sm sm:px-6",
+            "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-surface)/0.38)] px-5 py-5 shadow-[0_18px_48px_-46px_hsl(var(--marketing-shadow)/0.18)] backdrop-blur-sm sm:px-6",
             surfaceTransitionClassName,
           )}
           variant="quiet"

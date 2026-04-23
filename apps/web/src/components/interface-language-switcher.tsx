@@ -50,7 +50,7 @@ export function InterfaceLanguageSwitcher({
             key={item}
             aria-pressed={isActive}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-medium transition-[transform,background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] motion-reduce:transition-none",
+              "marketing-focus-ring rounded-full px-3 py-1.5 text-sm font-medium transition-[transform,background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] motion-reduce:transition-none",
               isActive
                 ? "bg-foreground text-background shadow-[0_12px_24px_-18px_rgba(15,23,42,0.42)]"
                 : "text-muted-foreground hover:-translate-y-[1px] hover:bg-secondary hover:text-foreground",

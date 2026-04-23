@@ -12,9 +12,9 @@ import { getCurrentAppShellSession } from "@/server/current-session";
 const siteHeaderContent = {
   en: {
     nav: [
-      { href: "/#showcase", label: "How it works" },
-      { href: "/#benefits", label: "What you get" },
-      { href: "/#offer", label: "Price" },
+      { href: "/#showcase", label: "Example" },
+      { href: "/#benefits", label: "Benefits" },
+      { href: "/#offer", label: "Pricing" },
     ],
     startCta: "Start free",
     mobileMenu: "Menu",
@@ -23,11 +23,11 @@ const siteHeaderContent = {
   },
   ru: {
     nav: [
-      { href: "/#showcase", label: "Как это работает" },
+      { href: "/#showcase", label: "Пример" },
       { href: "/#benefits", label: "Что входит" },
       { href: "/#offer", label: "Цена" },
     ],
-    startCta: "Запустить бесплатно",
+    startCta: "Начать бесплатно",
     mobileMenu: "Меню",
     themeLabel: "Переключить тему",
     languageLabel: "Язык",
@@ -44,14 +44,14 @@ export async function SiteHeader() {
 
   return (
     <header className="marketing-enter-header sticky top-0 z-30 border-b border-[hsl(var(--marketing-border)/0.55)] bg-[hsl(var(--marketing-header)/0.8)] backdrop-blur-xl transition-[background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none">
-      <div className="container flex min-h-[4.85rem] items-center justify-between gap-4 py-3 lg:gap-6">
+      <div className="container flex min-h-[4.25rem] items-center justify-between gap-2 py-2 sm:min-h-[4.85rem] sm:gap-4 sm:py-3 lg:gap-6">
         <Link
-          className="flex min-w-0 items-center gap-3 text-[hsl(var(--marketing-foreground))] transition-[color,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:opacity-90 motion-reduce:transition-none"
+          className="marketing-focus-ring flex min-w-0 items-center gap-3 rounded-full text-[hsl(var(--marketing-foreground))] transition-[color,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:opacity-90 motion-reduce:transition-none"
           href="/"
         >
           <BrandMark className="h-9 w-9 text-[hsl(var(--marketing-accent))]" />
-          <div className="min-w-0">
-            <p className="truncate text-[1.7rem] font-semibold tracking-[-0.05em]">{appConfig.name}</p>
+          <div className="hidden min-w-0 sm:block">
+            <p className="truncate text-[1.52rem] font-semibold tracking-[-0.05em] sm:text-[1.62rem]">{appConfig.name}</p>
           </div>
         </Link>
 
@@ -59,7 +59,7 @@ export async function SiteHeader() {
           {copy.nav.map((item) => (
             <Link
               key={item.href}
-              className="rounded-full px-4 py-2 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))] transition-[background-color,color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:text-[hsl(var(--marketing-foreground))] hover:shadow-[0_16px_28px_-24px_hsl(var(--marketing-shadow)/0.45)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none"
+              className="marketing-focus-ring rounded-full px-4 py-2 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))] transition-[background-color,color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:text-[hsl(var(--marketing-foreground))] hover:shadow-[0_16px_28px_-24px_hsl(var(--marketing-shadow)/0.45)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none"
               href={item.href}
             >
               {item.label}
@@ -78,7 +78,7 @@ export async function SiteHeader() {
           <Link
             className={cn(
               buttonVariants({ size: "sm" }),
-              "h-12 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.48)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_28px_62px_-26px_hsl(var(--marketing-shadow)/0.56)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+              "marketing-focus-ring h-12 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.48)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_28px_62px_-26px_hsl(var(--marketing-shadow)/0.56)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
             )}
             href={ctaHref}
           >
@@ -87,18 +87,18 @@ export async function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 sm:hidden">
-          <MarketingThemeToggle className="w-[4.25rem]" label={copy.themeLabel} />
+          <MarketingThemeToggle className="w-[4.05rem] min-[390px]:w-[4.25rem]" label={copy.themeLabel} />
           <Link
             className={cn(
               buttonVariants({ size: "sm" }),
-              "h-11 rounded-full bg-[hsl(var(--marketing-primary))] px-3.5 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_20px_44px_-30px_hsl(var(--marketing-shadow)/0.4)] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+              "marketing-focus-ring h-11 rounded-full bg-[hsl(var(--marketing-primary))] px-3 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_20px_44px_-30px_hsl(var(--marketing-shadow)/0.4)] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none min-[390px]:px-3.5",
             )}
             href={ctaHref}
           >
             {mobileCtaLabel}
           </Link>
           <details className="group relative">
-            <summary className="flex h-11 w-11 list-none items-center justify-center rounded-full border border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-surface)/0.75)] text-[hsl(var(--marketing-foreground))] shadow-[0_18px_40px_-28px_hsl(var(--marketing-shadow)/0.18)] transition-[background-color,border-color,box-shadow,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.985] group-open:bg-[hsl(var(--marketing-surface-elevated))] group-open:shadow-[0_22px_46px_-28px_hsl(var(--marketing-shadow)/0.28)] [&::-webkit-details-marker]:hidden">
+            <summary className="marketing-focus-ring flex h-11 w-11 list-none items-center justify-center rounded-full border border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-surface)/0.75)] text-[hsl(var(--marketing-foreground))] shadow-[0_18px_40px_-28px_hsl(var(--marketing-shadow)/0.18)] transition-[background-color,border-color,box-shadow,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.985] group-open:bg-[hsl(var(--marketing-surface-elevated))] group-open:shadow-[0_22px_46px_-28px_hsl(var(--marketing-shadow)/0.28)] [&::-webkit-details-marker]:hidden">
               <span className="sr-only">{copy.mobileMenu}</span>
               <span className="flex flex-col gap-[4px]">
                 <span className="block h-[1.5px] w-4 origin-center rounded-full bg-current transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:translate-y-[5px] group-open:rotate-45" />
@@ -120,7 +120,7 @@ export async function SiteHeader() {
                 {copy.nav.map((item) => (
                   <Link
                     key={item.href}
-                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))] transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:text-[hsl(var(--marketing-foreground))] hover:translate-x-[2px]"
+                    className="marketing-focus-ring block rounded-2xl px-4 py-3 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))] transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[hsl(var(--marketing-surface-elevated))] hover:text-[hsl(var(--marketing-foreground))] hover:translate-x-[2px]"
                     href={item.href}
                   >
                     {item.label}
@@ -131,7 +131,7 @@ export async function SiteHeader() {
                 <Link
                   className={cn(
                     buttonVariants({ size: "default" }),
-                    "h-12 w-full rounded-full bg-[hsl(var(--marketing-primary))] text-[hsl(var(--marketing-primary-foreground))] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:scale-[0.985] motion-reduce:transition-none",
+                    "marketing-focus-ring h-12 w-full rounded-full bg-[hsl(var(--marketing-primary))] text-[hsl(var(--marketing-primary-foreground))] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:scale-[0.985] motion-reduce:transition-none",
                   )}
                   href={ctaHref}
                 >

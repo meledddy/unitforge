@@ -106,13 +106,13 @@
     --marketing-bg-soft: 226 28% 10%;
     --marketing-header: 226 24% 9%;
     --marketing-surface: 227 23% 11%;
-    --marketing-surface-muted: 228 19% 13%;
-    --marketing-surface-elevated: 229 18% 16%;
+    --marketing-surface-muted: 228 20% 13%;
+    --marketing-surface-elevated: 229 18% 15%;
     --marketing-foreground: 36 39% 95%;
     --marketing-foreground-soft: 220 16% 79%;
     --marketing-foreground-muted: 220 11% 62%;
-    --marketing-border: 33 20% 18%;
-    --marketing-border-strong: 39 34% 32%;
+    --marketing-border: 33 18% 22%;
+    --marketing-border-strong: 39 34% 36%;
     --marketing-accent: 40 85% 70%;
     --marketing-accent-soft: 38 43% 17%;
     --marketing-primary: 40 88% 71%;
@@ -140,8 +140,8 @@
       --marketing-foreground: 35 36% 95%;
       --marketing-foreground-soft: 219 14% 75%;
       --marketing-foreground-muted: 220 12% 62%;
-      --marketing-border: 34 24% 20%;
-      --marketing-border-strong: 39 44% 34%;
+      --marketing-border: 34 20% 22%;
+      --marketing-border-strong: 39 42% 36%;
       --marketing-accent: 40 86% 71%;
       --marketing-accent-soft: 40 44% 18%;
       --marketing-primary: 40 86% 70%;
@@ -161,15 +161,24 @@
 }
 
 @layer utilities {
+  .marketing-focus-ring {
+    outline: none;
+  }
+
+  .marketing-focus-ring:focus-visible {
+    outline: 2px solid hsl(var(--marketing-accent, 31 94% 59%) / 0.72);
+    outline-offset: 3px;
+  }
+
   .marketing-enter-header {
     opacity: 0;
-    animation: marketing-header-in 560ms var(--marketing-ease) 50ms forwards;
+    animation: marketing-header-in 500ms var(--marketing-ease) 40ms forwards;
     will-change: transform, opacity;
   }
 
   .marketing-reveal {
-    --marketing-reveal-distance: 16px;
-    --marketing-reveal-duration: 620ms;
+    --marketing-reveal-distance: 13px;
+    --marketing-reveal-duration: 540ms;
     --marketing-reveal-scale: 1;
     --marketing-reveal-blur: 0px;
     opacity: 0;
@@ -190,20 +199,20 @@
   }
 
   .marketing-reveal-quiet {
-    --marketing-reveal-distance: 10px;
-    --marketing-reveal-duration: 500ms;
+    --marketing-reveal-distance: 8px;
+    --marketing-reveal-duration: 440ms;
   }
 
   .marketing-reveal-showcase {
-    --marketing-reveal-distance: 18px;
-    --marketing-reveal-duration: 700ms;
-    --marketing-reveal-scale: 0.985;
-    --marketing-reveal-blur: 3px;
+    --marketing-reveal-distance: 14px;
+    --marketing-reveal-duration: 600ms;
+    --marketing-reveal-scale: 0.992;
+    --marketing-reveal-blur: 1.5px;
   }
 
   .marketing-reveal-pricing {
-    --marketing-reveal-distance: 14px;
-    --marketing-reveal-duration: 640ms;
+    --marketing-reveal-distance: 12px;
+    --marketing-reveal-duration: 560ms;
   }
 
   .text-balance {
@@ -241,7 +250,7 @@
   }
 
   35% {
-    opacity: 0.85;
+    opacity: 0.58;
   }
 
   100% {
@@ -251,13 +260,13 @@
 
 @media (max-width: 768px) {
   .marketing-reveal {
-    --marketing-reveal-distance: 10px;
-    --marketing-reveal-duration: 460ms;
+    --marketing-reveal-distance: 8px;
+    --marketing-reveal-duration: 400ms;
   }
 
   .marketing-reveal-showcase {
-    --marketing-reveal-distance: 12px;
-    --marketing-reveal-duration: 520ms;
+    --marketing-reveal-distance: 9px;
+    --marketing-reveal-duration: 440ms;
     --marketing-reveal-scale: 1;
     --marketing-reveal-blur: 0px;
   }
