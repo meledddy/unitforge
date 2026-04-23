@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unitforge Auth"
+  short_description: "Auth, sessions, and onboarding"
+  default_prompt: "Use $unitforge-auth-onboarding to investigate or modify Unitforge sign-in, sessions, or pilot onboarding."
+
+policy:
+  allow_implicit_invocation: true

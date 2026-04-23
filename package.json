@@ -7,6 +7,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
+    "codex:skills:sync": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-codex-skills.ps1",
     "db:generate": "pnpm --filter @unitforge/db db:generate",
     "db:migrate": "pnpm --filter @unitforge/db db:migrate",
     "db:seed:mock-session": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/seed-mock-session.ts",

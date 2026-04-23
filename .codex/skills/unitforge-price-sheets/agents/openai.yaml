@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unitforge Price Sheets"
+  short_description: "Price Sheets and inquiry flows"
+  default_prompt: "Use $unitforge-price-sheets to investigate or modify Unitforge Price Sheets, publication, localization, or lead capture."
+
+policy:
+  allow_implicit_invocation: true

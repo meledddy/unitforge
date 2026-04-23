@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unitforge Art Direction"
+  short_description: "Art direction and visual hierarchy"
+  default_prompt: "Use $unitforge-ui-art-direction to redesign a Unitforge screen with a stronger visual thesis and clearer hierarchy."
+
+policy:
+  allow_implicit_invocation: true

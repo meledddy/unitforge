@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unitforge Motion Pass"
+  short_description: "Motion, timing, and interaction polish"
+  default_prompt: "Use $unitforge-motion-pass to refine the timing, transitions, and interaction feel of a Unitforge screen."
+
+policy:
+  allow_implicit_invocation: true

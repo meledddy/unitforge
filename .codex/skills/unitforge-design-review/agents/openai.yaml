@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unitforge Design Review"
+  short_description: "Visual QA and design critique"
+  default_prompt: "Use $unitforge-design-review to critique a Unitforge screen and identify the highest-impact design issues."
+
+policy:
+  allow_implicit_invocation: true
