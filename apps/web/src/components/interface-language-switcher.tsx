@@ -35,7 +35,12 @@ export function InterfaceLanguageSwitcher({
   }
 
   return (
-    <div className={cn("inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 p-1", className)}>
+    <div
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 p-1 transition-[background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+        className,
+      )}
+    >
       {label ? <span className={cn("px-2 text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground", labelClassName)}>{label}</span> : null}
       {interfaceLocales.map((item) => {
         const isActive = item === locale;
@@ -45,8 +50,10 @@ export function InterfaceLanguageSwitcher({
             key={item}
             aria-pressed={isActive}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-              isActive ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+              "rounded-full px-3 py-1.5 text-sm font-medium transition-[transform,background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] motion-reduce:transition-none",
+              isActive
+                ? "bg-foreground text-background shadow-[0_12px_24px_-18px_rgba(15,23,42,0.42)]"
+                : "text-muted-foreground hover:-translate-y-[1px] hover:bg-secondary hover:text-foreground",
               isActive ? activeClassName : inactiveClassName,
             )}
             type="button"

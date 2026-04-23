@@ -48,6 +48,8 @@
   }
 
   [data-marketing-shell] {
+    position: relative;
+    isolation: isolate;
     --marketing-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --marketing-bg: 35 49% 97%;
     --marketing-bg-soft: 35 62% 99%;
@@ -75,7 +77,24 @@
       linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
     transition:
       background-color 320ms var(--marketing-ease),
-      color 320ms var(--marketing-ease);
+      color 320ms var(--marketing-ease),
+      background-image 360ms var(--marketing-ease);
+  }
+
+  [data-marketing-shell]::after {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    background:
+      radial-gradient(circle at 20% 20%, hsl(var(--marketing-glow) / 0.12), transparent 28%),
+      radial-gradient(circle at 80% 16%, hsl(var(--marketing-glow) / 0.1), transparent 22%);
+  }
+
+  :root[data-marketing-theme-transitioning="true"] [data-marketing-shell]::after {
+    animation: marketing-theme-wash 420ms var(--marketing-ease);
   }
 
   :root[data-marketing-theme="light"] [data-marketing-shell] {
@@ -142,8 +161,65 @@
 }
 
 @layer utilities {
+  .marketing-enter-header {
+    opacity: 0;
+    animation: marketing-header-in 560ms var(--marketing-ease) 50ms forwards;
+    will-change: transform, opacity;
+  }
+
+  .marketing-reveal {
+    --marketing-reveal-distance: 16px;
+    --marketing-reveal-duration: 620ms;
+    --marketing-reveal-scale: 1;
+    --marketing-reveal-blur: 0px;
+    opacity: 0;
+    transform: translate3d(0, var(--marketing-reveal-distance), 0) scale(var(--marketing-reveal-scale));
+    filter: blur(var(--marketing-reveal-blur));
+    transition:
+      opacity var(--marketing-reveal-duration) var(--marketing-ease),
+      transform var(--marketing-reveal-duration) var(--marketing-ease),
+      filter var(--marketing-reveal-duration) var(--marketing-ease);
+    transition-delay: var(--marketing-reveal-delay, 0ms);
+    will-change: transform, opacity, filter;
+  }
+
+  .marketing-reveal[data-marketing-reveal-state="visible"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+
+  .marketing-reveal-quiet {
+    --marketing-reveal-distance: 10px;
+    --marketing-reveal-duration: 500ms;
+  }
+
+  .marketing-reveal-showcase {
+    --marketing-reveal-distance: 18px;
+    --marketing-reveal-duration: 700ms;
+    --marketing-reveal-scale: 0.985;
+    --marketing-reveal-blur: 3px;
+  }
+
+  .marketing-reveal-pricing {
+    --marketing-reveal-distance: 14px;
+    --marketing-reveal-duration: 640ms;
+  }
+
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@keyframes marketing-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -156,5 +232,45 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes marketing-theme-wash {
+  0% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.85;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .marketing-reveal {
+    --marketing-reveal-distance: 10px;
+    --marketing-reveal-duration: 460ms;
+  }
+
+  .marketing-reveal-showcase {
+    --marketing-reveal-distance: 12px;
+    --marketing-reveal-duration: 520ms;
+    --marketing-reveal-scale: 1;
+    --marketing-reveal-blur: 0px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-marketing-shell]::after,
+  .marketing-enter-header,
+  .marketing-reveal {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 }

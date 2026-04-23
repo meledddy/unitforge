@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@unitforge/ui";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import type { MarketingTheme } from "@/components/marketing/marketing-theme";
 import { marketingThemeStorageKey } from "@/components/marketing/marketing-theme";
@@ -24,19 +24,36 @@ function getResolvedTheme(): MarketingTheme {
 export function MarketingThemeToggle({ className, label }: MarketingThemeToggleProps) {
   const [theme, setTheme] = useState<MarketingTheme>("light");
   const [mounted, setMounted] = useState(false);
+  const transitionTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const resolvedTheme = getResolvedTheme();
     document.documentElement.dataset.marketingTheme = resolvedTheme;
     setTheme(resolvedTheme);
     setMounted(true);
+
+    return () => {
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(transitionTimeoutRef.current);
+      }
+    };
   }, []);
 
   function toggleTheme() {
     const nextTheme = theme === "dark" ? "light" : "dark";
+    const root = document.documentElement;
 
-    document.documentElement.dataset.marketingTheme = nextTheme;
+    root.dataset.marketingTheme = nextTheme;
+    root.dataset.marketingThemeTransitioning = "true";
     window.localStorage.setItem(marketingThemeStorageKey, nextTheme);
+
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+    }
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      delete root.dataset.marketingThemeTransitioning;
+    }, 420);
 
     startTransition(() => {
       setTheme(nextTheme);
@@ -48,7 +65,7 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
       aria-label={label}
       aria-pressed={mounted ? theme === "dark" : false}
       className={cn(
-        "group relative inline-flex h-11 w-[4.65rem] shrink-0 items-center rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[hsl(var(--marketing-surface)/0.78)] p-[3px] text-[hsl(var(--marketing-foreground-soft))] shadow-[0_20px_46px_-34px_hsl(var(--marketing-shadow)/0.28)] transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[hsl(var(--marketing-border-strong)/0.56)] hover:shadow-[0_24px_52px_-34px_hsl(var(--marketing-shadow)/0.36)] motion-reduce:transition-none",
+        "group relative inline-flex h-11 w-[4.65rem] shrink-0 items-center rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[hsl(var(--marketing-surface)/0.78)] p-[3px] text-[hsl(var(--marketing-foreground-soft))] shadow-[0_20px_46px_-34px_hsl(var(--marketing-shadow)/0.28)] transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:border-[hsl(var(--marketing-border-strong)/0.56)] hover:shadow-[0_24px_52px_-34px_hsl(var(--marketing-shadow)/0.36)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
         className,
       )}
       type="button"
@@ -61,7 +78,7 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
       <span
         aria-hidden="true"
         className={cn(
-          "absolute left-[3px] top-[3px] z-0 h-[calc(100%-6px)] w-[2rem] rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface)))] shadow-[0_12px_28px_-18px_hsl(var(--marketing-shadow)/0.42)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+          "absolute left-[3px] top-[3px] z-0 h-[calc(100%-6px)] w-[2rem] rounded-full border border-[hsl(var(--marketing-border)/0.72)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface)))] shadow-[0_12px_28px_-18px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-active:scale-[0.96] motion-reduce:transition-none",
           mounted && theme === "dark" ? "translate-x-[2.05rem]" : "translate-x-0",
         )}
       />
@@ -69,8 +86,10 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
         <span
           aria-hidden="true"
           className={cn(
-            "flex h-7 w-7 items-center justify-center transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            mounted && theme === "dark" ? "text-[hsl(var(--marketing-foreground-muted))]" : "text-[hsl(var(--marketing-accent))]",
+            "flex h-7 w-7 items-center justify-center transition-[color,transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            mounted && theme === "dark"
+              ? "translate-y-[1px] scale-[0.92] text-[hsl(var(--marketing-foreground-muted))] opacity-65"
+              : "translate-y-0 scale-100 text-[hsl(var(--marketing-accent))] opacity-100",
           )}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -88,8 +107,10 @@ export function MarketingThemeToggle({ className, label }: MarketingThemeToggleP
         <span
           aria-hidden="true"
           className={cn(
-            "flex h-7 w-7 items-center justify-center transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            mounted && theme === "dark" ? "text-[hsl(var(--marketing-accent))]" : "text-[hsl(var(--marketing-foreground-muted))]",
+            "flex h-7 w-7 items-center justify-center transition-[color,transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            mounted && theme === "dark"
+              ? "translate-y-0 scale-100 text-[hsl(var(--marketing-accent))] opacity-100"
+              : "-translate-y-[1px] scale-[0.92] text-[hsl(var(--marketing-foreground-muted))] opacity-68",
           )}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
