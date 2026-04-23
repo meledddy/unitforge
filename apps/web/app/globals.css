@@ -34,11 +34,110 @@
     scroll-behavior: smooth;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
       radial-gradient(circle at top, hsl(var(--accent) / 0.16), transparent 30%),
       linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+  }
+
+  [data-marketing-shell] {
+    --marketing-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --marketing-bg: 35 49% 97%;
+    --marketing-bg-soft: 35 62% 99%;
+    --marketing-header: 0 0% 100%;
+    --marketing-surface: 0 0% 100%;
+    --marketing-surface-muted: 36 45% 98%;
+    --marketing-surface-elevated: 34 50% 99%;
+    --marketing-foreground: 221 43% 16%;
+    --marketing-foreground-soft: 220 16% 42%;
+    --marketing-foreground-muted: 220 12% 56%;
+    --marketing-border: 34 34% 84%;
+    --marketing-border-strong: 36 49% 72%;
+    --marketing-accent: 39 73% 66%;
+    --marketing-accent-soft: 39 79% 90%;
+    --marketing-primary: 221 43% 18%;
+    --marketing-primary-foreground: 35 62% 98%;
+    --marketing-shadow: 220 40% 13%;
+    --marketing-glow: 39 88% 72%;
+    --marketing-pricing-surface: 40 75% 95%;
+    --marketing-pricing-edge: 39 56% 80%;
+    color-scheme: light;
+    background-image:
+      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.18), transparent 25%),
+      radial-gradient(circle at 75% 14%, hsl(var(--marketing-glow) / 0.14), transparent 17%),
+      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+    transition:
+      background-color 320ms var(--marketing-ease),
+      color 320ms var(--marketing-ease);
+  }
+
+  :root[data-marketing-theme="light"] [data-marketing-shell] {
+    color-scheme: light;
+  }
+
+  :root[data-marketing-theme="dark"] [data-marketing-shell] {
+    --marketing-bg: 224 31% 8%;
+    --marketing-bg-soft: 226 28% 10%;
+    --marketing-header: 226 24% 9%;
+    --marketing-surface: 227 23% 11%;
+    --marketing-surface-muted: 228 19% 13%;
+    --marketing-surface-elevated: 229 18% 16%;
+    --marketing-foreground: 36 39% 95%;
+    --marketing-foreground-soft: 220 16% 79%;
+    --marketing-foreground-muted: 220 11% 62%;
+    --marketing-border: 33 20% 18%;
+    --marketing-border-strong: 39 34% 32%;
+    --marketing-accent: 40 85% 70%;
+    --marketing-accent-soft: 38 43% 17%;
+    --marketing-primary: 40 88% 71%;
+    --marketing-primary-foreground: 226 29% 10%;
+    --marketing-shadow: 225 33% 4%;
+    --marketing-glow: 40 82% 62%;
+    --marketing-pricing-surface: 35 31% 14%;
+    --marketing-pricing-edge: 39 38% 28%;
+    color-scheme: dark;
+    background-image:
+      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 21%),
+      radial-gradient(circle at 76% 12%, hsl(var(--marketing-glow) / 0.08), transparent 17%),
+      radial-gradient(circle at bottom left, hsl(226 24% 14% / 0.75), transparent 24%),
+      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-marketing-theme]) [data-marketing-shell] {
+      --marketing-bg: 224 33% 8%;
+      --marketing-bg-soft: 224 29% 10%;
+      --marketing-header: 224 31% 8%;
+      --marketing-surface: 226 23% 10%;
+      --marketing-surface-muted: 226 21% 12%;
+      --marketing-surface-elevated: 228 19% 15%;
+      --marketing-foreground: 35 36% 95%;
+      --marketing-foreground-soft: 219 14% 75%;
+      --marketing-foreground-muted: 220 12% 62%;
+      --marketing-border: 34 24% 20%;
+      --marketing-border-strong: 39 44% 34%;
+      --marketing-accent: 40 86% 71%;
+      --marketing-accent-soft: 40 44% 18%;
+      --marketing-primary: 40 86% 70%;
+      --marketing-primary-foreground: 224 30% 10%;
+      --marketing-shadow: 220 28% 4%;
+      --marketing-glow: 40 86% 66%;
+      --marketing-pricing-surface: 35 30% 14%;
+      --marketing-pricing-edge: 39 38% 28%;
+      color-scheme: dark;
+      background-image:
+        radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 22%),
+        radial-gradient(circle at 80% 14%, hsl(var(--marketing-glow) / 0.1), transparent 18%),
+        radial-gradient(circle at bottom left, hsl(226 24% 14% / 0.75), transparent 24%),
+        linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+    }
   }
 }
 
@@ -48,3 +147,14 @@
   }
 }
 
+@keyframes marketing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

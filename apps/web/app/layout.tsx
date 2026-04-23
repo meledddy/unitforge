@@ -2,9 +2,10 @@ import "./globals.css";
 
 import { appConfig } from "@unitforge/config";
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { getMarketingThemeBootstrapScript } from "@/components/marketing/marketing-theme";
 import { getInterfaceLocaleTag } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 
@@ -19,6 +20,12 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+const serif = Cormorant_Garamond({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-serif",
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: appConfig.name,
@@ -31,8 +38,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const locale = await getCurrentInterfaceLocale();
 
   return (
-    <html lang={getInterfaceLocaleTag(locale)}>
-      <body className={`${sans.variable} ${mono.variable} min-h-screen font-sans text-foreground`}>{children}</body>
+    <html lang={getInterfaceLocaleTag(locale)} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: getMarketingThemeBootstrapScript() }} />
+      </head>
+      <body className={`${sans.variable} ${mono.variable} ${serif.variable} min-h-screen font-sans text-foreground`}>{children}</body>
     </html>
   );
 }

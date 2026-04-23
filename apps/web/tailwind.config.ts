@@ -39,6 +39,7 @@ const config = {
       fontFamily: {
         mono: ["var(--font-mono)"],
         sans: ["var(--font-sans)"],
+        serif: ["var(--font-serif)"],
       },
     },
   },
@@ -46,4 +47,3 @@ const config = {
 } satisfies Config;
 
 export default config;
-
