@@ -2,7 +2,7 @@ import { studioPlans } from "@unitforge/billing";
 import { Badge, buttonVariants, cn } from "@unitforge/ui";
 import Link from "next/link";
 
-import { BrandMark } from "@/components/marketing/brand-mark";
+import { UnitforgeLogo } from "@/components/marketing/brand-mark";
 import { MarketingReveal } from "@/components/marketing/marketing-reveal";
 import { getInterfaceNumberLocale } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
@@ -182,8 +182,8 @@ export default async function LandingPage() {
 
   return (
     <div className="relative overflow-hidden pb-12 sm:pb-16">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_top,hsl(var(--marketing-glow)/0.12),transparent_58%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-[13rem] h-[19rem] w-[19rem] -translate-x-1/2 rounded-full bg-[hsl(var(--marketing-glow)/0.1)] blur-3xl sm:h-[24rem] sm:w-[24rem]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(ellipse_at_top,hsl(var(--marketing-glow)/0.14),hsl(var(--marketing-accent-soft)/0.11)_34%,transparent_64%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-[13rem] h-[19rem] w-[19rem] -translate-x-1/2 rounded-full bg-[hsl(var(--marketing-surface-muted)/0.78)] blur-3xl sm:h-[24rem] sm:w-[24rem]" />
 
       <section className="container relative py-10 sm:py-16 lg:py-[5.5rem]">
         <div className="grid gap-12 xl:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)] xl:items-center xl:gap-14">
@@ -221,6 +221,7 @@ export default async function LandingPage() {
                     "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.32)] bg-[hsl(var(--marketing-primary))] px-7 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_28px_60px_-30px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_34px_70px_-28px_hsl(var(--marketing-shadow)/0.48)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none sm:w-auto",
                   )}
                   href={primaryCtaHref}
+                  prefetch={false}
                 >
                   {primaryCtaLabel}
                 </Link>
@@ -258,7 +259,7 @@ export default async function LandingPage() {
 
             <div
               className={cn(
-                "group/hero relative overflow-hidden rounded-[2rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface)),hsl(var(--marketing-surface-muted)))] p-4 shadow-[0_36px_90px_-48px_hsl(var(--marketing-shadow)/0.36)] will-change-transform sm:rounded-[2.5rem] sm:p-7 lg:hover:-translate-y-[2px] lg:hover:shadow-[0_42px_96px_-44px_hsl(var(--marketing-shadow)/0.42)]",
+                "group/hero relative overflow-hidden rounded-[2rem] border border-[hsl(var(--marketing-border)/0.82)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface-muted)/0.88))] p-4 shadow-[0_38px_96px_-48px_hsl(var(--marketing-shadow)/0.38),0_1px_0_hsl(var(--marketing-surface-elevated)/0.82)_inset] will-change-transform sm:rounded-[2.5rem] sm:p-7 lg:hover:-translate-y-[2px] lg:hover:shadow-[0_44px_102px_-44px_hsl(var(--marketing-shadow)/0.44)]",
                 surfaceTransitionClassName,
               )}
             >
@@ -268,11 +269,11 @@ export default async function LandingPage() {
                     <div className="flex items-center gap-3">
                       <span
                         className={cn(
-                          "flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated))] text-[hsl(var(--marketing-accent))] shadow-[0_18px_40px_-28px_hsl(var(--marketing-shadow)/0.24)]",
+                          "flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-[hsl(var(--marketing-border)/0.78)] bg-[hsl(var(--marketing-surface-elevated))] text-[hsl(var(--marketing-accent))] shadow-[0_18px_40px_-28px_hsl(var(--marketing-shadow)/0.28),0_1px_0_hsl(var(--marketing-surface-elevated)/0.82)_inset]",
                           surfaceTransitionClassName,
                         )}
                       >
-                        <BrandMark className="h-7 w-7" />
+                        <UnitforgeLogo className="h-7 w-7" variant="icon" />
                       </span>
                       <div>
                         <p className="font-mono text-xs font-medium uppercase tracking-[0.24em] text-[hsl(var(--marketing-foreground-muted))]">
@@ -285,7 +286,7 @@ export default async function LandingPage() {
                     </div>
                     <span
                       className={cn(
-                        "inline-flex rounded-full border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.72)] px-3 py-2 text-xs font-medium text-[hsl(var(--marketing-foreground-soft))]",
+                        "inline-flex rounded-full border border-[hsl(var(--marketing-border)/0.76)] bg-[hsl(var(--marketing-surface-elevated)/0.86)] px-3 py-2 text-xs font-medium text-[hsl(var(--marketing-foreground-soft))]",
                         surfaceTransitionClassName,
                       )}
                     >
@@ -295,7 +296,7 @@ export default async function LandingPage() {
 
                   <div
                     className={cn(
-                      "overflow-hidden rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.76)] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover/hero:-translate-y-[1px] lg:group-hover/hero:shadow-[0_24px_48px_-36px_hsl(var(--marketing-shadow)/0.24)]",
+                      "overflow-hidden rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.82)] bg-[hsl(var(--marketing-surface-elevated)/0.9)] shadow-[0_16px_42px_-38px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.82)_inset] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover/hero:-translate-y-[1px] lg:group-hover/hero:shadow-[0_24px_52px_-36px_hsl(var(--marketing-shadow)/0.28)]",
                       surfaceTransitionClassName,
                     )}
                   >
@@ -315,7 +316,7 @@ export default async function LandingPage() {
 
                   <div
                     className={cn(
-                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.72)] p-4 transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover/hero:translate-y-[1px]",
+                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.82)] bg-[hsl(var(--marketing-surface-elevated)/0.86)] p-4 shadow-[0_16px_42px_-38px_hsl(var(--marketing-shadow)/0.18),0_1px_0_hsl(var(--marketing-surface-elevated)/0.78)_inset] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover/hero:translate-y-[1px]",
                       surfaceTransitionClassName,
                     )}
                   >
@@ -324,7 +325,7 @@ export default async function LandingPage() {
                         <p className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">{copy.showcaseResponse}</p>
                         <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">{copy.showcaseDelivery}</p>
                       </div>
-                      <div className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[hsl(var(--marketing-border-strong)/0.36)] bg-[linear-gradient(135deg,hsl(var(--marketing-accent-soft)),hsl(var(--marketing-accent)/0.62))] px-5 text-base font-semibold text-[hsl(var(--marketing-foreground))] shadow-[0_18px_42px_-26px_hsl(var(--marketing-shadow)/0.26)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] motion-reduce:transition-none sm:w-auto">
+                      <div className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[hsl(var(--marketing-border-strong)/0.46)] bg-[linear-gradient(135deg,hsl(var(--marketing-accent-soft)),hsl(var(--marketing-accent)/0.5))] px-5 text-base font-semibold text-[hsl(var(--marketing-foreground))] shadow-[0_18px_44px_-28px_hsl(var(--marketing-shadow)/0.3),0_1px_0_hsl(var(--marketing-surface-elevated)/0.76)_inset] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] motion-reduce:transition-none sm:w-auto">
                         <span>{copy.showcaseCta}</span>
                         <MarketingIcon className="h-4 w-4" name="send" />
                       </div>
@@ -334,7 +335,7 @@ export default async function LandingPage() {
 
                 <div
                   className={cn(
-                    "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.84)] p-5 shadow-[0_20px_48px_-34px_hsl(var(--marketing-shadow)/0.24)] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:translate-y-1 lg:group-hover/hero:translate-y-[3px] lg:group-hover/hero:shadow-[0_24px_56px_-30px_hsl(var(--marketing-shadow)/0.3)]",
+                    "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.82)] bg-[hsl(var(--marketing-surface-elevated)/0.92)] p-5 shadow-[0_22px_54px_-34px_hsl(var(--marketing-shadow)/0.3),0_1px_0_hsl(var(--marketing-surface-elevated)/0.78)_inset] transition-[transform,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:translate-y-1 lg:group-hover/hero:translate-y-[3px] lg:group-hover/hero:shadow-[0_26px_62px_-30px_hsl(var(--marketing-shadow)/0.36)]",
                     surfaceTransitionClassName,
                   )}
                 >
@@ -395,7 +396,7 @@ export default async function LandingPage() {
               <MarketingReveal key={capability.title} className="h-full" delay={80 + index * 70} variant="quiet">
                 <article
                   className={cn(
-                    "group h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.62)] bg-[hsl(var(--marketing-surface)/0.42)] p-5 shadow-[0_18px_48px_-44px_hsl(var(--marketing-shadow)/0.22)] backdrop-blur-sm sm:p-6 lg:hover:-translate-y-[2px] lg:hover:border-[hsl(var(--marketing-border-strong)/0.48)] lg:hover:bg-[hsl(var(--marketing-surface)/0.6)] lg:hover:shadow-[0_24px_52px_-42px_hsl(var(--marketing-shadow)/0.26)]",
+                    "group h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.72)] bg-[hsl(var(--marketing-surface-elevated)/0.62)] p-5 shadow-[0_20px_52px_-44px_hsl(var(--marketing-shadow)/0.24),0_1px_0_hsl(var(--marketing-surface-elevated)/0.62)_inset] backdrop-blur-sm sm:p-6 lg:hover:-translate-y-[2px] lg:hover:border-[hsl(var(--marketing-border-strong)/0.54)] lg:hover:bg-[hsl(var(--marketing-surface-elevated)/0.72)] lg:hover:shadow-[0_26px_58px_-42px_hsl(var(--marketing-shadow)/0.3)]",
                     surfaceTransitionClassName,
                   )}
                 >
@@ -419,7 +420,7 @@ export default async function LandingPage() {
       <section className="container relative py-10 sm:py-16" id="offer">
         <MarketingReveal
           className={cn(
-            "relative overflow-hidden rounded-[2.2rem] border border-[hsl(var(--marketing-pricing-edge)/0.72)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface)),hsl(var(--marketing-pricing-surface))_46%,hsl(var(--marketing-surface)))] px-5 py-6 shadow-[0_42px_110px_-56px_hsl(var(--marketing-shadow)/0.38)] sm:rounded-[2.7rem] sm:px-8 sm:py-9 lg:p-10",
+            "relative overflow-hidden rounded-[2.2rem] border border-[hsl(var(--marketing-pricing-edge)/0.82)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-pricing-surface))_48%,hsl(var(--marketing-surface-elevated)/0.94))] px-5 py-6 shadow-[0_46px_118px_-56px_hsl(var(--marketing-shadow)/0.42),0_1px_0_hsl(var(--marketing-surface-elevated)/0.82)_inset] sm:rounded-[2.7rem] sm:px-8 sm:py-9 lg:p-10",
             surfaceTransitionClassName,
           )}
           variant="pricing"
@@ -438,7 +439,7 @@ export default async function LandingPage() {
 
               <div
                 className={cn(
-                  "rounded-[2rem] border border-[hsl(var(--marketing-border)/0.74)] bg-[hsl(var(--marketing-surface-elevated)/0.82)] p-5 shadow-[0_22px_54px_-34px_hsl(var(--marketing-shadow)/0.24)]",
+                  "rounded-[2rem] border border-[hsl(var(--marketing-border)/0.82)] bg-[hsl(var(--marketing-surface-elevated)/0.92)] p-5 shadow-[0_24px_60px_-34px_hsl(var(--marketing-shadow)/0.3),0_1px_0_hsl(var(--marketing-surface-elevated)/0.82)_inset]",
                   surfaceTransitionClassName,
                 )}
               >
@@ -458,6 +459,7 @@ export default async function LandingPage() {
                         "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.42)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.03] hover:shadow-[0_30px_66px_-28px_hsl(var(--marketing-shadow)/0.5)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none sm:w-auto",
                       )}
                       href={primaryCtaHref}
+                      prefetch={false}
                     >
                       {session ? primaryCtaLabel : copy.pricingCta}
                     </Link>
@@ -486,7 +488,7 @@ export default async function LandingPage() {
                 <MarketingReveal key={feature} delay={110 + index * 45} variant="quiet">
                   <div
                     className={cn(
-                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.74)] px-4 py-4 shadow-[0_18px_42px_-38px_hsl(var(--marketing-shadow)/0.16)]",
+                      "rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.78)] bg-[hsl(var(--marketing-surface-elevated)/0.84)] px-4 py-4 shadow-[0_18px_44px_-38px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)_inset]",
                       surfaceTransitionClassName,
                     )}
                   >
@@ -507,7 +509,7 @@ export default async function LandingPage() {
       <section className="container relative py-8 sm:py-12" id="support">
         <MarketingReveal
           className={cn(
-            "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-surface)/0.38)] px-5 py-5 shadow-[0_18px_48px_-46px_hsl(var(--marketing-shadow)/0.18)] backdrop-blur-sm sm:px-6",
+            "rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.54)] px-5 py-5 shadow-[0_20px_52px_-46px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.62)_inset] backdrop-blur-sm sm:px-6",
             surfaceTransitionClassName,
           )}
           variant="quiet"
@@ -520,7 +522,7 @@ export default async function LandingPage() {
             {copy.supportItems.map((item, index) => (
               <article
                 key={item.title}
-                className="flex items-start gap-3 rounded-[1.4rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-surface-elevated)/0.56)] px-4 py-4 transition-[background-color,border-color,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+                className="flex items-start gap-3 rounded-[1.4rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.72)] px-4 py-4 shadow-[0_14px_36px_-34px_hsl(var(--marketing-shadow)/0.18)] transition-[background-color,border-color,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
               >
                 <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[hsl(var(--marketing-accent-soft)/0.5)] text-[hsl(var(--marketing-accent))]">
                   <MarketingIcon className="h-5 w-5" name={getSupportIcon(index)} />

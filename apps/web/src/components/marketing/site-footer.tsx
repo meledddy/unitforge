@@ -1,7 +1,7 @@
 import { appConfig } from "@unitforge/config";
 import Link from "next/link";
 
-import { BrandMark } from "@/components/marketing/brand-mark";
+import { UnitforgeLogo } from "@/components/marketing/brand-mark";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 
 const footerContent = {
@@ -31,7 +31,11 @@ export async function SiteFooter() {
     <footer className="border-t border-[hsl(var(--marketing-border)/0.5)] bg-[hsl(var(--marketing-header)/0.68)] backdrop-blur">
       <div className="container flex flex-col gap-6 py-8 text-sm text-[hsl(var(--marketing-foreground-soft))] lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3">
-          <BrandMark className="mt-0.5 h-8 w-8 text-[hsl(var(--marketing-accent))]" />
+          <UnitforgeLogo
+            className="mt-0.5"
+            iconClassName="h-8 w-8"
+            variant="icon"
+          />
           <div className="space-y-1">
             <p className="text-base font-semibold tracking-[-0.04em] text-[hsl(var(--marketing-foreground))]">{appConfig.name}</p>
             <p className="max-w-xl">{copy.description}</p>

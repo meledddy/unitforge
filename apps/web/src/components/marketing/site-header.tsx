@@ -1,9 +1,8 @@
-import { appConfig } from "@unitforge/config";
 import { buttonVariants, cn } from "@unitforge/ui";
 import Link from "next/link";
 
 import { InterfaceLanguageSwitcher } from "@/components/interface-language-switcher";
-import { BrandMark } from "@/components/marketing/brand-mark";
+import { UnitforgeLogo } from "@/components/marketing/brand-mark";
 import { MarketingThemeToggle } from "@/components/marketing/marketing-theme-toggle";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
@@ -49,10 +48,11 @@ export async function SiteHeader() {
           className="marketing-focus-ring flex min-w-0 items-center gap-3 rounded-full text-[hsl(var(--marketing-foreground))] transition-[color,opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:opacity-90 motion-reduce:transition-none"
           href="/"
         >
-          <BrandMark className="h-9 w-9 text-[hsl(var(--marketing-accent))]" />
-          <div className="hidden min-w-0 sm:block">
-            <p className="truncate text-[1.52rem] font-semibold tracking-[-0.05em] sm:text-[1.62rem]">{appConfig.name}</p>
-          </div>
+          <UnitforgeLogo
+            className="gap-3"
+            iconClassName="h-9 w-9 drop-shadow-[0_10px_24px_hsl(var(--marketing-glow)/0.12)]"
+            wordmarkClassName="hidden sm:block"
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 rounded-full border border-[hsl(var(--marketing-border)/0.56)] bg-[hsl(var(--marketing-surface)/0.68)] px-2 py-1.5 shadow-[0_24px_60px_-44px_hsl(var(--marketing-shadow)/0.2)] transition-[background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:flex">
@@ -81,6 +81,7 @@ export async function SiteHeader() {
               "marketing-focus-ring h-12 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.48)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_28px_62px_-26px_hsl(var(--marketing-shadow)/0.56)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
             )}
             href={ctaHref}
+            prefetch={false}
           >
             {ctaLabel}
           </Link>
@@ -94,6 +95,7 @@ export async function SiteHeader() {
               "marketing-focus-ring h-11 rounded-full bg-[hsl(var(--marketing-primary))] px-3 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_20px_44px_-30px_hsl(var(--marketing-shadow)/0.4)] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none min-[390px]:px-3.5",
             )}
             href={ctaHref}
+            prefetch={false}
           >
             {mobileCtaLabel}
           </Link>
@@ -134,6 +136,7 @@ export async function SiteHeader() {
                     "marketing-focus-ring h-12 w-full rounded-full bg-[hsl(var(--marketing-primary))] text-[hsl(var(--marketing-primary-foreground))] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:scale-[0.985] motion-reduce:transition-none",
                   )}
                   href={ctaHref}
+                  prefetch={false}
                 >
                   {ctaLabel}
                 </Link>

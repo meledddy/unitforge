@@ -51,25 +51,30 @@
     position: relative;
     isolation: isolate;
     --marketing-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --marketing-bg: 35 49% 97%;
-    --marketing-bg-soft: 35 62% 99%;
-    --marketing-header: 0 0% 100%;
-    --marketing-surface: 0 0% 100%;
-    --marketing-surface-muted: 36 45% 98%;
-    --marketing-surface-elevated: 34 50% 99%;
-    --marketing-foreground: 221 43% 16%;
-    --marketing-foreground-soft: 220 16% 42%;
-    --marketing-foreground-muted: 220 12% 56%;
-    --marketing-border: 34 34% 84%;
-    --marketing-border-strong: 36 49% 72%;
-    --marketing-accent: 39 73% 66%;
-    --marketing-accent-soft: 39 79% 90%;
-    --marketing-primary: 221 43% 18%;
-    --marketing-primary-foreground: 35 62% 98%;
-    --marketing-shadow: 220 40% 13%;
-    --marketing-glow: 39 88% 72%;
-    --marketing-pricing-surface: 40 75% 95%;
-    --marketing-pricing-edge: 39 56% 80%;
+    --marketing-bg: 38 38% 94%;
+    --marketing-bg-soft: 42 54% 98%;
+    --marketing-header: 42 50% 98%;
+    --marketing-surface: 42 44% 98%;
+    --marketing-surface-muted: 38 36% 94%;
+    --marketing-surface-elevated: 42 56% 99%;
+    --marketing-foreground: 289 27% 13%;
+    --marketing-foreground-soft: 286 12% 32%;
+    --marketing-foreground-muted: 285 8% 42%;
+    --marketing-border: 34 30% 78%;
+    --marketing-border-strong: 32 36% 64%;
+    --marketing-accent: 33 44% 37%;
+    --marketing-accent-soft: 40 58% 88%;
+    --marketing-primary: 289 27% 13%;
+    --marketing-primary-foreground: 42 52% 98%;
+    --marketing-shadow: 288 28% 9%;
+    --marketing-glow: 37 60% 67%;
+    --marketing-pricing-surface: 39 46% 92%;
+    --marketing-pricing-edge: 33 38% 72%;
+    --marketing-logo-plane-light: 39 48% 91%;
+    --marketing-logo-plane-shadow: 31 23% 64%;
+    --marketing-logo-ink: 292 23% 14%;
+    --marketing-logo-edge: 34 46% 78%;
+    --marketing-logo-copper: 27 54% 50%;
     color-scheme: light;
     background-image:
       radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.18), transparent 25%),
@@ -102,59 +107,69 @@
   }
 
   :root[data-marketing-theme="dark"] [data-marketing-shell] {
-    --marketing-bg: 224 31% 8%;
-    --marketing-bg-soft: 226 28% 10%;
-    --marketing-header: 226 24% 9%;
-    --marketing-surface: 227 23% 11%;
-    --marketing-surface-muted: 228 20% 13%;
-    --marketing-surface-elevated: 229 18% 15%;
-    --marketing-foreground: 36 39% 95%;
-    --marketing-foreground-soft: 220 16% 79%;
-    --marketing-foreground-muted: 220 11% 62%;
-    --marketing-border: 33 18% 22%;
-    --marketing-border-strong: 39 34% 36%;
-    --marketing-accent: 40 85% 70%;
-    --marketing-accent-soft: 38 43% 17%;
-    --marketing-primary: 40 88% 71%;
-    --marketing-primary-foreground: 226 29% 10%;
-    --marketing-shadow: 225 33% 4%;
-    --marketing-glow: 40 82% 62%;
-    --marketing-pricing-surface: 35 31% 14%;
-    --marketing-pricing-edge: 39 38% 28%;
+    --marketing-bg: 289 25% 8%;
+    --marketing-bg-soft: 286 22% 10%;
+    --marketing-header: 289 23% 8%;
+    --marketing-surface: 288 20% 11%;
+    --marketing-surface-muted: 287 18% 13%;
+    --marketing-surface-elevated: 284 15% 16%;
+    --marketing-foreground: 39 38% 94%;
+    --marketing-foreground-soft: 38 15% 78%;
+    --marketing-foreground-muted: 36 10% 62%;
+    --marketing-border: 32 17% 23%;
+    --marketing-border-strong: 33 30% 37%;
+    --marketing-accent: 38 74% 70%;
+    --marketing-accent-soft: 31 34% 18%;
+    --marketing-primary: 38 76% 72%;
+    --marketing-primary-foreground: 289 25% 9%;
+    --marketing-shadow: 289 26% 4%;
+    --marketing-glow: 35 58% 56%;
+    --marketing-pricing-surface: 31 24% 14%;
+    --marketing-pricing-edge: 33 32% 29%;
+    --marketing-logo-plane-light: 39 54% 88%;
+    --marketing-logo-plane-shadow: 30 18% 30%;
+    --marketing-logo-ink: 289 25% 12%;
+    --marketing-logo-edge: 33 48% 72%;
+    --marketing-logo-copper: 28 56% 48%;
     color-scheme: dark;
     background-image:
       radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 21%),
       radial-gradient(circle at 76% 12%, hsl(var(--marketing-glow) / 0.08), transparent 17%),
-      radial-gradient(circle at bottom left, hsl(226 24% 14% / 0.75), transparent 24%),
+      radial-gradient(circle at bottom left, hsl(292 18% 15% / 0.75), transparent 24%),
       linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-marketing-theme]) [data-marketing-shell] {
-      --marketing-bg: 224 33% 8%;
-      --marketing-bg-soft: 224 29% 10%;
-      --marketing-header: 224 31% 8%;
-      --marketing-surface: 226 23% 10%;
-      --marketing-surface-muted: 226 21% 12%;
-      --marketing-surface-elevated: 228 19% 15%;
-      --marketing-foreground: 35 36% 95%;
-      --marketing-foreground-soft: 219 14% 75%;
-      --marketing-foreground-muted: 220 12% 62%;
-      --marketing-border: 34 20% 22%;
-      --marketing-border-strong: 39 42% 36%;
-      --marketing-accent: 40 86% 71%;
-      --marketing-accent-soft: 40 44% 18%;
-      --marketing-primary: 40 86% 70%;
-      --marketing-primary-foreground: 224 30% 10%;
-      --marketing-shadow: 220 28% 4%;
-      --marketing-glow: 40 86% 66%;
-      --marketing-pricing-surface: 35 30% 14%;
-      --marketing-pricing-edge: 39 38% 28%;
+      --marketing-bg: 289 25% 8%;
+      --marketing-bg-soft: 286 22% 10%;
+      --marketing-header: 289 23% 8%;
+      --marketing-surface: 288 20% 11%;
+      --marketing-surface-muted: 287 18% 13%;
+      --marketing-surface-elevated: 284 15% 16%;
+      --marketing-foreground: 39 38% 94%;
+      --marketing-foreground-soft: 38 15% 78%;
+      --marketing-foreground-muted: 36 10% 62%;
+      --marketing-border: 32 17% 23%;
+      --marketing-border-strong: 33 30% 37%;
+      --marketing-accent: 38 74% 70%;
+      --marketing-accent-soft: 31 34% 18%;
+      --marketing-primary: 38 76% 72%;
+      --marketing-primary-foreground: 289 25% 9%;
+      --marketing-shadow: 289 26% 4%;
+      --marketing-glow: 35 58% 56%;
+      --marketing-pricing-surface: 31 24% 14%;
+      --marketing-pricing-edge: 33 32% 29%;
+      --marketing-logo-plane-light: 39 54% 88%;
+      --marketing-logo-plane-shadow: 30 18% 30%;
+      --marketing-logo-ink: 289 25% 12%;
+      --marketing-logo-edge: 33 48% 72%;
+      --marketing-logo-copper: 28 56% 48%;
       color-scheme: dark;
       background-image:
         radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 22%),
         radial-gradient(circle at 80% 14%, hsl(var(--marketing-glow) / 0.1), transparent 18%),
-        radial-gradient(circle at bottom left, hsl(226 24% 14% / 0.75), transparent 24%),
+        radial-gradient(circle at bottom left, hsl(292 18% 15% / 0.75), transparent 24%),
         linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
     }
   }
