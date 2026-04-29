@@ -3,6 +3,7 @@ import { Badge, buttonVariants, cn } from "@unitforge/ui";
 import Link from "next/link";
 
 import { UnitforgeLogo } from "@/components/marketing/brand-mark";
+import { MarketingReveal } from "@/components/marketing/marketing-reveal";
 import { getInterfaceNumberLocale } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getCurrentAppShellSession } from "@/server/current-session";
@@ -241,37 +242,37 @@ export default async function PricingPage() {
       <section className="container relative grid gap-10 py-10 sm:gap-12 sm:py-16 lg:grid-cols-[minmax(0,0.9fr),minmax(24rem,0.96fr)] lg:items-center lg:gap-12 lg:py-[5.75rem] xl:gap-16">
         <div className="max-w-[42rem] space-y-7">
           <Badge
-            className="border-[hsl(var(--marketing-border-strong)/0.42)] bg-[hsl(var(--marketing-accent-soft)/0.42)] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--marketing-foreground-soft))]"
+            className="pricing-hero-copy pricing-hero-copy-eyebrow border-[hsl(var(--marketing-border-strong)/0.42)] bg-[hsl(var(--marketing-accent-soft)/0.42)] px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--marketing-foreground-soft))]"
             variant="outline"
           >
             {copy.badge}
           </Badge>
 
           <div className="space-y-5">
-            <h1 className="max-w-4xl text-balance font-serif text-[2.9rem] font-medium leading-[0.93] tracking-[-0.055em] text-[hsl(var(--marketing-foreground))] sm:text-[4.2rem] lg:text-[5rem]">
+            <h1 className="pricing-hero-copy pricing-hero-copy-title max-w-4xl text-balance font-serif text-[2.9rem] font-medium leading-[0.93] tracking-[-0.055em] text-[hsl(var(--marketing-foreground))] sm:text-[4.2rem] lg:text-[5rem]">
               {copy.title}
             </h1>
-            <p className="max-w-2xl text-[1.04rem] leading-7 text-[hsl(var(--marketing-foreground-soft))] sm:text-[1.22rem] sm:leading-8">
+            <p className="pricing-hero-copy pricing-hero-copy-paragraph max-w-2xl text-[1.04rem] leading-7 text-[hsl(var(--marketing-foreground-soft))] sm:text-[1.22rem] sm:leading-8">
               {copy.description}
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="pricing-hero-copy pricing-hero-copy-actions flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-7 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_28px_68px_-34px_hsl(var(--marketing-shadow)/0.38)] sm:w-auto",
+                "marketing-focus-ring pricing-cta pricing-cta-primary h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-7 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_28px_68px_-34px_hsl(var(--marketing-shadow)/0.38)] sm:w-auto",
               )}
               href="/app"
               prefetch={false}
             >
-              <PricingIcon className="mr-2 h-4 w-4" name="spark" />
+              <PricingIcon className="pricing-cta-icon mr-2 h-4 w-4" name="spark" />
               {primaryCtaLabel}
             </Link>
             <Link
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
-                "marketing-focus-ring h-14 w-full rounded-full border-[hsl(var(--marketing-border-strong)/0.38)] bg-[hsl(var(--marketing-surface)/0.62)] px-6 text-base font-medium text-[hsl(var(--marketing-foreground))] shadow-[0_18px_44px_-34px_hsl(var(--marketing-shadow)/0.14)] sm:w-auto",
+                "marketing-focus-ring pricing-cta pricing-cta-secondary h-14 w-full rounded-full border-[hsl(var(--marketing-border-strong)/0.38)] bg-[hsl(var(--marketing-surface)/0.62)] px-6 text-base font-medium text-[hsl(var(--marketing-foreground))] shadow-[0_18px_44px_-34px_hsl(var(--marketing-shadow)/0.14)] sm:w-auto",
               )}
               href="/"
             >
@@ -279,7 +280,7 @@ export default async function PricingPage() {
             </Link>
           </div>
 
-          <div className="max-w-xl rounded-[1.5rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-surface)/0.58)] px-4 py-3 text-sm leading-6 text-[hsl(var(--marketing-foreground-muted))] shadow-[0_20px_42px_-36px_hsl(var(--marketing-shadow)/0.12)] backdrop-blur-sm">
+          <div className="pricing-hero-copy pricing-hero-copy-note max-w-xl rounded-[1.5rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-surface)/0.58)] px-4 py-3 text-sm leading-6 text-[hsl(var(--marketing-foreground-muted))] shadow-[0_20px_42px_-36px_hsl(var(--marketing-shadow)/0.12)] backdrop-blur-sm">
             {copy.heroNote}
           </div>
         </div>
@@ -290,100 +291,107 @@ export default async function PricingPage() {
       </section>
 
       <section className="container relative" id="offer">
-        <div className="relative overflow-hidden rounded-[2.3rem] border border-[hsl(var(--marketing-pricing-edge)/0.78)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.98),hsl(var(--marketing-pricing-surface)/0.88))] p-4 shadow-[0_48px_124px_-62px_hsl(var(--marketing-shadow)/0.4),0_0_0_1px_hsl(var(--marketing-surface-elevated)/0.46)_inset] sm:rounded-[2.8rem] sm:p-5 lg:p-6">
-          <div className="pointer-events-none absolute left-0 top-0 h-40 w-40 rounded-full bg-[hsl(var(--marketing-glow)/0.1)] blur-3xl" />
-          <div className="pointer-events-none absolute bottom-6 right-6 h-32 w-32 rounded-full bg-[hsl(var(--marketing-glow)/0.06)] blur-3xl" />
+        <MarketingReveal variant="pricing">
+          <div className="relative overflow-hidden rounded-[2.3rem] border border-[hsl(var(--marketing-pricing-edge)/0.78)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.98),hsl(var(--marketing-pricing-surface)/0.88))] p-4 shadow-[0_48px_124px_-62px_hsl(var(--marketing-shadow)/0.4),0_0_0_1px_hsl(var(--marketing-surface-elevated)/0.46)_inset] sm:rounded-[2.8rem] sm:p-5 lg:p-6">
+            <div className="pointer-events-none absolute left-0 top-0 h-40 w-40 rounded-full bg-[hsl(var(--marketing-glow)/0.1)] blur-3xl" />
+            <div className="pointer-events-none absolute bottom-6 right-6 h-32 w-32 rounded-full bg-[hsl(var(--marketing-glow)/0.06)] blur-3xl" />
 
-          <div className="relative grid gap-4 lg:grid-cols-[minmax(0,0.42fr),minmax(0,0.58fr)] lg:gap-5">
-            <article className="rounded-[2rem] border border-[hsl(var(--marketing-pricing-edge)/0.72)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface)/0.96))] p-6 shadow-[0_28px_76px_-52px_hsl(var(--marketing-shadow)/0.32),0_1px_0_hsl(var(--marketing-surface-elevated)/0.8)_inset] sm:p-7">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-3">
-                  <h2 className="font-serif text-[3rem] font-medium leading-none tracking-[-0.05em] text-[hsl(var(--marketing-foreground))]">
-                    {studioPlan.name}
-                  </h2>
-                  <p className="max-w-sm text-base leading-7 text-[hsl(var(--marketing-foreground-soft))]">
-                    {copy.planDescription}
-                  </p>
-                </div>
-                <span className="rounded-full border border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-accent-soft)/0.4)] px-4 py-2 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))]">
-                  {copy.planBadge}
-                </span>
-              </div>
-
-              <div className="mt-8 rounded-[1.9rem] border border-[hsl(var(--marketing-pricing-edge)/0.66)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface-muted)/0.72))] p-5 shadow-[0_28px_68px_-50px_hsl(var(--marketing-shadow)/0.26),0_1px_0_hsl(var(--marketing-surface-elevated)/0.9)_inset] sm:p-6">
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <div className="flex items-end gap-2">
-                      <p className="text-[3.6rem] font-semibold leading-none tracking-[-0.08em] text-[hsl(var(--marketing-foreground))] sm:text-[4.25rem]">
-                        {planPrice}
-                      </p>
-                      <p className="pb-2 text-xl text-[hsl(var(--marketing-foreground-soft))]">
-                        {copy.pricingSuffix}
-                      </p>
-                    </div>
-                    <p className="text-sm text-[hsl(var(--marketing-foreground-muted))]">
-                      {copy.priceMeta}
+            <div className="relative grid gap-4 lg:grid-cols-[minmax(0,0.42fr),minmax(0,0.58fr)] lg:gap-5">
+              <article className="rounded-[2rem] border border-[hsl(var(--marketing-pricing-edge)/0.72)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface)/0.96))] p-6 shadow-[0_28px_76px_-52px_hsl(var(--marketing-shadow)/0.32),0_1px_0_hsl(var(--marketing-surface-elevated)/0.8)_inset] sm:p-7">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-3">
+                    <h2 className="font-serif text-[3rem] font-medium leading-none tracking-[-0.05em] text-[hsl(var(--marketing-foreground))]">
+                      {studioPlan.name}
+                    </h2>
+                    <p className="max-w-sm text-base leading-7 text-[hsl(var(--marketing-foreground-soft))]">
+                      {copy.planDescription}
                     </p>
                   </div>
-
-                  <Link
-                    className={cn(
-                      buttonVariants({ size: "lg" }),
-                      "marketing-focus-ring h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_22px_56px_-34px_hsl(var(--marketing-shadow)/0.4)]",
-                    )}
-                    href="/app"
-                    prefetch={false}
-                  >
-                    {primaryCtaLabel}
-                  </Link>
-
-                  <div className="rounded-full border border-[hsl(var(--marketing-border)/0.52)] bg-[hsl(var(--marketing-surface-muted)/0.82)] px-4 py-3 text-sm leading-6 text-[hsl(var(--marketing-foreground-muted))]">
-                    {copy.planNote}
-                  </div>
+                  <span className="rounded-full border border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-accent-soft)/0.4)] px-4 py-2 text-sm font-medium text-[hsl(var(--marketing-foreground-soft))]">
+                    {copy.planBadge}
+                  </span>
                 </div>
-              </div>
-            </article>
 
-            <article className="rounded-[2rem] border border-[hsl(var(--marketing-pricing-edge)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.76)] p-6 shadow-[0_24px_64px_-52px_hsl(var(--marketing-shadow)/0.24),0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)_inset] sm:p-7">
-              <div className="max-w-xl space-y-3">
-                <p className="text-[0.74rem] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--marketing-foreground-muted))]">
-                  {copy.pilotEyebrow}
-                </p>
-                <h3 className="font-serif text-[2rem] font-medium tracking-[-0.05em] text-[hsl(var(--marketing-foreground))] sm:text-[2.2rem]">
-                  {copy.pilotHeading}
-                </h3>
-                <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))] sm:text-[0.96rem]">
-                  {copy.pilotDescription}
-                </p>
-              </div>
-
-              <div className="mt-6 grid gap-3 md:grid-cols-2">
-                {copy.inclusions.map((item) => (
-                  <div
-                    key={item.title}
-                    className="h-full"
-                  >
-                    <div className="h-full min-h-[9.5rem] rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.7)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.98),hsl(var(--marketing-surface)/0.78))] px-4 py-4 shadow-[0_20px_48px_-42px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)_inset] sm:min-h-[10.2rem]">
-                      <div className="flex gap-3">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] border border-[hsl(var(--marketing-border)/0.56)] bg-[hsl(var(--marketing-accent-soft)/0.48)] text-[hsl(var(--marketing-accent))]">
-                          <PricingIcon className="h-5 w-5" name={item.icon} />
-                        </span>
-                        <div className="space-y-1">
-                          <h4 className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">
-                            {item.title}
-                          </h4>
-                          <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">
-                            {item.description}
-                          </p>
-                        </div>
+                <div className="mt-8 rounded-[1.9rem] border border-[hsl(var(--marketing-pricing-edge)/0.66)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)),hsl(var(--marketing-surface-muted)/0.72))] p-5 shadow-[0_28px_68px_-50px_hsl(var(--marketing-shadow)/0.26),0_1px_0_hsl(var(--marketing-surface-elevated)/0.9)_inset] sm:p-6">
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <div className="flex items-end gap-2">
+                        <p className="text-[3.6rem] font-semibold leading-none tracking-[-0.08em] text-[hsl(var(--marketing-foreground))] sm:text-[4.25rem]">
+                          {planPrice}
+                        </p>
+                        <p className="pb-2 text-xl text-[hsl(var(--marketing-foreground-soft))]">
+                          {copy.pricingSuffix}
+                        </p>
                       </div>
+                      <p className="text-sm text-[hsl(var(--marketing-foreground-muted))]">
+                        {copy.priceMeta}
+                      </p>
+                    </div>
+
+                    <Link
+                      className={cn(
+                        buttonVariants({ size: "lg" }),
+                        "marketing-focus-ring pricing-cta pricing-cta-primary pricing-card-cta h-14 w-full rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-base font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_22px_56px_-34px_hsl(var(--marketing-shadow)/0.4)]",
+                      )}
+                      href="/app"
+                      prefetch={false}
+                    >
+                      {primaryCtaLabel}
+                    </Link>
+
+                    <div className="rounded-full border border-[hsl(var(--marketing-border)/0.52)] bg-[hsl(var(--marketing-surface-muted)/0.82)] px-4 py-3 text-sm leading-6 text-[hsl(var(--marketing-foreground-muted))]">
+                      {copy.planNote}
                     </div>
                   </div>
-                ))}
-              </div>
-            </article>
+                </div>
+              </article>
+
+              <article className="rounded-[2rem] border border-[hsl(var(--marketing-pricing-edge)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.76)] p-6 shadow-[0_24px_64px_-52px_hsl(var(--marketing-shadow)/0.24),0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)_inset] sm:p-7">
+                <div className="max-w-xl space-y-3">
+                  <p className="text-[0.74rem] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--marketing-foreground-muted))]">
+                    {copy.pilotEyebrow}
+                  </p>
+                  <h3 className="font-serif text-[2rem] font-medium tracking-[-0.05em] text-[hsl(var(--marketing-foreground))] sm:text-[2.2rem]">
+                    {copy.pilotHeading}
+                  </h3>
+                  <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))] sm:text-[0.96rem]">
+                    {copy.pilotDescription}
+                  </p>
+                </div>
+
+                <div className="mt-6 grid gap-3 md:grid-cols-2">
+                  {copy.inclusions.map((item, index) => (
+                    <MarketingReveal
+                      key={item.title}
+                      className="h-full"
+                      delay={80 + index * 45}
+                      variant="quiet"
+                    >
+                      <div className="pricing-feature-card h-full min-h-[9.5rem] rounded-[1.55rem] border border-[hsl(var(--marketing-border)/0.7)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.98),hsl(var(--marketing-surface)/0.78))] px-4 py-4 shadow-[0_20px_48px_-42px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)_inset] sm:min-h-[10.2rem]">
+                        <div className="flex gap-3">
+                          <span className="pricing-feature-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] border border-[hsl(var(--marketing-border)/0.56)] bg-[hsl(var(--marketing-accent-soft)/0.48)] text-[hsl(var(--marketing-accent))]">
+                            <PricingIcon
+                              className="h-5 w-5"
+                              name={item.icon}
+                            />
+                          </span>
+                          <div className="space-y-1">
+                            <h4 className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">
+                              {item.title}
+                            </h4>
+                            <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </MarketingReveal>
+                  ))}
+                </div>
+              </article>
+            </div>
           </div>
-        </div>
+        </MarketingReveal>
       </section>
 
       <section className="container relative py-12 sm:py-16" id="pilot-notes">
@@ -399,13 +407,15 @@ export default async function PricingPage() {
 
           <div className="grid gap-4 md:grid-cols-3">
             {copy.details.map((item, index) => (
-              <div
+              <MarketingReveal
                 key={item.title}
                 className="h-full"
+                delay={index * 55}
+                variant="quiet"
               >
-                <article className="relative h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.64)] p-5 shadow-[0_20px_56px_-48px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.66)_inset] backdrop-blur-sm sm:p-6">
+                <article className="pricing-feature-card relative h-full rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface-elevated)/0.64)] p-5 shadow-[0_20px_56px_-48px_hsl(var(--marketing-shadow)/0.2),0_1px_0_hsl(var(--marketing-surface-elevated)/0.66)_inset] backdrop-blur-sm sm:p-6">
                   <div className="flex items-start gap-4 pr-10">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-accent-soft)/0.46)] text-[hsl(var(--marketing-accent))]">
+                    <span className="pricing-feature-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] border border-[hsl(var(--marketing-border)/0.54)] bg-[hsl(var(--marketing-accent-soft)/0.46)] text-[hsl(var(--marketing-accent))]">
                       <PricingIcon className="h-5 w-5" name={item.icon} />
                     </span>
                     <div className="space-y-2">
@@ -421,35 +431,37 @@ export default async function PricingPage() {
                     {index + 1}
                   </span>
                 </article>
-              </div>
+              </MarketingReveal>
             ))}
           </div>
         </div>
       </section>
 
       <section className="container relative pb-10 sm:pb-14" id="support">
-        <div className="overflow-hidden rounded-[1.9rem] border border-[hsl(var(--marketing-border)/0.66)] bg-[hsl(var(--marketing-surface-elevated)/0.58)] shadow-[0_20px_54px_-46px_hsl(var(--marketing-shadow)/0.18),0_1px_0_hsl(var(--marketing-surface-elevated)/0.68)_inset] backdrop-blur-sm">
-          <div className="grid divide-y divide-[hsl(var(--marketing-border)/0.44)] lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-            {copy.supportItems.map((item) => (
-              <article
-                key={item.title}
-                className="flex items-start gap-4 px-5 py-5 sm:px-6 lg:px-7"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--marketing-border)/0.5)] bg-[hsl(var(--marketing-accent-soft)/0.4)] text-[hsl(var(--marketing-accent))]">
-                  <PricingIcon className="h-5 w-5" name={item.icon} />
-                </span>
-                <div className="space-y-1">
-                  <h3 className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">
-                    {item.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+        <MarketingReveal variant="quiet">
+          <div className="overflow-hidden rounded-[1.9rem] border border-[hsl(var(--marketing-border)/0.66)] bg-[hsl(var(--marketing-surface-elevated)/0.58)] shadow-[0_20px_54px_-46px_hsl(var(--marketing-shadow)/0.18),0_1px_0_hsl(var(--marketing-surface-elevated)/0.68)_inset] backdrop-blur-sm">
+            <div className="grid divide-y divide-[hsl(var(--marketing-border)/0.44)] lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+              {copy.supportItems.map((item) => (
+                <article
+                  key={item.title}
+                  className="flex items-start gap-4 px-5 py-5 sm:px-6 lg:px-7"
+                >
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--marketing-border)/0.5)] bg-[hsl(var(--marketing-accent-soft)/0.4)] text-[hsl(var(--marketing-accent))]">
+                    <PricingIcon className="h-5 w-5" name={item.icon} />
+                  </span>
+                  <div className="space-y-1">
+                    <h3 className="text-base font-semibold tracking-[-0.03em] text-[hsl(var(--marketing-foreground))]">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm leading-6 text-[hsl(var(--marketing-foreground-soft))]">
+                      {item.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
+        </MarketingReveal>
       </section>
     </div>
   );
@@ -457,18 +469,18 @@ export default async function PricingPage() {
 
 function PricingArtifact() {
   return (
-    <div className="relative isolate mx-auto flex min-h-[15.5rem] w-full max-w-[40rem] items-center justify-center px-2 sm:min-h-[22rem] sm:px-4 lg:min-h-[28rem]">
-      <div className="absolute inset-x-[9%] top-[18%] bottom-[17%] rounded-[2.6rem] border border-[hsl(var(--marketing-border)/0.58)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface-elevated)/0.72),hsl(var(--marketing-pricing-surface)/0.38)_54%,hsl(var(--marketing-surface)/0.56))] shadow-[0_42px_112px_-70px_hsl(var(--marketing-shadow)/0.34),0_1px_0_hsl(var(--marketing-surface-elevated)/0.68)_inset]" />
-      <div className="absolute left-[25%] top-[21%] h-[56%] w-[18%] -rotate-[7deg] rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.36)] bg-[linear-gradient(180deg,hsl(var(--marketing-logo-plane-light)/0.52),hsl(var(--marketing-surface-elevated)/0.12))] shadow-[inset_0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)]" />
-      <div className="absolute right-[25%] top-[21%] h-[56%] w-[18%] rotate-[7deg] rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.3)] bg-[linear-gradient(180deg,hsl(var(--marketing-logo-ink)/0.18),hsl(var(--marketing-surface-elevated)/0.06))] shadow-[inset_0_1px_0_hsl(var(--marketing-surface-elevated)/0.24)]" />
-      <div className="absolute bottom-[23%] left-1/2 h-10 w-[48%] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,hsl(var(--marketing-shadow)/0.18),transparent_68%)] blur-xl" />
-      <div className="absolute left-1/2 top-[48%] h-[48%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-[2.4rem] bg-[radial-gradient(ellipse_at_center,hsl(var(--marketing-glow)/0.24),hsl(var(--marketing-glow)/0.08)_46%,transparent_74%)] blur-2xl" />
+    <div className="pricing-artifact relative isolate mx-auto flex min-h-[15.5rem] w-full max-w-[40rem] items-center justify-center px-2 sm:min-h-[22rem] sm:px-4 lg:min-h-[28rem]">
+      <div className="pricing-artifact-surface absolute inset-x-[9%] top-[18%] bottom-[17%] rounded-[2.6rem] border border-[hsl(var(--marketing-border)/0.58)] bg-[linear-gradient(135deg,hsl(var(--marketing-surface-elevated)/0.72),hsl(var(--marketing-pricing-surface)/0.38)_54%,hsl(var(--marketing-surface)/0.56))] shadow-[0_42px_112px_-70px_hsl(var(--marketing-shadow)/0.34),0_1px_0_hsl(var(--marketing-surface-elevated)/0.68)_inset]" />
+      <div className="pricing-artifact-plane pricing-artifact-plane-light absolute left-[25%] top-[21%] h-[56%] w-[18%] -rotate-[7deg] rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.36)] bg-[linear-gradient(180deg,hsl(var(--marketing-logo-plane-light)/0.52),hsl(var(--marketing-surface-elevated)/0.12))] shadow-[inset_0_1px_0_hsl(var(--marketing-surface-elevated)/0.72)]" />
+      <div className="pricing-artifact-plane pricing-artifact-plane-ink absolute right-[25%] top-[21%] h-[56%] w-[18%] rotate-[7deg] rounded-[1.8rem] border border-[hsl(var(--marketing-border)/0.3)] bg-[linear-gradient(180deg,hsl(var(--marketing-logo-ink)/0.18),hsl(var(--marketing-surface-elevated)/0.06))] shadow-[inset_0_1px_0_hsl(var(--marketing-surface-elevated)/0.24)]" />
+      <div className="pricing-artifact-ground absolute bottom-[23%] left-1/2 h-10 w-[48%] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,hsl(var(--marketing-shadow)/0.18),transparent_68%)] blur-xl" />
+      <div className="pricing-artifact-glow absolute left-1/2 top-[48%] h-[48%] w-[50%] -translate-x-1/2 -translate-y-1/2 rounded-[2.4rem] bg-[radial-gradient(ellipse_at_center,hsl(var(--marketing-glow)/0.24),hsl(var(--marketing-glow)/0.08)_46%,transparent_74%)] blur-2xl" />
 
-      <div className="relative flex h-[11.8rem] w-[11.8rem] items-center justify-center rounded-[2.4rem] border border-[hsl(var(--marketing-border-strong)/0.46)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.82),hsl(var(--marketing-surface)/0.42))] shadow-[0_30px_84px_-52px_hsl(var(--marketing-shadow)/0.42),0_1px_0_hsl(var(--marketing-surface-elevated)/0.78)_inset] backdrop-blur-sm sm:h-[14rem] sm:w-[14rem]">
-        <div className="absolute inset-[14%] rounded-[1.7rem] border border-[hsl(var(--marketing-border)/0.34)] bg-[linear-gradient(145deg,hsl(var(--marketing-surface-elevated)/0.18),transparent_68%)]" />
-        <div className="absolute bottom-[24%] h-px w-[54%] bg-[linear-gradient(90deg,transparent,hsl(var(--marketing-logo-copper)/0.64),transparent)]" />
+      <div className="pricing-artifact-tile relative flex h-[11.8rem] w-[11.8rem] items-center justify-center rounded-[2.4rem] border border-[hsl(var(--marketing-border-strong)/0.46)] bg-[linear-gradient(180deg,hsl(var(--marketing-surface-elevated)/0.82),hsl(var(--marketing-surface)/0.42))] shadow-[0_30px_84px_-52px_hsl(var(--marketing-shadow)/0.42),0_1px_0_hsl(var(--marketing-surface-elevated)/0.78)_inset] backdrop-blur-sm sm:h-[14rem] sm:w-[14rem]">
+        <div className="pricing-artifact-tile-inner absolute inset-[14%] rounded-[1.7rem] border border-[hsl(var(--marketing-border)/0.34)] bg-[linear-gradient(145deg,hsl(var(--marketing-surface-elevated)/0.18),transparent_68%)]" />
+        <div className="pricing-artifact-line absolute bottom-[24%] h-px w-[54%] bg-[linear-gradient(90deg,transparent,hsl(var(--marketing-logo-copper)/0.64),transparent)]" />
         <UnitforgeLogo
-          className="relative h-[7.4rem] w-[7.4rem] drop-shadow-[0_18px_36px_hsl(var(--marketing-shadow)/0.26)] sm:h-[8.6rem] sm:w-[8.6rem]"
+          className="pricing-artifact-logo relative h-[7.4rem] w-[7.4rem] drop-shadow-[0_18px_36px_hsl(var(--marketing-shadow)/0.26)] sm:h-[8.6rem] sm:w-[8.6rem]"
           variant="icon"
         />
       </div>
