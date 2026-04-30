@@ -6,6 +6,12 @@ import { z } from "zod";
 
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
+import {
+  consumeRateLimit,
+  getRateLimitClientIp,
+  type RateLimitResult,
+  resetRateLimit,
+} from "@/server/rate-limit";
 
 import { AUTH_SESSION_COOKIE_NAME } from "./constants";
 import { authenticateUserByPassword, invalidateAuthSession } from "./service";
@@ -15,6 +21,17 @@ import {
   getAuthSessionTokenFromCookie,
 } from "./session";
 import type { SignInActionState } from "./sign-in-state";
+
+const LOGIN_IP_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 10 * 60 * 1000,
+};
+const LOGIN_EMAIL_RATE_LIMIT = {
+  limit: 8,
+  windowMs: 10 * 60 * 1000,
+};
+const LOGIN_IP_NAMESPACE = "auth:login:ip";
+const LOGIN_EMAIL_NAMESPACE = "auth:login:email";
 
 export async function signInAction(_previousState: SignInActionState, formData: FormData): Promise<SignInActionState> {
   const locale = await getCurrentInterfaceLocale();
@@ -38,10 +55,33 @@ export async function signInAction(_previousState: SignInActionState, formData: 
     } satisfies SignInActionState;
   }
 
+  const clientIp = await getRateLimitClientIp();
+  const emailIdentity = [parsedInput.data.email];
+  const ipLimit = consumeRateLimit({
+    namespace: LOGIN_IP_NAMESPACE,
+    identityParts: [clientIp],
+    ...LOGIN_IP_RATE_LIMIT,
+  });
+
+  if (!ipLimit.allowed) {
+    return getRateLimitedSignInState(ipLimit);
+  }
+
+  const emailLimit = consumeRateLimit({
+    namespace: LOGIN_EMAIL_NAMESPACE,
+    identityParts: emailIdentity,
+    ...LOGIN_EMAIL_RATE_LIMIT,
+  });
+
+  if (!emailLimit.allowed) {
+    return getRateLimitedSignInState(emailLimit);
+  }
+
   try {
     const authenticatedUser = await authenticateUserByPassword(parsedInput.data);
     const cookieStore = await cookies();
     cookieStore.set(createAuthSessionCookie(authenticatedUser.sessionToken));
+    resetRateLimit(LOGIN_EMAIL_NAMESPACE, emailIdentity);
   } catch {
     return {
       status: "error",
@@ -75,6 +115,19 @@ function getSafePostLoginRedirect(nextPath: string | undefined) {
   }
 
   return "/app";
+}
+
+function getRateLimitedSignInState(rateLimit: RateLimitResult): SignInActionState {
+  return {
+    status: "error",
+    message: `Too many sign-in attempts. Wait about ${formatRetryMinutes(rateLimit.retryAfterSeconds)} and try again.`,
+  };
+}
+
+function formatRetryMinutes(retryAfterSeconds: number) {
+  const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+
+  return minutes === 1 ? "1 minute" : `${minutes} minutes`;
 }
 
 function getSignInFieldErrors(error: z.ZodError) {

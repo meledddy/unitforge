@@ -7,6 +7,7 @@ import {
   toPriceSheetLeadSubmissionInput,
 } from "@/features/price-sheets/lead-form";
 import type { PriceSheetInterfaceLanguage } from "@/features/price-sheets/localization";
+import { consumeRateLimit, getRateLimitClientIp, type RateLimitResult } from "@/server/rate-limit";
 
 import { createPublishedPriceSheetLead, isPriceSheetLeadServiceError } from "./service";
 
@@ -16,6 +17,19 @@ export interface PriceSheetLeadActionState {
   fieldErrors?: Record<string, string>;
   leadId?: string;
 }
+
+const LEAD_IP_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 10 * 60 * 1000,
+};
+const LEAD_SHEET_IP_RATE_LIMIT = {
+  limit: 8,
+  windowMs: 10 * 60 * 1000,
+};
+const LEAD_SHEET_EMAIL_RATE_LIMIT = {
+  limit: 3,
+  windowMs: 30 * 60 * 1000,
+};
 
 export async function submitPriceSheetLeadAction(
   _previousState: PriceSheetLeadActionState,
@@ -31,6 +45,37 @@ export async function submitPriceSheetLeadAction(
       message: copy.errorMessage,
       fieldErrors: getPriceSheetLeadFieldErrors(parsedFormData.error),
     } satisfies PriceSheetLeadActionState;
+  }
+
+  const clientIp = await getRateLimitClientIp();
+  const globalIpLimit = consumeRateLimit({
+    namespace: "price-sheet-lead:ip",
+    identityParts: [clientIp],
+    ...LEAD_IP_RATE_LIMIT,
+  });
+
+  if (!globalIpLimit.allowed) {
+    return getRateLimitedLeadState(globalIpLimit);
+  }
+
+  const sheetIpLimit = consumeRateLimit({
+    namespace: "price-sheet-lead:sheet-ip",
+    identityParts: [parsedFormData.data.priceSheetSlug, clientIp],
+    ...LEAD_SHEET_IP_RATE_LIMIT,
+  });
+
+  if (!sheetIpLimit.allowed) {
+    return getRateLimitedLeadState(sheetIpLimit);
+  }
+
+  const sheetEmailLimit = consumeRateLimit({
+    namespace: "price-sheet-lead:sheet-email",
+    identityParts: [parsedFormData.data.priceSheetSlug, parsedFormData.data.email],
+    ...LEAD_SHEET_EMAIL_RATE_LIMIT,
+  });
+
+  if (!sheetEmailLimit.allowed) {
+    return getRateLimitedLeadState(sheetEmailLimit);
   }
 
   try {
@@ -64,4 +109,17 @@ export async function submitPriceSheetLeadAction(
 
 function normalizeInterfaceLanguage(value: FormDataEntryValue | null): PriceSheetInterfaceLanguage {
   return value === "ru" ? "ru" : "en";
+}
+
+function getRateLimitedLeadState(rateLimit: RateLimitResult): PriceSheetLeadActionState {
+  return {
+    status: "error",
+    message: `Too many requests. Wait about ${formatRetryMinutes(rateLimit.retryAfterSeconds)} and try again.`,
+  };
+}
+
+function formatRetryMinutes(retryAfterSeconds: number) {
+  const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+
+  return minutes === 1 ? "1 minute" : `${minutes} minutes`;
 }
