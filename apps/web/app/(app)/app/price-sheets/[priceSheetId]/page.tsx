@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
+import { DeletePriceSheetConfirmation } from "@/features/price-sheets/delete-price-sheet-confirmation";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { PriceSheetLeadsPanel, PriceSheetLeadsSummary } from "@/features/price-sheets/price-sheet-leads-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
@@ -139,11 +140,17 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                 <CardDescription>{messages.priceSheets.deleteDescription}</CardDescription>
               </CardHeader>
               <CardContent>
-                <form action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}>
-                  <Button className="w-full" type="submit" variant="destructive">
-                    {messages.priceSheets.deleteButton}
-                  </Button>
-                </form>
+                <DeletePriceSheetConfirmation
+                  action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}
+                  cancelLabel={messages.priceSheets.deleteCancelButton}
+                  confirmButtonLabel={messages.priceSheets.deleteConfirmButton}
+                  consequence={messages.priceSheets.deleteConfirmConsequence}
+                  description={messages.priceSheets.deleteConfirmDescription}
+                  sheetLabel={messages.priceSheets.deleteConfirmSheetLabel}
+                  sheetTitle={priceSheet.title}
+                  title={messages.priceSheets.deleteConfirmTitle}
+                  triggerLabel={messages.priceSheets.deleteButton}
+                />
               </CardContent>
             </Card>
           </div>
