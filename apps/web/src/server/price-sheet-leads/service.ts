@@ -3,6 +3,7 @@ import type { AppShellSession } from "@/server/current-session";
 import { findPublishedPriceSheetRecordBySlug } from "@/server/price-sheets/repository";
 
 import { PriceSheetLeadServiceError } from "./errors";
+import { tracePriceSheetLeadCreated } from "./notifications";
 import {
   createPriceSheetLeadRecord,
   listPriceSheetLeadRecordsByWorkspaceAndPriceSheetId,
@@ -44,7 +45,7 @@ export async function createPublishedPriceSheetLead(
     throw new PriceSheetLeadServiceError("INQUIRY_DISABLED", "This price sheet is not accepting inquiries.");
   }
 
-  return createPriceSheetLeadRecord({
+  const lead = await createPriceSheetLeadRecord({
     priceSheetId: priceSheet.id,
     sheetSlugSnapshot: priceSheet.slug,
     submission: {
@@ -57,6 +58,15 @@ export async function createPublishedPriceSheetLead(
       message: input.message,
     },
   });
+
+  await tracePriceSheetLeadCreated({
+    lead,
+    priceSheet: {
+      workspaceId: priceSheet.workspaceId,
+    },
+  });
+
+  return lead;
 }
 
 export async function listWorkspacePriceSheetLeads(session: AppShellSession, priceSheetId: string) {
