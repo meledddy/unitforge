@@ -1,3 +1,3 @@
 display_name: Unitforge Browser Design QA
-short_description: Repeatable browser checks for Unitforge marketing UI.
-default_prompt: Use this skill to inspect Unitforge marketing pages in the in-app browser across light/dark and responsive states, then report visual risks and verification results.
+short_description: Fast scoped in-app browser QA for Unitforge UI changes.
+default_prompt: Use this skill to quickly reuse or start the local Unitforge dev server, inspect only the affected browser states, and report concise visual risks without heavy setup.
