@@ -30,6 +30,10 @@ export interface PriceSheetPublicSettings {
   primaryCtaLabel: string | null;
   secondaryCtaLabel: string | null;
   inquiryText: string | null;
+  businessLocation: string | null;
+  businessHours: string | null;
+  businessResponseTime: string | null;
+  businessNote: string | null;
   inquiryEnabled: boolean;
 }
 

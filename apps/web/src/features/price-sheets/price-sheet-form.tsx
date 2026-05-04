@@ -266,6 +266,10 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
       contactEmail: formCopy.contactEmail,
       contactLabel: formCopy.contactLabel,
       contactPhone: formCopy.contactPhone,
+      businessHours: formCopy.businessHours,
+      businessLocation: formCopy.businessLocation,
+      businessNote: formCopy.businessNote,
+      businessResponseTime: formCopy.businessResponseTime,
       currency: formCopy.currency,
       defaultContentLocale: formCopy.defaultContentLocale,
       description: formCopy.description,
@@ -513,6 +517,66 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                   onChange={(event) => updateTopLevelField("inquiryText", event.target.value)}
                 />
                 {getFieldError("inquiryText") ? <p className="text-sm text-destructive">{getFieldError("inquiryText")}</p> : null}
+              </div>
+
+              <div className="rounded-2xl border border-border/70 bg-background/70 p-4 md:col-span-2">
+                <p className="text-sm font-medium">{formCopy.businessDetailsTitle}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{formCopy.businessDetailsDescription}</p>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="business-location">{formCopy.businessLocation}</Label>
+                    <Input
+                      aria-invalid={Boolean(getFieldError("businessLocation"))}
+                      className={getFieldClasses("businessLocation")}
+                      id="business-location"
+                      value={values.businessLocation}
+                      onChange={(event) => updateTopLevelField("businessLocation", event.target.value)}
+                    />
+                    {getFieldError("businessLocation") ? (
+                      <p className="text-sm text-destructive">{getFieldError("businessLocation")}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="business-hours">{formCopy.businessHours}</Label>
+                    <Input
+                      aria-invalid={Boolean(getFieldError("businessHours"))}
+                      className={getFieldClasses("businessHours")}
+                      id="business-hours"
+                      value={values.businessHours}
+                      onChange={(event) => updateTopLevelField("businessHours", event.target.value)}
+                    />
+                    {getFieldError("businessHours") ? <p className="text-sm text-destructive">{getFieldError("businessHours")}</p> : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="business-response-time">{formCopy.businessResponseTime}</Label>
+                    <Input
+                      aria-invalid={Boolean(getFieldError("businessResponseTime"))}
+                      className={getFieldClasses("businessResponseTime")}
+                      id="business-response-time"
+                      value={values.businessResponseTime}
+                      onChange={(event) => updateTopLevelField("businessResponseTime", event.target.value)}
+                    />
+                    {getFieldError("businessResponseTime") ? (
+                      <p className="text-sm text-destructive">{getFieldError("businessResponseTime")}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="business-note">{formCopy.businessNote}</Label>
+                    <Textarea
+                      aria-invalid={Boolean(getFieldError("businessNote"))}
+                      className={getFieldClasses("businessNote")}
+                      id="business-note"
+                      rows={3}
+                      value={values.businessNote}
+                      onChange={(event) => updateTopLevelField("businessNote", event.target.value)}
+                    />
+                    {getFieldError("businessNote") ? <p className="text-sm text-destructive">{getFieldError("businessNote")}</p> : null}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

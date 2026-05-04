@@ -1,8 +1,6 @@
 import { z } from "zod";
 
-import {
-  priceSheetContentLocaleSchema,
-} from "@/features/price-sheets/validation";
+import { priceSheetContentLocaleSchema } from "@/features/price-sheets/validation";
 
 import type { PriceSheetContentLocale, PriceSheetInterfaceLanguage } from "./localization";
 
@@ -10,11 +8,14 @@ export interface PriceSheetLeadFormCopy {
   eyebrow: string;
   title: string;
   description: string;
+  helperText: string;
   contactNameLabel: string;
   companyNameLabel: string;
   emailLabel: string;
   phoneLabel: string;
   messageLabel: string;
+  openFormLabel: string;
+  closeFormLabel: string;
   submitLabel: string;
   submittingLabel: string;
   successTitle: string;
@@ -42,11 +43,14 @@ const priceSheetLeadCopy: Record<PriceSheetInterfaceLanguage, PriceSheetLeadForm
     eyebrow: "Inquiry",
     title: "Send an inquiry",
     description: "Share your request and leave the best contact details for a follow-up.",
+    helperText: "Ask about listed services, timing, price details, or a custom request.",
     contactNameLabel: "Contact name",
     companyNameLabel: "Company or business name",
     emailLabel: "Email",
     phoneLabel: "Phone or handle",
     messageLabel: "What do you need?",
+    openFormLabel: "Ask about these services",
+    closeFormLabel: "Hide form",
     submitLabel: "Send inquiry",
     submittingLabel: "Sending...",
     successTitle: "Inquiry sent",
@@ -62,11 +66,14 @@ const priceSheetLeadCopy: Record<PriceSheetInterfaceLanguage, PriceSheetLeadForm
     eyebrow: "Запрос",
     title: "Отправить запрос",
     description: "Опишите задачу и оставьте удобные контакты для ответа.",
+    helperText: "Можно спросить об услугах, сроках, деталях цены или нестандартной задаче.",
     contactNameLabel: "Контактное лицо",
     companyNameLabel: "Компания или бизнес",
     emailLabel: "Почта",
     phoneLabel: "Телефон или аккаунт",
     messageLabel: "Что вам нужно?",
+    openFormLabel: "Задать вопрос по услугам",
+    closeFormLabel: "Скрыть форму",
     submitLabel: "Отправить запрос",
     submittingLabel: "Отправка...",
     successTitle: "Запрос отправлен",
@@ -90,8 +97,15 @@ export function getPriceSheetLeadFormSchema(language: PriceSheetInterfaceLanguag
   return z.object({
     priceSheetSlug: z.string().trim().min(1, copy.unavailableMessage),
     locale: priceSheetContentLocaleSchema,
-    contactName: z.string().trim().min(1, language === "ru" ? "Укажите контактное лицо." : "Contact name is required.").max(120, language === "ru" ? "Имя слишком длинное." : "Contact name is too long."),
-    companyOrBusinessName: z.string().trim().max(160, language === "ru" ? "Название компании слишком длинное." : "Company name is too long."),
+    contactName: z
+      .string()
+      .trim()
+      .min(1, language === "ru" ? "Укажите контактное лицо." : "Contact name is required.")
+      .max(120, language === "ru" ? "Имя слишком длинное." : "Contact name is too long."),
+    companyOrBusinessName: z
+      .string()
+      .trim()
+      .max(160, language === "ru" ? "Название компании слишком длинное." : "Company name is too long."),
     email: z
       .string()
       .trim()

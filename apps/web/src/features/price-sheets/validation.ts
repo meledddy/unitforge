@@ -65,6 +65,10 @@ export function getPriceSheetFormSchema(locale: InterfaceLocale) {
       primaryCtaLabel: z.string().trim().max(48, copy.primaryCtaLong),
       secondaryCtaLabel: z.string().trim().max(48, copy.secondaryCtaLong),
       inquiryText: z.string().trim().max(320, copy.inquiryTextLong),
+      businessLocation: z.string().trim().max(180, copy.businessLocationLong),
+      businessHours: z.string().trim().max(160, copy.businessHoursLong),
+      businessResponseTime: z.string().trim().max(120, copy.businessResponseTimeLong),
+      businessNote: z.string().trim().max(320, copy.businessNoteLong),
       publicInquiryState: priceSheetPublicInquiryStateSchema,
       slug: z.string().trim().min(1, copy.slugRequired).max(160, copy.slugLong).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, copy.slugFormat),
       status: priceSheetStatusSchema,
@@ -140,6 +144,10 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
     primaryCtaLabel: "",
     secondaryCtaLabel: "",
     inquiryText: "",
+    businessLocation: "",
+    businessHours: "",
+    businessResponseTime: "",
+    businessNote: "",
     publicInquiryState: "enabled",
     slug: "",
     status: "draft",
@@ -225,6 +233,10 @@ export function toPriceSheetFormValues(input: {
     primaryCtaLabel: input.publicSettings.primaryCtaLabel ?? "",
     secondaryCtaLabel: input.publicSettings.secondaryCtaLabel ?? "",
     inquiryText: input.publicSettings.inquiryText ?? "",
+    businessLocation: input.publicSettings.businessLocation ?? "",
+    businessHours: input.publicSettings.businessHours ?? "",
+    businessResponseTime: input.publicSettings.businessResponseTime ?? "",
+    businessNote: input.publicSettings.businessNote ?? "",
     publicInquiryState: input.publicSettings.inquiryEnabled ? "enabled" : "hidden",
     slug: input.slug,
     status: input.status,
@@ -295,7 +307,17 @@ function getSheetTranslations(
 function getPublicSettings(
   values: Pick<
     PriceSheetFormValues,
-    "contactLabel" | "contactEmail" | "contactPhone" | "primaryCtaLabel" | "secondaryCtaLabel" | "inquiryText" | "publicInquiryState"
+    | "contactLabel"
+    | "contactEmail"
+    | "contactPhone"
+    | "primaryCtaLabel"
+    | "secondaryCtaLabel"
+    | "inquiryText"
+    | "businessLocation"
+    | "businessHours"
+    | "businessResponseTime"
+    | "businessNote"
+    | "publicInquiryState"
   >,
 ): PriceSheetPublicSettings {
   const emptySettings = getEmptyPriceSheetPublicSettings();
@@ -308,6 +330,10 @@ function getPublicSettings(
     primaryCtaLabel: toOptionalString(values.primaryCtaLabel),
     secondaryCtaLabel: toOptionalString(values.secondaryCtaLabel),
     inquiryText: toOptionalString(values.inquiryText),
+    businessLocation: toOptionalString(values.businessLocation),
+    businessHours: toOptionalString(values.businessHours),
+    businessResponseTime: toOptionalString(values.businessResponseTime),
+    businessNote: toOptionalString(values.businessNote),
     inquiryEnabled: values.publicInquiryState === "enabled",
   };
 }

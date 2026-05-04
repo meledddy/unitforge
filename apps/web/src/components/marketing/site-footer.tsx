@@ -38,11 +38,13 @@ export async function SiteFooter() {
           />
           <div className="space-y-1">
             <p className="text-base font-semibold tracking-[-0.04em] text-[hsl(var(--marketing-foreground))]">{appConfig.name}</p>
-            <p className="max-w-xl">{copy.description}</p>
+            <p className="max-w-xl" data-public-sheet-footer-secondary>
+              {copy.description}
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:justify-end">
-          <nav className="flex flex-wrap items-center gap-3">
+          <nav className="flex flex-wrap items-center gap-3" data-public-sheet-footer-secondary>
             {copy.links.map((item) => (
               <Link
                 key={item.href}

@@ -52,6 +52,10 @@ async function main() {
     primaryCtaLabel: "Email us",
     secondaryCtaLabel: "Message us",
     inquiryText: "Reach out for scope confirmation and booking.",
+    businessLocation: "Studio 4, Verification Street",
+    businessHours: "Mon-Fri 10:00-18:00",
+    businessResponseTime: "Usually within 1 business day",
+    businessNote: "Pilot verification business details.",
     publicInquiryState: "enabled",
     slug,
     status: "published",
@@ -98,6 +102,10 @@ async function main() {
     assert.equal(editable.formValues.primaryCtaLabel, payload.primaryCtaLabel);
     assert.equal(editable.formValues.secondaryCtaLabel, payload.secondaryCtaLabel);
     assert.equal(editable.formValues.inquiryText, payload.inquiryText);
+    assert.equal(editable.formValues.businessLocation, payload.businessLocation);
+    assert.equal(editable.formValues.businessHours, payload.businessHours);
+    assert.equal(editable.formValues.businessResponseTime, payload.businessResponseTime);
+    assert.equal(editable.formValues.businessNote, payload.businessNote);
     assert.equal(editable.formValues.publicInquiryState, payload.publicInquiryState);
     assert.equal(editable.items.length, 1);
     assert.equal(editable.formValues.items[0]?.secondaryName, payload.items[0]?.secondaryName);
@@ -116,6 +124,10 @@ async function main() {
     assert.equal(publicSheet.publicSettings.primaryCtaLabel, payload.primaryCtaLabel);
     assert.equal(publicSheet.publicSettings.secondaryCtaLabel, payload.secondaryCtaLabel);
     assert.equal(publicSheet.publicSettings.inquiryText, payload.inquiryText);
+    assert.equal(publicSheet.publicSettings.businessLocation, payload.businessLocation);
+    assert.equal(publicSheet.publicSettings.businessHours, payload.businessHours);
+    assert.equal(publicSheet.publicSettings.businessResponseTime, payload.businessResponseTime);
+    assert.equal(publicSheet.publicSettings.businessNote, payload.businessNote);
     assert.equal(publicSheet.publicSettings.inquiryEnabled, true);
     assert.equal(publicSheet.items[0]?.translations["ru-RU"]?.name, payload.items[0]?.secondaryName);
 
@@ -186,6 +198,10 @@ async function main() {
     assert.equal(duplicated.publicSettings.primaryCtaLabel, payload.primaryCtaLabel);
     assert.equal(duplicated.publicSettings.secondaryCtaLabel, payload.secondaryCtaLabel);
     assert.equal(duplicated.publicSettings.inquiryText, payload.inquiryText);
+    assert.equal(duplicated.publicSettings.businessLocation, payload.businessLocation);
+    assert.equal(duplicated.publicSettings.businessHours, payload.businessHours);
+    assert.equal(duplicated.publicSettings.businessResponseTime, payload.businessResponseTime);
+    assert.equal(duplicated.publicSettings.businessNote, payload.businessNote);
     assert.equal(duplicated.publicSettings.inquiryEnabled, true);
     assert.equal(duplicated.items.length, 1);
     assert.equal(duplicated.formValues.secondaryTitle, payload.secondaryTitle);

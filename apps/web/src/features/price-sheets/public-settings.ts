@@ -8,6 +8,10 @@ export function getEmptyPriceSheetPublicSettings(): PriceSheetPublicSettings {
     primaryCtaLabel: null,
     secondaryCtaLabel: null,
     inquiryText: null,
+    businessLocation: null,
+    businessHours: null,
+    businessResponseTime: null,
+    businessNote: null,
     inquiryEnabled: true,
   };
 }
@@ -26,6 +30,10 @@ export function normalizePriceSheetPublicSettings(value: unknown): PriceSheetPub
     primaryCtaLabel: normalizeOptionalString(value.primaryCtaLabel),
     secondaryCtaLabel: normalizeOptionalString(value.secondaryCtaLabel),
     inquiryText: normalizeOptionalString(value.inquiryText),
+    businessLocation: normalizeOptionalString(value.businessLocation),
+    businessHours: normalizeOptionalString(value.businessHours),
+    businessResponseTime: normalizeOptionalString(value.businessResponseTime),
+    businessNote: normalizeOptionalString(value.businessNote),
     inquiryEnabled: normalizeBoolean(value.inquiryEnabled, emptySettings.inquiryEnabled),
   };
 }

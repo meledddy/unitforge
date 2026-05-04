@@ -173,6 +173,210 @@
         linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
     }
   }
+
+  [data-price-sheet-theme] {
+    --ps-page: 39 40% 95%;
+    --ps-hero: 42 50% 98%;
+    --ps-surface: 42 48% 98%;
+    --ps-surface-muted: 39 34% 94%;
+    --ps-surface-elevated: 42 56% 99%;
+    --ps-highlight: 42 56% 100%;
+    --ps-text: 289 27% 13%;
+    --ps-text-soft: 286 13% 32%;
+    --ps-text-muted: 285 8% 45%;
+    --ps-border: 35 28% 80%;
+    --ps-border-strong: 34 36% 66%;
+    --ps-accent: 34 54% 48%;
+    --ps-accent-soft: 39 58% 88%;
+    --ps-accent-text: 32 48% 34%;
+    --ps-mark-bg: 39 58% 90%;
+    --ps-mark-text: 289 27% 13%;
+    --ps-price: 289 27% 13%;
+    --ps-control-active: 289 27% 13%;
+    --ps-control-active-hover: 289 24% 18%;
+    --ps-control-active-text: 42 52% 98%;
+    --ps-input-bg: 42 56% 99%;
+    --ps-input-border: 35 28% 78%;
+    --ps-ring: 33 44% 48%;
+    --ps-shadow: 288 28% 9%;
+    --ps-danger: 0 70% 48%;
+    --ps-danger-text: 0 68% 42%;
+    color-scheme: light;
+    background-image:
+      radial-gradient(circle at 22% 4%, hsl(var(--ps-accent-soft) / 0.42), transparent 24rem),
+      radial-gradient(circle at 78% 6%, hsl(var(--ps-accent) / 0.12), transparent 18rem),
+      linear-gradient(180deg, hsl(var(--ps-page)), hsl(var(--ps-page)));
+  }
+
+  [data-price-sheet-theme="slate"] {
+    --ps-page: 40 28% 96%;
+    --ps-hero: 210 28% 97%;
+    --ps-surface: 210 26% 98%;
+    --ps-surface-muted: 210 21% 94%;
+    --ps-surface-elevated: 42 40% 99%;
+    --ps-text: 224 36% 13%;
+    --ps-text-soft: 218 17% 34%;
+    --ps-text-muted: 215 13% 47%;
+    --ps-border: 214 24% 80%;
+    --ps-border-strong: 215 20% 64%;
+    --ps-accent: 215 23% 46%;
+    --ps-accent-soft: 214 28% 89%;
+    --ps-accent-text: 217 32% 29%;
+    --ps-mark-bg: 224 36% 13%;
+    --ps-mark-text: 42 48% 97%;
+    --ps-ring: 215 22% 48%;
+  }
+
+  [data-price-sheet-theme="stone"] {
+    --ps-page: 42 27% 95%;
+    --ps-hero: 40 36% 98%;
+    --ps-surface: 40 32% 98%;
+    --ps-surface-muted: 39 22% 94%;
+    --ps-surface-elevated: 42 42% 99%;
+    --ps-text: 289 20% 14%;
+    --ps-text-soft: 28 9% 32%;
+    --ps-text-muted: 30 7% 45%;
+    --ps-border: 34 18% 79%;
+    --ps-border-strong: 33 17% 64%;
+    --ps-accent: 31 22% 45%;
+    --ps-accent-soft: 34 25% 88%;
+    --ps-accent-text: 28 21% 33%;
+    --ps-mark-bg: 36 22% 88%;
+    --ps-mark-text: 289 20% 14%;
+    --ps-control-active: 28 14% 28%;
+    --ps-control-active-hover: 28 13% 34%;
+    --ps-ring: 30 18% 45%;
+  }
+
+  [data-price-sheet-theme="amber"] {
+    --ps-page: 42 57% 94%;
+    --ps-hero: 43 64% 97%;
+    --ps-surface: 42 62% 98%;
+    --ps-surface-muted: 41 50% 93%;
+    --ps-surface-elevated: 43 72% 99%;
+    --ps-text: 289 27% 13%;
+    --ps-text-soft: 286 12% 31%;
+    --ps-text-muted: 31 19% 43%;
+    --ps-border: 41 54% 77%;
+    --ps-border-strong: 39 58% 63%;
+    --ps-accent: 42 86% 57%;
+    --ps-accent-soft: 43 84% 88%;
+    --ps-accent-text: 31 52% 35%;
+    --ps-mark-bg: 45 90% 78%;
+    --ps-mark-text: 289 27% 13%;
+    --ps-price: 24 64% 24%;
+    --ps-control-active: 42 88% 58%;
+    --ps-control-active-hover: 42 88% 52%;
+    --ps-control-active-text: 289 27% 13%;
+    --ps-ring: 42 80% 48%;
+  }
+
+  :root[data-marketing-theme="dark"] [data-price-sheet-theme] {
+    --ps-page: 289 25% 8%;
+    --ps-hero: 286 18% 15%;
+    --ps-surface: 288 19% 12%;
+    --ps-surface-muted: 287 17% 15%;
+    --ps-surface-elevated: 286 16% 18%;
+    --ps-highlight: 42 50% 98%;
+    --ps-text: 42 40% 94%;
+    --ps-text-soft: 39 16% 77%;
+    --ps-text-muted: 36 11% 62%;
+    --ps-border: 33 18% 27%;
+    --ps-border-strong: 35 28% 42%;
+    --ps-accent: 38 74% 70%;
+    --ps-accent-soft: 33 31% 20%;
+    --ps-accent-text: 38 74% 72%;
+    --ps-mark-bg: 39 42% 88%;
+    --ps-mark-text: 289 25% 9%;
+    --ps-price: 38 74% 78%;
+    --ps-control-active: 38 76% 72%;
+    --ps-control-active-hover: 39 82% 76%;
+    --ps-control-active-text: 289 25% 9%;
+    --ps-input-bg: 288 15% 17%;
+    --ps-input-border: 33 17% 31%;
+    --ps-ring: 38 74% 70%;
+    --ps-shadow: 289 26% 4%;
+    --ps-danger: 0 72% 64%;
+    --ps-danger-text: 0 86% 76%;
+    color-scheme: dark;
+    background-image:
+      radial-gradient(circle at 32% 0%, hsl(var(--ps-accent) / 0.15), transparent 24rem),
+      radial-gradient(circle at 80% 12%, hsl(289 18% 21% / 0.8), transparent 22rem),
+      linear-gradient(180deg, hsl(289 24% 10%), hsl(var(--ps-page)));
+  }
+
+  :root[data-marketing-theme="dark"] [data-price-sheet-theme="slate"] {
+    --ps-hero: 286 16% 15%;
+    --ps-surface: 286 17% 12%;
+    --ps-surface-muted: 286 15% 15%;
+    --ps-surface-elevated: 285 14% 18%;
+    --ps-border: 219 14% 29%;
+    --ps-border-strong: 217 18% 44%;
+    --ps-accent: 214 35% 72%;
+    --ps-accent-soft: 217 20% 21%;
+    --ps-accent-text: 214 38% 76%;
+    --ps-mark-bg: 214 28% 84%;
+    --ps-ring: 214 35% 72%;
+  }
+
+  :root[data-marketing-theme="dark"] [data-price-sheet-theme="stone"] {
+    --ps-hero: 30 13% 15%;
+    --ps-surface: 289 17% 12%;
+    --ps-surface-muted: 30 12% 15%;
+    --ps-surface-elevated: 30 11% 18%;
+    --ps-border: 30 15% 29%;
+    --ps-border-strong: 31 20% 42%;
+    --ps-accent: 34 34% 68%;
+    --ps-accent-soft: 31 20% 20%;
+    --ps-accent-text: 35 39% 72%;
+    --ps-mark-bg: 38 38% 84%;
+    --ps-control-active: 36 44% 72%;
+    --ps-control-active-hover: 37 48% 76%;
+    --ps-ring: 35 38% 68%;
+  }
+
+  :root[data-marketing-theme="dark"] [data-price-sheet-theme="amber"] {
+    --ps-hero: 31 21% 16%;
+    --ps-surface: 289 18% 12%;
+    --ps-surface-muted: 31 18% 15%;
+    --ps-surface-elevated: 31 16% 18%;
+    --ps-border: 39 28% 31%;
+    --ps-border-strong: 40 44% 45%;
+    --ps-accent: 42 90% 66%;
+    --ps-accent-soft: 39 35% 22%;
+    --ps-accent-text: 42 90% 72%;
+    --ps-mark-bg: 44 82% 72%;
+    --ps-price: 42 90% 72%;
+    --ps-control-active: 42 90% 64%;
+    --ps-control-active-hover: 42 92% 70%;
+    --ps-ring: 42 88% 66%;
+  }
+
+  .price-sheet-public-page {
+    background-image:
+      radial-gradient(circle at 18% 4%, hsl(var(--ps-accent-soft) / 0.5), transparent 24rem),
+      radial-gradient(circle at 79% 6%, hsl(var(--ps-accent) / 0.13), transparent 20rem),
+      linear-gradient(180deg, hsl(var(--ps-page)), hsl(var(--ps-page)));
+  }
+
+  .price-sheet-public-glow {
+    background:
+      radial-gradient(circle at 35% 0%, hsl(var(--ps-accent) / 0.2), transparent 30rem),
+      radial-gradient(circle at 78% 10%, hsl(var(--ps-accent-soft) / 0.38), transparent 26rem);
+  }
+
+  [data-marketing-shell]:has([data-price-sheet-theme]) .public-sheet-marketing-controls {
+    display: none;
+  }
+
+  [data-marketing-shell]:has([data-price-sheet-theme]) .marketing-enter-header {
+    position: relative;
+    top: auto;
+  }
+
+  [data-marketing-shell]:has([data-price-sheet-theme]) [data-public-sheet-footer-secondary] {
+    display: none;
+  }
 }
 
 @layer utilities {
