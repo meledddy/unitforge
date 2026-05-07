@@ -24,6 +24,7 @@ export interface PriceSheetTranslation {
 }
 
 export interface PriceSheetPublicSettings {
+  presentationAppearance: PriceSheetPresentationAppearance;
   contactLabel: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
@@ -36,6 +37,8 @@ export interface PriceSheetPublicSettings {
   businessNote: string | null;
   inquiryEnabled: boolean;
 }
+
+export type PriceSheetPresentationAppearance = "light" | "dark";
 
 export interface PriceSheetItemTranslation {
   name: string;

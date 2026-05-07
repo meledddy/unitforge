@@ -62,6 +62,7 @@ async function main() {
     currency: "USD",
     defaultContentLocale: "en-US",
     theme: "slate",
+    presentationAppearance: "dark",
     items: [
       {
         name: "Verification Item",
@@ -94,6 +95,7 @@ async function main() {
     assert.equal(editable.description, payload.description);
     assert.equal(editable.slug, slug);
     assert.equal(editable.theme, "slate");
+    assert.equal(editable.formValues.presentationAppearance, payload.presentationAppearance);
     assert.equal(editable.defaultContentLocale, "en-US");
     assert.equal(editable.formValues.secondaryTitle, payload.secondaryTitle);
     assert.equal(editable.formValues.contactLabel, payload.contactLabel);
@@ -115,6 +117,7 @@ async function main() {
     assert.equal(publicSheet.description, payload.description);
     assert.equal(publicSheet.slug, slug);
     assert.equal(publicSheet.theme, "slate");
+    assert.equal(publicSheet.publicSettings.presentationAppearance, payload.presentationAppearance);
     assert.equal(publicSheet.defaultContentLocale, "en-US");
     assert.equal(publicSheet.items.length, 1);
     assert.equal(publicSheet.translations["ru-RU"]?.title, payload.secondaryTitle);
@@ -191,6 +194,7 @@ async function main() {
     assert.notEqual(duplicated.slug, slug);
     assert.equal(duplicated.slug, `${slug}-copy`);
     assert.equal(duplicated.theme, "slate");
+    assert.equal(duplicated.formValues.presentationAppearance, payload.presentationAppearance);
     assert.equal(duplicated.defaultContentLocale, "en-US");
     assert.equal(duplicated.publicSettings.contactLabel, payload.contactLabel);
     assert.equal(duplicated.publicSettings.contactEmail, payload.contactEmail);
@@ -202,6 +206,7 @@ async function main() {
     assert.equal(duplicated.publicSettings.businessHours, payload.businessHours);
     assert.equal(duplicated.publicSettings.businessResponseTime, payload.businessResponseTime);
     assert.equal(duplicated.publicSettings.businessNote, payload.businessNote);
+    assert.equal(duplicated.publicSettings.presentationAppearance, payload.presentationAppearance);
     assert.equal(duplicated.publicSettings.inquiryEnabled, true);
     assert.equal(duplicated.items.length, 1);
     assert.equal(duplicated.formValues.secondaryTitle, payload.secondaryTitle);

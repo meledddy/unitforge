@@ -1,6 +1,9 @@
+import type { PriceSheetPresentationAppearance } from "@unitforge/db";
+
 export const priceSheetContentLocaleValues = ["en-US", "ru-RU"] as const;
 export const priceSheetInterfaceLanguageValues = ["en", "ru"] as const;
 export const priceSheetThemeValues = ["amber", "slate", "stone"] as const;
+export const priceSheetPresentationAppearanceValues = ["light", "dark"] as const satisfies readonly PriceSheetPresentationAppearance[];
 
 export type PriceSheetContentLocale = (typeof priceSheetContentLocaleValues)[number];
 export type PriceSheetInterfaceLanguage = (typeof priceSheetInterfaceLanguageValues)[number];

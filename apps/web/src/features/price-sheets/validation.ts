@@ -8,6 +8,7 @@ import type { PriceSheetContentLocale, PriceSheetItemTranslations, PriceSheetThe
 import {
   getAlternatePriceSheetContentLocale,
   priceSheetContentLocaleValues,
+  priceSheetPresentationAppearanceValues,
   priceSheetThemeValues,
 } from "./localization";
 import { getEmptyPriceSheetPublicSettings } from "./public-settings";
@@ -16,6 +17,7 @@ export const priceSheetStatusValues = ["draft", "published"] as const;
 
 export const priceSheetStatusSchema = z.enum(priceSheetStatusValues);
 export const priceSheetThemeSchema = z.enum(priceSheetThemeValues);
+export const priceSheetPresentationAppearanceSchema = z.enum(priceSheetPresentationAppearanceValues);
 export const priceSheetContentLocaleSchema = z.enum(priceSheetContentLocaleValues);
 export const priceSheetPublicInquiryStateSchema = z.enum(["enabled", "hidden"]);
 
@@ -75,6 +77,7 @@ export function getPriceSheetFormSchema(locale: InterfaceLocale) {
       currency: z.string().trim().length(3, copy.currencyCode).transform((value) => value.toUpperCase()),
       defaultContentLocale: priceSheetContentLocaleSchema,
       theme: priceSheetThemeSchema,
+      presentationAppearance: priceSheetPresentationAppearanceSchema,
       items: z.array(getPriceSheetItemFormSchema(locale)).min(1, copy.addOneItem),
     })
     .superRefine((value, ctx) => {
@@ -154,6 +157,7 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
     currency: "USD",
     defaultContentLocale: "en-US",
     theme: "amber",
+    presentationAppearance: "dark",
     items: [getEmptyPriceSheetItemValues()],
   };
 }
@@ -243,6 +247,7 @@ export function toPriceSheetFormValues(input: {
     currency: input.currency,
     defaultContentLocale: input.defaultContentLocale,
     theme: input.theme,
+    presentationAppearance: input.publicSettings.presentationAppearance,
     items:
       input.items.length > 0
         ? input.items.map((item) => {
@@ -318,6 +323,7 @@ function getPublicSettings(
     | "businessResponseTime"
     | "businessNote"
     | "publicInquiryState"
+    | "presentationAppearance"
   >,
 ): PriceSheetPublicSettings {
   const emptySettings = getEmptyPriceSheetPublicSettings();
@@ -335,6 +341,7 @@ function getPublicSettings(
     businessResponseTime: toOptionalString(values.businessResponseTime),
     businessNote: toOptionalString(values.businessNote),
     inquiryEnabled: values.publicInquiryState === "enabled",
+    presentationAppearance: values.presentationAppearance,
   };
 }
 

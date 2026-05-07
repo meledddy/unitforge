@@ -43,6 +43,10 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
     const nextStatus = priceSheet.status === "published" ? "draft" : "published";
     const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
     const leadCountLabel = `${messages.priceSheets.leadCountLabel}: ${leads.length}`;
+    const presentationAppearanceLabel =
+      priceSheet.publicSettings.presentationAppearance === "dark"
+        ? messages.priceSheetForm.presentationAppearanceDark
+        : messages.priceSheetForm.presentationAppearanceLight;
 
     return (
       <div className="space-y-8">
@@ -111,6 +115,10 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                   <div className="flex items-start justify-between gap-3 text-muted-foreground">
                     <span>{messages.priceSheets.themeLabel}</span>
                     <span className="text-foreground">{priceSheet.theme}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                    <span>{messages.priceSheets.appearanceLabel}</span>
+                    <span className="text-foreground">{presentationAppearanceLabel}</span>
                   </div>
                   <div className="flex items-start justify-between gap-3 text-muted-foreground">
                     <span>{messages.priceSheets.currencyLabel}</span>

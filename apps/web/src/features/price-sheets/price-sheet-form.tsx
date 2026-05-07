@@ -275,6 +275,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
       description: formCopy.description,
       inquiryText: formCopy.inquiryText,
       items: formCopy.itemsTitle,
+      presentationAppearance: formCopy.presentationAppearance,
       primaryCtaLabel: formCopy.primaryCtaLabel,
       publicInquiryState: formCopy.publicInquiryState,
       secondaryDescription: formCopy.translatedDescription,
@@ -406,6 +407,24 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
               <option value="stone">{formCopy.themeStone}</option>
             </Select>
             {getFieldError("theme") ? <p className="text-sm text-destructive">{getFieldError("theme")}</p> : null}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="presentation-appearance">{formCopy.presentationAppearance}</Label>
+            <Select
+              aria-invalid={Boolean(getFieldError("presentationAppearance"))}
+              className={getFieldClasses("presentationAppearance")}
+              id="presentation-appearance"
+              value={values.presentationAppearance}
+              onChange={(event) => updateTopLevelField("presentationAppearance", event.target.value)}
+            >
+              <option value="dark">{formCopy.presentationAppearanceDark}</option>
+              <option value="light">{formCopy.presentationAppearanceLight}</option>
+            </Select>
+            <p className="text-sm text-muted-foreground">{formCopy.presentationAppearanceDescription}</p>
+            {getFieldError("presentationAppearance") ? (
+              <p className="text-sm text-destructive">{getFieldError("presentationAppearance")}</p>
+            ) : null}
           </div>
 
           <div className="space-y-2">

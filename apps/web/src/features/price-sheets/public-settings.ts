@@ -1,7 +1,10 @@
-import type { PriceSheetPublicSettings } from "@unitforge/db";
+import type { PriceSheetPresentationAppearance, PriceSheetPublicSettings } from "@unitforge/db";
+
+export const defaultPriceSheetPresentationAppearance = "dark" satisfies PriceSheetPresentationAppearance;
 
 export function getEmptyPriceSheetPublicSettings(): PriceSheetPublicSettings {
   return {
+    presentationAppearance: defaultPriceSheetPresentationAppearance,
     contactLabel: null,
     contactEmail: null,
     contactPhone: null,
@@ -24,6 +27,7 @@ export function normalizePriceSheetPublicSettings(value: unknown): PriceSheetPub
   }
 
   return {
+    presentationAppearance: normalizePriceSheetPresentationAppearance(value.presentationAppearance),
     contactLabel: normalizeOptionalString(value.contactLabel),
     contactEmail: normalizeOptionalString(value.contactEmail),
     contactPhone: normalizeOptionalString(value.contactPhone),
@@ -36,6 +40,10 @@ export function normalizePriceSheetPublicSettings(value: unknown): PriceSheetPub
     businessNote: normalizeOptionalString(value.businessNote),
     inquiryEnabled: normalizeBoolean(value.inquiryEnabled, emptySettings.inquiryEnabled),
   };
+}
+
+export function normalizePriceSheetPresentationAppearance(value: unknown): PriceSheetPresentationAppearance {
+  return value === "light" ? "light" : defaultPriceSheetPresentationAppearance;
 }
 
 function normalizeOptionalString(value: unknown) {

@@ -173,7 +173,11 @@ export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContent
     publicContactActions.length > 0;
 
   return (
-    <div className={cn("relative isolate overflow-hidden pb-12 sm:pb-16", theme.pageClassName)} data-price-sheet-theme={theme.id}>
+    <div
+      className={cn("relative isolate overflow-hidden pb-12 sm:pb-16", theme.pageClassName)}
+      data-price-sheet-appearance={priceSheet.publicSettings.presentationAppearance}
+      data-price-sheet-theme={theme.id}
+    >
       <div aria-hidden className={cn("absolute inset-x-0 top-0 h-[22rem] blur-3xl", theme.glowClassName)} />
 
       <section className="container relative pt-7 sm:pt-10">
