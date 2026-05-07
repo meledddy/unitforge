@@ -14,6 +14,7 @@ import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/pr
 export const dynamic = "force-dynamic";
 
 const statusFilterValues = ["all", "published", "draft"] as const;
+const priceSheetsPageSize = 5;
 
 type PriceSheetListStatusFilter = (typeof statusFilterValues)[number];
 
@@ -21,6 +22,7 @@ interface PriceSheetsPageProps {
   searchParams?: Promise<{
     q?: string | string[];
     status?: string | string[];
+    limit?: string | string[];
   }>;
 }
 
@@ -29,6 +31,7 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const searchQuery = getFirstQueryParamValue(resolvedSearchParams.q)?.trim() ?? "";
   const activeStatusFilter = parseStatusFilter(getFirstQueryParamValue(resolvedSearchParams.status));
+  const visibleLimit = parseVisibleLimit(getFirstQueryParamValue(resolvedSearchParams.limit));
   const hasActiveListTools = searchQuery.length > 0 || activeStatusFilter !== "all";
   const messages = getMessages(locale);
   const dateTimeLocale = getInterfaceNumberLocale(locale);
@@ -37,6 +40,14 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
     const priceSheets = await listWorkspacePriceSheets(session, {
       query: searchQuery || undefined,
       status: activeStatusFilter === "all" ? undefined : activeStatusFilter,
+    });
+    const visiblePriceSheets = priceSheets.slice(0, visibleLimit);
+    const hasMorePriceSheets = visiblePriceSheets.length < priceSheets.length;
+    const nextVisibleLimit = Math.min(visibleLimit + priceSheetsPageSize, priceSheets.length);
+    const currentListHref = buildPriceSheetsListHref({
+      query: searchQuery,
+      status: activeStatusFilter,
+      limit: visibleLimit,
     });
 
     return (
@@ -52,28 +63,28 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
           }
         />
 
-        <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <form action="/app/price-sheets" className="flex flex-col gap-3 sm:flex-row sm:items-center" method="get">
+        <div className="rounded-3xl border border-border/70 bg-card/85 p-3 shadow-[0_18px_55px_rgba(31,22,34,0.06)] sm:p-4">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <form action="/app/price-sheets" className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center" method="get">
               <Input
-                className="h-11 min-w-0 sm:min-w-[280px]"
+                className="h-10 min-w-0 bg-background/85 sm:min-w-[320px]"
                 defaultValue={searchQuery}
                 name="q"
                 placeholder={messages.priceSheets.searchPlaceholder}
                 type="search"
               />
               {activeStatusFilter !== "all" ? <input name="status" type="hidden" value={activeStatusFilter} /> : null}
-              <Button className="w-full sm:w-auto" type="submit" variant="outline">
+              <Button className="h-10 w-full sm:w-auto" size="sm" type="submit" variant="outline">
                 {messages.shared.search}
               </Button>
               {hasActiveListTools ? (
-                <Link className={cn(buttonVariants({ size: "default", variant: "ghost" }), "w-full sm:w-auto")} href="/app/price-sheets">
+                <Link className={cn(buttonVariants({ size: "sm", variant: "ghost" }), "h-10 w-full sm:w-auto")} href="/app/price-sheets">
                   {messages.shared.reset}
                 </Link>
               ) : null}
             </form>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 rounded-full border border-border/70 bg-background/70 p-1">
               {statusFilterValues.map((statusFilter) => (
                 <Link
                   key={statusFilter}
@@ -82,7 +93,7 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                       size: "sm",
                       variant: activeStatusFilter === statusFilter ? "default" : "outline",
                     }),
-                    "min-w-[84px]",
+                    "h-8 min-w-[82px] flex-1 rounded-full px-3 text-xs shadow-none sm:flex-none",
                   )}
                   href={buildPriceSheetsListHref({
                     query: searchQuery,
@@ -94,6 +105,11 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
               ))}
             </div>
           </div>
+          {priceSheets.length > 0 ? (
+            <p className="mt-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+              {messages.priceSheets.resultsShowing} {visiblePriceSheets.length} {messages.priceSheets.resultsOf} {priceSheets.length}
+            </p>
+          ) : null}
         </div>
 
         {priceSheets.length === 0 ? (
@@ -121,73 +137,109 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
             </PlaceholderPanel>
           )
         ) : (
-          <div className="grid gap-4 sm:gap-5">
-            {priceSheets.map((priceSheet) => {
-              const nextStatus = priceSheet.status === "published" ? "draft" : "published";
-              const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
+          <div className="space-y-4">
+            <div className="grid gap-3">
+              {visiblePriceSheets.map((priceSheet) => {
+                const nextStatus = priceSheet.status === "published" ? "draft" : "published";
+                const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
+                const publishedMetadata = priceSheet.publishedAt
+                  ? priceSheet.publishedAt.toLocaleString(dateTimeLocale)
+                  : messages.priceSheets.notYetPublished;
 
-              return (
-                <Card key={priceSheet.id}>
-                  <CardHeader>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
-                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
-                            {priceSheet.itemCount} {messages.priceSheets.itemsCount}
-                          </span>
-                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
-                            {priceSheet.currency}
-                          </span>
+                return (
+                  <Card className="overflow-hidden rounded-2xl border-border/70 bg-card/95 shadow-[0_12px_36px_rgba(31,22,34,0.04)]" key={priceSheet.id}>
+                    <CardHeader className="gap-4 p-4 sm:p-5">
+                      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+                        <div className="min-w-0 space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
+                            <span className="rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">
+                              {priceSheet.itemCount} {messages.priceSheets.itemsCount}
+                            </span>
+                            <span className="rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                              {priceSheet.currency}
+                            </span>
+                            <span className="rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">
+                              {priceSheet.defaultContentLocale}
+                            </span>
+                          </div>
+                          <div className="min-w-0 space-y-1.5">
+                            <CardTitle className="text-base leading-6 sm:text-lg">
+                              <Link className="break-words transition-colors hover:text-primary" href={`/app/price-sheets/${priceSheet.id}`}>
+                                {priceSheet.title}
+                              </Link>
+                            </CardTitle>
+                            <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                              <span>{messages.priceSheets.slugLabel}:</span>
+                              <span className="break-all font-mono text-[11px] uppercase tracking-[0.14em]">/{priceSheet.slug}</span>
+                            </CardDescription>
+                            {priceSheet.description ? <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{priceSheet.description}</p> : null}
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          <CardTitle>{priceSheet.title}</CardTitle>
-                          <CardDescription className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span>{messages.priceSheets.slugLabel}:</span>
-                            <span className="font-mono text-xs uppercase tracking-[0.18em]">/{priceSheet.slug}</span>
-                            <span aria-hidden="true" className="text-border">•</span>
-                            <span>{priceSheet.defaultContentLocale}</span>
-                          </CardDescription>
-                          {priceSheet.description ? <p className="max-w-2xl text-sm text-muted-foreground">{priceSheet.description}</p> : null}
-                        </div>
-                      </div>
 
-                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                        <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, "/app/price-sheets")}>
-                          <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
-                            {statusActionLabel}
-                          </Button>
-                        </form>
-                        <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
-                          <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
-                            {messages.shared.duplicate}
-                          </Button>
-                        </form>
-                        {priceSheet.status === "published" ? (
+                        <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-start lg:max-w-[440px] lg:justify-end">
                           <Link
-                            className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")}
-                            href={`/price-sheets/${priceSheet.slug}`}
+                            className={cn(buttonVariants({ size: "sm" }), "col-span-2 w-full min-w-[92px] sm:col-span-1 sm:w-auto")}
+                            href={`/app/price-sheets/${priceSheet.id}`}
                           >
-                            {messages.priceSheets.publicPage}
+                            {messages.priceSheets.editSheet}
                           </Link>
-                        ) : null}
-                        <Link className={cn(buttonVariants({ size: "sm" }), "w-full sm:w-auto")} href={`/app/price-sheets/${priceSheet.id}`}>
-                          {messages.priceSheets.editSheet}
-                        </Link>
+                          {priceSheet.status === "published" ? (
+                            <Link
+                              className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full whitespace-normal text-center sm:w-auto")}
+                              href={`/price-sheets/${priceSheet.slug}`}
+                            >
+                              {messages.priceSheets.publicPage}
+                            </Link>
+                          ) : null}
+                          <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)} className="min-w-0">
+                            <Button className="w-full whitespace-normal sm:w-auto" size="sm" type="submit" variant="outline">
+                              {messages.shared.duplicate}
+                            </Button>
+                          </form>
+                          <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, currentListHref)} className="min-w-0">
+                            <Button className="w-full whitespace-normal sm:w-auto" size="sm" type="submit" variant="outline">
+                              {statusActionLabel}
+                            </Button>
+                          </form>
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-                    <p>{messages.priceSheets.updatedPrefix} {priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</p>
-                    <p>
-                      {priceSheet.publishedAt
-                        ? `${messages.priceSheets.publishedPrefix} ${priceSheet.publishedAt.toLocaleString(dateTimeLocale)}`
-                        : messages.priceSheets.notYetPublished}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardHeader>
+                    <CardContent className="border-t border-border/60 px-4 pb-4 pt-3 sm:px-5">
+                      <dl className="grid gap-3 text-xs text-muted-foreground sm:grid-cols-3">
+                        <div className="min-w-0">
+                          <dt className="font-medium text-foreground/70">{messages.priceSheets.defaultLocaleLabel}</dt>
+                          <dd>{priceSheet.defaultContentLocale}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="font-medium text-foreground/70">{messages.priceSheets.updatedPrefix}</dt>
+                          <dd>{priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</dd>
+                        </div>
+                        <div className="min-w-0">
+                          <dt className="font-medium text-foreground/70">{messages.priceSheets.publishedPrefix}</dt>
+                          <dd>{publishedMetadata}</dd>
+                        </div>
+                      </dl>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {hasMorePriceSheets ? (
+              <div className="flex justify-center pt-2">
+                <Link
+                  className={cn(buttonVariants({ variant: "outline" }), "min-w-[180px]")}
+                  href={buildPriceSheetsListHref({
+                    query: searchQuery,
+                    status: activeStatusFilter,
+                    limit: nextVisibleLimit,
+                  })}
+                >
+                  {messages.priceSheets.loadMore}
+                </Link>
+              </div>
+            ) : null}
           </div>
         )}
       </div>
@@ -214,9 +266,24 @@ function parseStatusFilter(value?: string): PriceSheetListStatusFilter {
   return value === "published" || value === "draft" ? value : "all";
 }
 
+function parseVisibleLimit(value?: string) {
+  if (!value) {
+    return priceSheetsPageSize;
+  }
+
+  const parsedValue = Number.parseInt(value, 10);
+
+  if (!Number.isFinite(parsedValue) || parsedValue <= priceSheetsPageSize) {
+    return priceSheetsPageSize;
+  }
+
+  return parsedValue;
+}
+
 function buildPriceSheetsListHref(input: {
   query: string;
   status: PriceSheetListStatusFilter;
+  limit?: number;
 }) {
   const params = new URLSearchParams();
 
@@ -226,6 +293,10 @@ function buildPriceSheetsListHref(input: {
 
   if (input.status !== "all") {
     params.set("status", input.status);
+  }
+
+  if (input.limit && input.limit > priceSheetsPageSize) {
+    params.set("limit", String(input.limit));
   }
 
   const queryString = params.toString();
@@ -246,4 +317,3 @@ function getStatusFilterLabel(locale: "en" | "ru", status: PriceSheetListStatusF
 
   return messages.priceSheets.filterAll;
 }
-
