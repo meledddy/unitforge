@@ -51,7 +51,12 @@ export function DeletePriceSheetConfirmation({
 
   return (
     <>
-      <Button className="w-full" type="button" variant="destructive" onClick={() => setOpen(true)}>
+      <Button
+        className="w-full gap-2 border border-red-200 bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500"
+        type="button"
+        variant="destructive"
+        onClick={() => setOpen(true)}
+      >
         {triggerLabel}
       </Button>
 
@@ -96,7 +101,7 @@ export function DeletePriceSheetConfirmation({
                   {cancelLabel}
                 </Button>
                 <form action={action}>
-                  <Button className="w-full" type="submit" variant="destructive">
+                  <Button className="w-full bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500" type="submit" variant="destructive">
                     {confirmButtonLabel}
                   </Button>
                 </form>

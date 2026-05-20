@@ -3,11 +3,6 @@
 import {
   Button,
   buttonVariants,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
   cn,
   Input,
   Label,
@@ -15,7 +10,7 @@ import {
   Textarea,
 } from "@unitforge/ui";
 import Link from "next/link";
-import { useActionState, useEffect, useState } from "react";
+import { type ReactNode, useActionState, useEffect, useState } from "react";
 
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import { getMessages } from "@/i18n/messages";
@@ -23,7 +18,6 @@ import type { PriceSheetFormActionState } from "@/server/price-sheets/actions";
 
 import {
   getAlternatePriceSheetContentLocale,
-  getPriceSheetContentLocaleLabel,
   type PriceSheetContentLocale,
 } from "./localization";
 import {
@@ -51,19 +45,30 @@ const initialFormState: PriceSheetFormActionState = {
   status: "idle",
 };
 
+const editorSectionFrameClassName =
+  "relative overflow-hidden rounded-[1.65rem] border border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent";
+const editorSectionHeaderClassName =
+  "flex flex-col gap-3 border-b border-border/60 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5";
+const editorSectionBodyClassName = "p-4 sm:p-5";
+const editorInnerPanelClassName =
+  "rounded-[1.35rem] border border-border/65 bg-gradient-to-br from-background/95 via-card/80 to-muted/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]";
+const editorFieldGridClassName = "grid gap-4 md:grid-cols-2";
+const editorControlClassName =
+  "rounded-2xl border-border/75 bg-background/95 shadow-[inset_0_1px_0_rgba(15,23,42,0.03)]";
+
 export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyPriceSheetFormValues(), cancelHref }: PriceSheetFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialFormState);
   const [values, setValues] = useState(initialValues);
   const [hasEditedSlug, setHasEditedSlug] = useState(Boolean(initialValues.slug));
   const [sheetContentTab, setSheetContentTab] = useState<ContentEditorTab>("primary");
-  const [collapsedItems, setCollapsedItems] = useState(() => createInitialCollapsedItems(initialValues.items.length));
+  const [collapsedItems, setCollapsedItems] = useState(() => createInitialCollapsedItems(initialValues.items.length, mode));
   const [itemContentTabs, setItemContentTabs] = useState(() => createInitialItemContentTabs(initialValues.items.length));
   const fieldErrorEntries = state.fieldErrors ? Object.entries(state.fieldErrors) : [];
-  const secondaryLocale = getAlternatePriceSheetContentLocale(values.defaultContentLocale);
-  const primaryLocaleLabel = getPriceSheetContentLocaleLabel(values.defaultContentLocale);
-  const secondaryLocaleLabel = getPriceSheetContentLocaleLabel(secondaryLocale);
   const messages = getMessages(locale);
   const formCopy = messages.priceSheetForm;
+  const secondaryLocale = getAlternatePriceSheetContentLocale(values.defaultContentLocale);
+  const primaryLocaleLabel = getContentLanguageLabel(values.defaultContentLocale, formCopy);
+  const secondaryLocaleLabel = getContentLanguageLabel(secondaryLocale, formCopy);
 
   useEffect(() => {
     if (!state.fieldErrors) {
@@ -290,7 +295,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
   }
 
   function getFieldClasses(path: string) {
-    return getFieldError(path) ? "border-destructive focus-visible:ring-destructive" : undefined;
+    return cn(editorControlClassName, getFieldError(path) ? "border-destructive focus-visible:ring-destructive" : undefined);
   }
 
   function hasItemErrors(index: number) {
@@ -344,12 +349,23 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
         </div>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{mode === "create" ? formCopy.detailsTitleCreate : formCopy.detailsTitleEdit}</CardTitle>
-          <CardDescription>{formCopy.detailsDescription}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-5 sm:gap-6 md:grid-cols-2">
+      {mode === "edit" ? (
+        <div className="rounded-[1.35rem] border border-border/70 bg-gradient-to-r from-card/95 via-background/95 to-card/95 px-3 py-2 shadow-sm">
+          <div className="flex justify-end">
+            <div className="inline-flex w-full flex-col gap-1.5 rounded-2xl border border-border/70 bg-background/90 p-1.5 shadow-sm sm:w-auto sm:flex-row">
+              <Button className="h-9 w-full rounded-xl px-4 sm:w-auto" disabled={isPending} name="intent" type="submit" value="continue">
+                {isPending ? messages.shared.saving : formCopy.saveAndContinue}
+              </Button>
+              <Button className="h-9 w-full rounded-xl px-4 sm:w-auto" disabled={isPending} name="intent" type="submit" value="return" variant="outline">
+                {isPending ? messages.shared.saving : formCopy.saveAndReturn}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <EditorSectionFrame title={mode === "create" ? formCopy.detailsTitleCreate : formCopy.publishingSetupTitle}>
+        <div className={cn(editorFieldGridClassName, "gap-4 sm:gap-5")}>
           <div className="space-y-2">
             <Label htmlFor="default-content-locale">{formCopy.defaultContentLocale}</Label>
             <Select
@@ -359,8 +375,8 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
               value={values.defaultContentLocale}
               onChange={(event) => updateDefaultContentLocale(event.target.value as PriceSheetContentLocale)}
             >
-              <option value="en-US">English (en-US)</option>
-              <option value="ru-RU">Русский (ru-RU)</option>
+              <option value="en-US">{formCopy.contentLanguageEnglish}</option>
+              <option value="ru-RU">{formCopy.contentLanguageRussian}</option>
             </Select>
             {getFieldError("defaultContentLocale") ? (
               <p className="text-sm text-destructive">{getFieldError("defaultContentLocale")}</p>
@@ -394,40 +410,6 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="theme">{formCopy.theme}</Label>
-            <Select
-              aria-invalid={Boolean(getFieldError("theme"))}
-              className={getFieldClasses("theme")}
-              id="theme"
-              value={values.theme}
-              onChange={(event) => updateTopLevelField("theme", event.target.value)}
-            >
-              <option value="amber">{formCopy.themeAmber}</option>
-              <option value="slate">{formCopy.themeSlate}</option>
-              <option value="stone">{formCopy.themeStone}</option>
-            </Select>
-            {getFieldError("theme") ? <p className="text-sm text-destructive">{getFieldError("theme")}</p> : null}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="presentation-appearance">{formCopy.presentationAppearance}</Label>
-            <Select
-              aria-invalid={Boolean(getFieldError("presentationAppearance"))}
-              className={getFieldClasses("presentationAppearance")}
-              id="presentation-appearance"
-              value={values.presentationAppearance}
-              onChange={(event) => updateTopLevelField("presentationAppearance", event.target.value)}
-            >
-              <option value="dark">{formCopy.presentationAppearanceDark}</option>
-              <option value="light">{formCopy.presentationAppearanceLight}</option>
-            </Select>
-            <p className="text-sm text-muted-foreground">{formCopy.presentationAppearanceDescription}</p>
-            {getFieldError("presentationAppearance") ? (
-              <p className="text-sm text-destructive">{getFieldError("presentationAppearance")}</p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="currency">{formCopy.currency}</Label>
             <Input
               aria-invalid={Boolean(getFieldError("currency"))}
@@ -440,10 +422,50 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
             {getFieldError("currency") ? <p className="text-sm text-destructive">{getFieldError("currency")}</p> : null}
           </div>
 
-          <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:col-span-2">
-            <p className="text-sm font-medium">{formCopy.contactAndCtaTitle}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{formCopy.contactAndCtaDescription}</p>
+          <div className={cn(editorInnerPanelClassName, "md:col-span-2")}>
+            <div className="flex items-center justify-between gap-3 border-b border-border/55 pb-3">
+              <p className="text-sm font-medium">{formCopy.appearanceSetupTitle}</p>
+            </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="theme">{formCopy.theme}</Label>
+                <Select
+                  aria-invalid={Boolean(getFieldError("theme"))}
+                  className={getFieldClasses("theme")}
+                  id="theme"
+                  value={values.theme}
+                  onChange={(event) => updateTopLevelField("theme", event.target.value)}
+                >
+                  <option value="amber">{formCopy.themeAmber}</option>
+                  <option value="slate">{formCopy.themeSlate}</option>
+                  <option value="stone">{formCopy.themeStone}</option>
+                </Select>
+                {getFieldError("theme") ? <p className="text-sm text-destructive">{getFieldError("theme")}</p> : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="presentation-appearance">{formCopy.presentationAppearance}</Label>
+                <Select
+                  aria-invalid={Boolean(getFieldError("presentationAppearance"))}
+                  className={getFieldClasses("presentationAppearance")}
+                  id="presentation-appearance"
+                  value={values.presentationAppearance}
+                  onChange={(event) => updateTopLevelField("presentationAppearance", event.target.value)}
+                >
+                  <option value="dark">{formCopy.presentationAppearanceDark}</option>
+                  <option value="light">{formCopy.presentationAppearanceLight}</option>
+                </Select>
+                {getFieldError("presentationAppearance") ? (
+                  <p className="text-sm text-destructive">{getFieldError("presentationAppearance")}</p>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </EditorSectionFrame>
+
+      <EditorSectionFrame title={formCopy.contactAndCtaTitle}>
+        <div className={editorFieldGridClassName}>
               <div className="space-y-2">
                 <Label htmlFor="contact-label">{formCopy.contactLabel}</Label>
                 <Input
@@ -532,17 +554,17 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                   aria-invalid={Boolean(getFieldError("inquiryText"))}
                   className={getFieldClasses("inquiryText")}
                   id="inquiry-text"
+                  rows={3}
                   value={values.inquiryText}
                   onChange={(event) => updateTopLevelField("inquiryText", event.target.value)}
                 />
                 {getFieldError("inquiryText") ? <p className="text-sm text-destructive">{getFieldError("inquiryText")}</p> : null}
               </div>
+        </div>
+      </EditorSectionFrame>
 
-              <div className="rounded-2xl border border-border/70 bg-background/70 p-4 md:col-span-2">
-                <p className="text-sm font-medium">{formCopy.businessDetailsTitle}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{formCopy.businessDetailsDescription}</p>
-
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <EditorSectionFrame title={formCopy.businessDetailsTitle}>
+        <div className={editorFieldGridClassName}>
                   <div className="space-y-2">
                     <Label htmlFor="business-location">{formCopy.businessLocation}</Label>
                     <Input
@@ -595,31 +617,25 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                     />
                     {getFieldError("businessNote") ? <p className="text-sm text-destructive">{getFieldError("businessNote")}</p> : null}
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
+      </EditorSectionFrame>
 
-          <div className="rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:col-span-2">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium">{formCopy.contentTitle}</p>
-                <p className="text-sm text-muted-foreground">{formCopy.translationHint}</p>
-              </div>
-              <EditorTabSwitcher
+      <EditorSectionFrame
+        action={
+              <ContentLanguageSelect
                 activeTab={sheetContentTab}
+                id="sheet-content-language"
+                label={formCopy.contentLanguage}
                 primaryHasErrors={hasSheetTabErrors("primary")}
-                primaryTabLabel={formCopy.primaryContentTab}
                 primaryLocaleLabel={primaryLocaleLabel}
                 secondaryLocaleLabel={secondaryLocaleLabel}
-                translationOptionalSuffix={formCopy.translationOptionalSuffix}
-                translationTabLabel={formCopy.translationTab}
                 translationHasErrors={hasSheetTabErrors("translation")}
                 onChange={setSheetContentTab}
               />
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
+        }
+        title={formCopy.pageContentTitle}
+      >
+            <div className="rounded-2xl border border-border/65 bg-background/80 p-4 shadow-sm sm:p-5">
               {sheetContentTab === "primary" ? (
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="space-y-2 lg:col-span-2">
@@ -640,6 +656,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                       aria-invalid={Boolean(getFieldError("description"))}
                       className={getFieldClasses("description")}
                       id="description"
+                      rows={3}
                       value={values.description}
                       onChange={(event) => updateTopLevelField("description", event.target.value)}
                     />
@@ -648,12 +665,6 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                 </div>
               ) : (
                 <div className="grid gap-4 lg:grid-cols-2">
-                  <div className="space-y-2 lg:col-span-2">
-                    <p className="text-sm text-muted-foreground">
-                      {secondaryLocaleLabel}. {formCopy.translationHint}
-                    </p>
-                  </div>
-
                   <div className="space-y-2 lg:col-span-2">
                     <Label htmlFor="secondary-title">{formCopy.translatedTitle}</Label>
                     <Input
@@ -672,6 +683,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                       aria-invalid={Boolean(getFieldError("secondaryDescription"))}
                       className={getFieldClasses("secondaryDescription")}
                       id="secondary-description"
+                      rows={3}
                       value={values.secondaryDescription}
                       onChange={(event) => updateTopLevelField("secondaryDescription", event.target.value)}
                     />
@@ -682,60 +694,45 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                 </div>
               )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+      </EditorSectionFrame>
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <CardTitle>{formCopy.itemsTitle}</CardTitle>
-              <CardDescription>{formCopy.itemsDescription}</CardDescription>
-            </div>
-            <Button className="w-full sm:w-auto" onClick={addItem} type="button" variant="outline">
-              {formCopy.addItem}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <EditorSectionFrame
+        action={
+          <Button className="w-full rounded-xl sm:w-auto" onClick={addItem} type="button" variant="outline">
+            {formCopy.addItem}
+          </Button>
+        }
+        title={formCopy.servicesItemsTitle}
+      >
+        <div className="space-y-4">
           {values.items.map((item, index) => {
             const isCollapsed = collapsedItems[index] ?? false;
             const activeItemTab = itemContentTabs[index] ?? "primary";
             const itemError = hasItemErrors(index);
-            const itemSummary = getItemSummary(item, values.currency, locale, values.defaultContentLocale);
+            const itemSummary = getItemSummary(item, locale);
+            const itemTitle = item.name.trim() || item.secondaryName.trim() || `${formCopy.itemLabel} ${index + 1}`;
 
             return (
               <div
                 key={item.id ?? `item-${index}`}
                 className={cn(
-                  "rounded-3xl border bg-background/70 p-4 transition-colors sm:p-5",
+                  "rounded-[1.45rem] border bg-background/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-colors sm:p-4",
                   itemError ? "border-destructive/40" : "border-border/70",
                 )}
               >
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="min-w-0 space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                          {formCopy.itemLabel} {index + 1}
-                        </span>
-                        <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                          {itemSummary.price}
-                        </span>
-                        {itemSummary.section ? (
-                          <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
-                            {itemSummary.section}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="space-y-1">
-                        <p className="truncate font-medium">{item.name.trim() || `${formCopy.itemLabel} ${index + 1}`}</p>
-                        {isCollapsed ? <p className="text-sm text-muted-foreground">{itemSummary.description}</p> : null}
+                  <div className="flex flex-col gap-3 rounded-[1.2rem] border border-border/60 bg-card/95 p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+                      <span className="w-fit rounded-full border border-primary/10 bg-primary/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                        {formCopy.itemLabel} {index + 1}
+                      </span>
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="break-words text-sm font-semibold">{itemTitle}</p>
+                        {isCollapsed ? <p className="break-words text-xs text-muted-foreground">{itemSummary.description}</p> : null}
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 flex-wrap items-center gap-1 self-start rounded-2xl border border-border/70 bg-card/80 p-1">
+                    <div className="flex shrink-0 flex-wrap items-center gap-1 self-start rounded-2xl border border-border/70 bg-background/95 p-1 shadow-sm lg:self-center">
                       <Button
                         className="h-8 rounded-xl px-3"
                         onClick={() => toggleItem(index)}
@@ -767,8 +764,8 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                   </div>
 
                   {!isCollapsed ? (
-                    <div className="grid gap-4 xl:grid-cols-[minmax(0,208px),minmax(0,1fr)]">
-                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4">
+                    <div className="grid gap-4 xl:grid-cols-[minmax(180px,0.68fr)_minmax(0,1.6fr)]">
+                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm">
                         <div className="space-y-0.5">
                           <p className="text-sm font-medium">{formCopy.sharedFields}</p>
                         </div>
@@ -791,17 +788,16 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-border/70 bg-card/80 p-4 sm:p-5">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm sm:p-5">
+                        <div className="flex flex-col gap-3 border-b border-border/55 pb-3 sm:flex-row sm:items-center sm:justify-between">
                           <p className="text-sm font-medium">{formCopy.localizedContent}</p>
-                          <EditorTabSwitcher
+                          <ContentLanguageSelect
                             activeTab={activeItemTab}
+                            id={`item-content-language-${index}`}
+                            label={formCopy.contentLanguage}
                             primaryHasErrors={hasItemTabErrors(index, "primary")}
-                            primaryTabLabel={formCopy.primaryContentTab}
                             primaryLocaleLabel={primaryLocaleLabel}
                             secondaryLocaleLabel={secondaryLocaleLabel}
-                            translationOptionalSuffix={formCopy.translationOptionalSuffix}
-                            translationTabLabel={formCopy.translationTab}
                             translationHasErrors={hasItemTabErrors(index, "translation")}
                             onChange={(tab) => setItemContentTab(index, tab)}
                           />
@@ -909,8 +905,8 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
           })}
 
           {getFieldError("items") ? <p className="text-sm text-destructive">{getFieldError("items")}</p> : null}
-        </CardContent>
-      </Card>
+        </div>
+      </EditorSectionFrame>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {mode === "create" ? (
@@ -935,7 +931,32 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
   );
 }
 
-function createInitialCollapsedItems(itemsLength: number) {
+interface EditorSectionFrameProps {
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  title: string;
+}
+
+function EditorSectionFrame({ action, children, className, title }: EditorSectionFrameProps) {
+  return (
+    <section className={cn(editorSectionFrameClassName, className)}>
+      <div className={editorSectionHeaderClassName}>
+        <div className="flex min-w-0 items-center gap-3">
+          <h2 className="truncate text-base font-semibold tracking-tight">{title}</h2>
+        </div>
+        {action ? <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div> : null}
+      </div>
+      <div className={editorSectionBodyClassName}>{children}</div>
+    </section>
+  );
+}
+
+function createInitialCollapsedItems(itemsLength: number, mode: "create" | "edit") {
+  if (mode === "edit") {
+    return Array.from({ length: Math.max(itemsLength, 1) }, () => true);
+  }
+
   if (itemsLength <= 1) {
     return [false];
   }
@@ -947,117 +968,62 @@ function createInitialItemContentTabs(itemsLength: number) {
   return Array.from({ length: Math.max(itemsLength, 1) }, (): ContentEditorTab => "primary");
 }
 
-function getItemSummary(
-  item: PriceSheetItemValues,
-  currency: string,
-  interfaceLocale: InterfaceLocale,
-  contentLocale: PriceSheetContentLocale,
-) {
+function getItemSummary(item: PriceSheetItemValues, interfaceLocale: InterfaceLocale) {
   const description = item.description.trim() || item.secondaryDescription.trim() || getMessages(interfaceLocale).priceSheetForm.noDescriptionYet;
-  const section = item.section.trim() || item.secondarySection.trim();
 
   return {
     description,
-    price: formatItemSummaryPrice(item.price, currency, interfaceLocale, contentLocale),
-    section,
   };
 }
 
-function formatItemSummaryPrice(
-  value: string,
-  currency: string,
-  interfaceLocale: InterfaceLocale,
-  contentLocale: PriceSheetContentLocale,
+function getContentLanguageLabel(
+  locale: PriceSheetContentLocale,
+  labels: {
+    contentLanguageEnglish: string;
+    contentLanguageRussian: string;
+  },
 ) {
-  const trimmedValue = value.trim();
-
-  if (!trimmedValue) {
-    return getMessages(interfaceLocale).priceSheetForm.noPriceYet;
-  }
-
-  const amount = Number(trimmedValue);
-
-  if (!Number.isFinite(amount)) {
-    return trimmedValue;
-  }
-
-  try {
-    return new Intl.NumberFormat(contentLocale, {
-      style: "currency",
-      currency,
-    }).format(amount);
-  } catch {
-    return `${currency} ${amount.toFixed(2)}`;
-  }
+  return locale === "ru-RU" ? labels.contentLanguageRussian : labels.contentLanguageEnglish;
 }
 
-interface EditorTabSwitcherProps {
+interface ContentLanguageSelectProps {
   activeTab: ContentEditorTab;
+  id: string;
+  label: string;
   onChange: (tab: ContentEditorTab) => void;
-  primaryTabLabel: string;
   primaryLocaleLabel: string;
   secondaryLocaleLabel: string;
-  translationOptionalSuffix: string;
-  translationTabLabel: string;
   primaryHasErrors?: boolean;
   translationHasErrors?: boolean;
 }
 
-function EditorTabSwitcher({
+function ContentLanguageSelect({
   activeTab,
+  id,
+  label,
   onChange,
-  primaryTabLabel,
   primaryLocaleLabel,
   secondaryLocaleLabel,
-  translationOptionalSuffix,
-  translationTabLabel,
   primaryHasErrors = false,
   translationHasErrors = false,
-}: EditorTabSwitcherProps) {
-  return (
-    <div className="inline-flex rounded-2xl border border-border/70 bg-background/80 p-1">
-      <EditorTabButton
-        active={activeTab === "primary"}
-        hasErrors={primaryHasErrors}
-        label={primaryTabLabel}
-        localeLabel={primaryLocaleLabel}
-        onClick={() => onChange("primary")}
-      />
-      <EditorTabButton
-        active={activeTab === "translation"}
-        hasErrors={translationHasErrors}
-        label={translationTabLabel}
-        localeLabel={`${secondaryLocaleLabel} ${translationOptionalSuffix}`}
-        onClick={() => onChange("translation")}
-      />
-    </div>
-  );
-}
+}: ContentLanguageSelectProps) {
+  const hasErrors = primaryHasErrors || translationHasErrors;
 
-interface EditorTabButtonProps {
-  active: boolean;
-  hasErrors: boolean;
-  label: string;
-  localeLabel: string;
-  onClick: () => void;
-}
-
-function EditorTabButton({ active, hasErrors, label, localeLabel, onClick }: EditorTabButtonProps) {
   return (
-    <button
-      aria-pressed={active}
-      className={cn(
-        "min-w-[132px] rounded-xl px-3 py-2 text-left transition-colors",
-        active ? "bg-foreground text-background shadow-sm" : "text-foreground hover:bg-card",
-      )}
-      type="button"
-      onClick={onClick}
-    >
-      <span className="flex items-center gap-2 text-sm font-medium">
+    <div className="w-full rounded-2xl border border-border/65 bg-background/85 p-3 sm:w-56">
+      <Label className="text-xs uppercase tracking-[0.16em] text-muted-foreground" htmlFor={id}>
         {label}
-        {hasErrors ? <span className={cn("h-2 w-2 rounded-full", active ? "bg-background" : "bg-destructive")} /> : null}
-      </span>
-      <span className={cn("mt-1 block text-xs", active ? "text-background/75" : "text-muted-foreground")}>{localeLabel}</span>
-    </button>
+      </Label>
+      <Select
+        aria-invalid={hasErrors}
+        className={cn(editorControlClassName, "mt-2", hasErrors ? "border-destructive focus-visible:ring-destructive" : undefined)}
+        id={id}
+        value={activeTab}
+        onChange={(event) => onChange(event.target.value as ContentEditorTab)}
+      >
+        <option value="primary">{primaryLocaleLabel}</option>
+        <option value="translation">{secondaryLocaleLabel}</option>
+      </Select>
+    </div>
   );
 }

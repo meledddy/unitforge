@@ -1,4 +1,4 @@
-import { Badge, Button, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import { Badge, Button, buttonVariants, Card, CardContent, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -8,7 +8,6 @@ import { DeletePriceSheetConfirmation } from "@/features/price-sheets/delete-pri
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { PriceSheetLeadsPanel, PriceSheetLeadsSummary } from "@/features/price-sheets/price-sheet-leads-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
-import { getInterfaceNumberLocale } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
@@ -33,7 +32,6 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
   const [session, locale] = await Promise.all([requireCurrentAppShellSession(), getCurrentInterfaceLocale()]);
   const { priceSheetId } = await params;
   const messages = getMessages(locale);
-  const dateTimeLocale = getInterfaceNumberLocale(locale);
 
   try {
     const [priceSheet, leads] = await Promise.all([
@@ -49,7 +47,25 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
         : messages.priceSheetForm.presentationAppearanceLight;
 
     return (
-      <div className="space-y-8">
+      <div className="relative">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-16 top-8 h-72 w-72 rounded-full bg-primary/5 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 top-72 h-80 w-80 rounded-full bg-amber-200/10 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-28 h-px bg-gradient-to-r from-transparent via-border/80 to-transparent"
+        />
+
+      <div className="relative space-y-7">
+        <Link className="inline-flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground" href="/app/price-sheets">
+          {messages.priceSheets.backToList}
+        </Link>
+
         <PageHeader
           eyebrow={messages.priceSheets.editEyebrow}
           title={priceSheet.title}
@@ -84,7 +100,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           status={priceSheet.status}
         />
 
-        <div className="grid gap-6 xl:grid-cols-[1fr,320px]">
+        <div className="grid gap-5 xl:grid-cols-[1fr,320px]">
           <PriceSheetForm
             action={updatePriceSheetAction.bind(null, priceSheet.id)}
             cancelHref="/app/price-sheets"
@@ -94,12 +110,11 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           />
 
           <div className="space-y-4">
-            <Card>
-              <CardHeader>
+            <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent">
+              <CardHeader className="border-b border-border/55 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 p-5">
                 <CardTitle>{messages.priceSheets.stateTitle}</CardTitle>
-                <CardDescription>{messages.priceSheets.stateDescription}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <PriceSheetStatusBadge locale={locale} status={priceSheet.status} />
                   <span className="rounded-full border border-border/70 bg-card/80 px-2.5 py-1 text-xs text-muted-foreground">
@@ -107,30 +122,41 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                   </span>
                 </div>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border/70 bg-background/85 p-1">
+                  <span
+                    className={cn(
+                      "rounded-xl px-3 py-2 text-center text-xs font-medium",
+                      priceSheet.status === "published" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground",
+                    )}
+                  >
+                    {messages.priceSheets.statusPublished}
+                  </span>
+                  <span
+                    className={cn(
+                      "rounded-xl px-3 py-2 text-center text-xs font-medium",
+                      priceSheet.status === "draft" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground",
+                    )}
+                  >
+                    {messages.priceSheets.statusDraft}
+                  </span>
+                </div>
+
+                <div className="space-y-2.5 text-sm">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
                     <span>{messages.priceSheets.slugLabel}</span>
                     <span className="font-mono text-xs uppercase tracking-[0.18em] text-foreground">/{priceSheet.slug}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
                     <span>{messages.priceSheets.themeLabel}</span>
                     <span className="text-foreground">{priceSheet.theme}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
                     <span>{messages.priceSheets.appearanceLabel}</span>
                     <span className="text-foreground">{presentationAppearanceLabel}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
                     <span>{messages.priceSheets.currencyLabel}</span>
                     <span className="text-foreground">{priceSheet.currency}</span>
-                  </div>
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
-                    <span>{messages.priceSheets.defaultLocaleLabel}</span>
-                    <span className="text-foreground">{priceSheet.defaultContentLocale}</span>
-                  </div>
-                  <div className="flex items-start justify-between gap-3 text-muted-foreground">
-                    <span>{messages.shared.updated}</span>
-                    <span className="text-right text-foreground">{priceSheet.updatedAt.toLocaleString(dateTimeLocale)}</span>
                   </div>
                 </div>
 
@@ -142,12 +168,8 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>{messages.priceSheets.deleteTitle}</CardTitle>
-                <CardDescription>{messages.priceSheets.deleteDescription}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <Card className="relative overflow-hidden rounded-[1.45rem] border-red-200/80 bg-red-50/70 shadow-[0_14px_38px_rgba(185,28,28,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-red-400/60 before:to-transparent">
+              <CardContent className="p-4">
                 <DeletePriceSheetConfirmation
                   action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}
                   cancelLabel={messages.priceSheets.deleteCancelButton}
@@ -171,6 +193,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           publicUrl={priceSheet.publicUrl}
           status={priceSheet.status}
         />
+      </div>
       </div>
     );
   } catch (error) {
