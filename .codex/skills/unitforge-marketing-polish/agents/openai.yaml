@@ -1,0 +1,8 @@
+interface:
+  display_name: "Unitforge Marketing Polish"
+  short_description: "Public Home and Pricing polish"
+  default_prompt: "Use $unitforge-marketing-polish to refine Unitforge Public Home or Pricing while preserving product behavior."
+
+policy:
+  allow_implicit_invocation: true
+

@@ -1,0 +1,8 @@
+interface:
+  display_name: "Unitforge Public Sheet Polish"
+  short_description: "Customer-facing price sheet polish"
+  default_prompt: "Use $unitforge-public-price-sheet-polish to refine Unitforge public price sheet pages and inquiry UX."
+
+policy:
+  allow_implicit_invocation: true
+

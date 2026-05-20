@@ -1,0 +1,8 @@
+interface:
+  display_name: "Unitforge Repo Handoff"
+  short_description: "Cleanup, status, commit handoff"
+  default_prompt: "Use $unitforge-repo-handoff to clean Unitforge workspace state and prepare a safe handoff."
+
+policy:
+  allow_implicit_invocation: true
+

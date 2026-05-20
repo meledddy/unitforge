@@ -1,0 +1,8 @@
+interface:
+  display_name: "Unitforge Operator UI"
+  short_description: "Authenticated Price Sheets UI polish"
+  default_prompt: "Use $unitforge-price-sheet-operator-ui to refine authenticated Price Sheet list or editor screens."
+
+policy:
+  allow_implicit_invocation: true
+
