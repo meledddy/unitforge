@@ -1,12 +1,13 @@
 "use client";
 
-import { getCurrentAppNavigationItem } from "@unitforge/core";
-import { Avatar, Button } from "@unitforge/ui";
+import { appNavigation, isAppNavigationItemActive } from "@unitforge/core";
+import { Avatar, Button, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { getMembershipRoleLabel, getSubscriptionStatusLabel } from "@/components/app/app-shell-labels";
+import { AppThemeToggle } from "@/components/app/app-theme-toggle";
 import { InterfaceLanguageSwitcher } from "@/components/interface-language-switcher";
+import { UnitforgeLogo } from "@/components/marketing/brand-mark";
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import { getMessages } from "@/i18n/messages";
 import { signOutAction } from "@/server/auth/actions";
@@ -17,57 +18,87 @@ interface AppTopbarProps {
   locale: InterfaceLocale;
 }
 
+function getLocalizedNavItem(messages: ReturnType<typeof getMessages>, href: string) {
+  if (href === "/app") {
+    return messages.appShell.nav.overview;
+  }
+
+  if (href === "/app/price-sheets") {
+    return messages.appShell.nav.priceSheets;
+  }
+
+  return messages.appShell.nav.settings;
+}
+
 export function AppTopbar({ session, locale }: AppTopbarProps) {
   const pathname = usePathname();
-  const currentItem = getCurrentAppNavigationItem(pathname);
   const messages = getMessages(locale);
   const userDisplayName = session.currentUser.name || session.currentUser.email;
-  const roleLabel = getMembershipRoleLabel(locale, session.membership.role);
-  const accountMeta = session.subscription ? `${roleLabel} / ${getSubscriptionStatusLabel(locale, session.subscription.status)}` : roleLabel;
-  const localizedCurrentItem =
-    currentItem?.href === "/app"
-      ? messages.appShell.nav.overview
-      : currentItem?.href === "/app/price-sheets"
-        ? messages.appShell.nav.priceSheets
-        : currentItem?.href === "/app/settings"
-          ? messages.appShell.nav.settings
-          : null;
 
   return (
-    <header className="border-b border-border/70 bg-background/85 px-6 py-4 backdrop-blur lg:px-10">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">{session.currentWorkspace.slug}</p>
-          <h1 className="text-lg font-semibold tracking-tight">{localizedCurrentItem?.label ?? messages.shared.workspace}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {localizedCurrentItem?.description ?? messages.shared.authenticatedWorkspaceShell}
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 xl:items-end">
-          <div className="flex flex-wrap items-center gap-3 xl:justify-end">
-            <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              <Link className="text-muted-foreground transition-colors hover:text-foreground" href="/pricing">
-                {messages.shared.pricing}
-              </Link>
-              <Link className="text-muted-foreground transition-colors hover:text-foreground" href="/">
-                {messages.shared.publicSite}
-              </Link>
-            </nav>
-            <InterfaceLanguageSwitcher className="w-fit" locale={locale} />
-          </div>
+    <header className="border-b border-border/55 bg-background/74 backdrop-blur-xl">
+      <div className="mx-auto grid min-h-[4.6rem] w-full max-w-[1180px] grid-cols-[1fr_auto] items-center gap-3 px-5 py-3 sm:px-6 lg:min-h-[4.85rem] lg:grid-cols-[1fr_auto_1fr] lg:px-8">
+        <Link
+          aria-label="Unitforge"
+          className="inline-flex min-w-0 items-center justify-self-start rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          href="/"
+        >
+          <UnitforgeLogo
+            className="gap-3 text-foreground"
+            iconClassName="h-8 w-8"
+            tone="light"
+            wordmarkClassName="hidden text-foreground sm:block"
+          />
+        </Link>
 
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/70 bg-card/75 px-3 py-2 sm:flex-nowrap sm:px-4">
-            <Avatar name={userDisplayName} size="sm" />
-            <div className="min-w-0 sm:min-w-[13rem]">
-              <p className="truncate text-sm font-medium">{userDisplayName}</p>
-              <p className="truncate text-xs text-muted-foreground">{accountMeta}</p>
-            </div>
-            <form action={signOutAction}>
-              <Button size="sm" type="submit" variant="ghost">
-                {messages.shared.signOut}
-              </Button>
-            </form>
+        <nav
+          aria-label={messages.appShell.sidebarBadge}
+          className="order-last col-span-2 flex min-w-0 justify-center lg:order-none lg:col-span-1"
+        >
+          <div className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-border/65 bg-card/58 p-1 shadow-[0_16px_40px_hsl(var(--app-shadow)/0.08)]">
+            {appNavigation.map((item) => {
+              const navCopy = getLocalizedNavItem(messages, item.href);
+              const isActive = isAppNavigationItemActive(item.href, pathname);
+
+              return (
+                <Link
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground",
+                  )}
+                  href={item.href}
+                  key={item.href}
+                >
+                  {navCopy.label}
+                </Link>
+              );
+            })}
           </div>
+        </nav>
+
+        <div className="flex min-w-0 items-center justify-end gap-1.5 justify-self-end">
+          <AppThemeToggle
+            className="h-9 w-[3.95rem] border-border/60 bg-card/58 shadow-none"
+            label={messages.appShell.themeToggleLabel}
+          />
+          <InterfaceLanguageSwitcher
+            activeClassName="bg-primary text-primary-foreground shadow-sm"
+            className="w-fit border-border/60 bg-card/58 p-1 shadow-none"
+            inactiveClassName="text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+            locale={locale}
+          />
+          <div className="flex h-10 min-w-10 items-center justify-center rounded-full border border-border/65 bg-card/62 px-1.5 shadow-sm">
+            <Avatar name={userDisplayName} size="sm" />
+            <span className="sr-only">{userDisplayName}</span>
+          </div>
+          <form action={signOutAction}>
+            <Button className="rounded-full px-3 sm:px-4" size="sm" type="submit" variant="ghost">
+              {messages.shared.signOut}
+            </Button>
+          </form>
         </div>
       </div>
     </header>

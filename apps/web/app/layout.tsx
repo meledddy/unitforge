@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { getAppThemeBootstrapScript } from "@/components/app/app-theme";
 import { getMarketingThemeBootstrapScript } from "@/components/marketing/marketing-theme";
 import { getInterfaceLocaleTag } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang={getInterfaceLocaleTag(locale)} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: getMarketingThemeBootstrapScript() }} />
+        <script dangerouslySetInnerHTML={{ __html: getAppThemeBootstrapScript() }} />
       </head>
       <body className={`${sans.variable} ${mono.variable} ${serif.variable} min-h-screen font-sans text-foreground`}>{children}</body>
     </html>

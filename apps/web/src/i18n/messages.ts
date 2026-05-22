@@ -252,6 +252,7 @@ const appShellMessages = {
     sidebarDescription: "Core workspace area for day-to-day operations.",
     billingNotConfigured: "Billing not configured",
     topbarSubscriptionFallback: "setup",
+    themeToggleLabel: "Toggle app theme",
     nav: {
       overview: {
         label: "Overview",
@@ -272,6 +273,7 @@ const appShellMessages = {
     sidebarDescription: "Основная рабочая зона для ежедневной работы.",
     billingNotConfigured: "Биллинг не настроен",
     topbarSubscriptionFallback: "настройка",
+    themeToggleLabel: "Переключить тему приложения",
     nav: {
       overview: {
         label: "Обзор",

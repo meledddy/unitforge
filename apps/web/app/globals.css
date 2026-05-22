@@ -47,6 +47,66 @@
       linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
   }
 
+  [data-app-shell] {
+    --background: 42 38% 97%;
+    --foreground: 220 28% 14%;
+    --card: 42 48% 99%;
+    --card-foreground: 220 28% 14%;
+    --popover: 42 48% 99%;
+    --popover-foreground: 220 28% 14%;
+    --primary: 220 32% 18%;
+    --primary-foreground: 42 52% 98%;
+    --secondary: 40 30% 93%;
+    --secondary-foreground: 220 28% 18%;
+    --muted: 39 23% 92%;
+    --muted-foreground: 220 12% 42%;
+    --accent: 38 74% 68%;
+    --accent-foreground: 220 32% 18%;
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 42 52% 98%;
+    --border: 35 22% 82%;
+    --input: 35 22% 82%;
+    --ring: 38 74% 58%;
+    color-scheme: light;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(circle at 56% 8%, hsl(var(--accent) / 0.14), transparent 28%),
+      radial-gradient(circle at 12% 94%, hsl(34 42% 74% / 0.13), transparent 24%),
+      linear-gradient(180deg, hsl(42 45% 98%), hsl(var(--background)));
+    transition:
+      background-color 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-image 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  :root[data-app-theme="dark"] [data-app-shell] {
+    --background: 289 25% 8%;
+    --foreground: 39 38% 94%;
+    --card: 288 20% 11%;
+    --card-foreground: 39 38% 94%;
+    --popover: 288 20% 11%;
+    --popover-foreground: 39 38% 94%;
+    --primary: 38 76% 72%;
+    --primary-foreground: 289 25% 9%;
+    --secondary: 287 18% 14%;
+    --secondary-foreground: 39 34% 88%;
+    --muted: 287 17% 13%;
+    --muted-foreground: 38 12% 66%;
+    --accent: 38 74% 70%;
+    --accent-foreground: 289 25% 9%;
+    --destructive: 0 68% 58%;
+    --destructive-foreground: 42 52% 98%;
+    --border: 33 18% 24%;
+    --input: 33 18% 24%;
+    --ring: 38 74% 70%;
+    color-scheme: dark;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(circle at 55% 0%, hsl(var(--accent) / 0.13), transparent 24%),
+      radial-gradient(circle at 94% 14%, hsl(292 18% 15% / 0.72), transparent 26%),
+      linear-gradient(180deg, hsl(286 22% 10%), hsl(var(--background)));
+  }
+
   [data-marketing-shell] {
     position: relative;
     isolation: isolate;
