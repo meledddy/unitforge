@@ -8,7 +8,7 @@ import { getInterfaceNumberLocale } from "@/i18n/interface-locale";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
 import { requireCurrentAppShellSession } from "@/server/current-session";
-import { duplicatePriceSheetAction, setPriceSheetStatusAction } from "@/server/price-sheets/actions";
+import { setPriceSheetStatusAction } from "@/server/price-sheets/actions";
 import { getPriceSheetErrorMessage, listWorkspacePriceSheets } from "@/server/price-sheets/service";
 
 export const dynamic = "force-dynamic";
@@ -177,26 +177,13 @@ export default async function PriceSheetsPage({ searchParams }: PriceSheetsPageP
                           </div>
                         </div>
 
-                        <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-start lg:max-w-[440px] lg:justify-end">
+                        <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-start lg:max-w-[260px] lg:justify-end">
                           <Link
-                            className={cn(buttonVariants({ size: "sm" }), "col-span-2 w-full min-w-[92px] sm:col-span-1 sm:w-auto")}
+                            className={cn(buttonVariants({ size: "sm" }), "w-full min-w-[92px] sm:w-auto")}
                             href={`/app/price-sheets/${priceSheet.id}`}
                           >
                             {messages.priceSheets.editSheet}
                           </Link>
-                          {priceSheet.status === "published" ? (
-                            <Link
-                              className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full whitespace-normal text-center sm:w-auto")}
-                              href={`/price-sheets/${priceSheet.slug}`}
-                            >
-                              {messages.priceSheets.publicPage}
-                            </Link>
-                          ) : null}
-                          <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)} className="min-w-0">
-                            <Button className="w-full whitespace-normal sm:w-auto" size="sm" type="submit" variant="outline">
-                              {messages.shared.duplicate}
-                            </Button>
-                          </form>
                           <form action={setPriceSheetStatusAction.bind(null, priceSheet.id, nextStatus, currentListHref)} className="min-w-0">
                             <Button className="w-full whitespace-normal sm:w-auto" size="sm" type="submit" variant="outline">
                               {statusActionLabel}

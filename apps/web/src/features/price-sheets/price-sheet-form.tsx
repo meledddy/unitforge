@@ -46,15 +46,15 @@ const initialFormState: PriceSheetFormActionState = {
 };
 
 const editorSectionFrameClassName =
-  "relative overflow-hidden rounded-[1.65rem] border border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent";
+  "relative overflow-hidden rounded-[1.65rem] border border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_18px_60px_rgba(0,0,0,0.22)] dark:before:via-primary/35";
 const editorSectionHeaderClassName =
-  "flex flex-col gap-3 border-b border-border/60 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5";
+  "flex flex-col gap-3 border-b border-border/60 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5 dark:from-primary/10 dark:via-card/80 dark:to-transparent";
 const editorSectionBodyClassName = "p-4 sm:p-5";
 const editorInnerPanelClassName =
-  "rounded-[1.35rem] border border-border/65 bg-gradient-to-br from-background/95 via-card/80 to-muted/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]";
+  "rounded-[1.35rem] border border-border/65 bg-gradient-to-br from-background/95 via-card/80 to-muted/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] dark:from-background/80 dark:via-card/85 dark:to-primary/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
 const editorFieldGridClassName = "grid gap-4 md:grid-cols-2";
 const editorControlClassName =
-  "rounded-2xl border-border/75 bg-background/95 shadow-[inset_0_1px_0_rgba(15,23,42,0.03)]";
+  "rounded-2xl border-border/75 bg-background/95 shadow-[inset_0_1px_0_rgba(15,23,42,0.03)] dark:bg-background/70 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
 
 export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyPriceSheetFormValues(), cancelHref }: PriceSheetFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialFormState);
@@ -350,9 +350,9 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
       ) : null}
 
       {mode === "edit" ? (
-        <div className="rounded-[1.35rem] border border-border/70 bg-gradient-to-r from-card/95 via-background/95 to-card/95 px-3 py-2 shadow-sm">
+        <div className="rounded-[1.35rem] border border-border/70 bg-card/85 px-3 py-2 shadow-[0_12px_34px_rgba(31,22,34,0.05)] dark:bg-card/70 dark:shadow-[0_14px_38px_rgba(0,0,0,0.18)]">
           <div className="flex justify-end">
-            <div className="inline-flex w-full flex-col gap-1.5 rounded-2xl border border-border/70 bg-background/90 p-1.5 shadow-sm sm:w-auto sm:flex-row">
+            <div className="inline-flex w-full flex-col gap-1.5 rounded-2xl border border-border/70 bg-background/85 p-1.5 shadow-sm sm:w-auto sm:flex-row dark:bg-background/55">
               <Button className="h-9 w-full rounded-xl px-4 sm:w-auto" disabled={isPending} name="intent" type="submit" value="continue">
                 {isPending ? messages.shared.saving : formCopy.saveAndContinue}
               </Button>
@@ -716,23 +716,32 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
               <div
                 key={item.id ?? `item-${index}`}
                 className={cn(
-                  "rounded-[1.45rem] border bg-background/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-colors sm:p-4",
+                  "rounded-[1.45rem] border bg-background/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-colors sm:p-4 dark:bg-background/45 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
                   itemError ? "border-destructive/40" : "border-border/70",
                 )}
               >
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-3 rounded-[1.2rem] border border-border/60 bg-card/95 p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-col gap-3 rounded-[1.2rem] border border-border/60 bg-card/95 p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between dark:bg-card/75">
                     <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
                       <span className="w-fit rounded-full border border-primary/10 bg-primary/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
                         {formCopy.itemLabel} {index + 1}
                       </span>
                       <div className="min-w-0 space-y-0.5">
                         <p className="break-words text-sm font-semibold">{itemTitle}</p>
-                        {isCollapsed ? <p className="break-words text-xs text-muted-foreground">{itemSummary.description}</p> : null}
+                        {isCollapsed ? (
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            {itemSummary.section ? (
+                              <span className="rounded-full border border-border/70 bg-background/70 px-2 py-0.5 dark:bg-background/45">
+                                {itemSummary.section}
+                              </span>
+                            ) : null}
+                            <span className="break-words">{itemSummary.description}</span>
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 flex-wrap items-center gap-1 self-start rounded-2xl border border-border/70 bg-background/95 p-1 shadow-sm lg:self-center">
+                    <div className="flex shrink-0 flex-wrap items-center gap-1 self-start rounded-2xl border border-border/70 bg-background/95 p-1 shadow-sm lg:self-center dark:bg-background/55">
                       <Button
                         className="h-8 rounded-xl px-3"
                         onClick={() => toggleItem(index)}
@@ -765,7 +774,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
 
                   {!isCollapsed ? (
                     <div className="grid gap-4 xl:grid-cols-[minmax(180px,0.68fr)_minmax(0,1.6fr)]">
-                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm">
+                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm dark:bg-card/70">
                         <div className="space-y-0.5">
                           <p className="text-sm font-medium">{formCopy.sharedFields}</p>
                         </div>
@@ -788,7 +797,7 @@ export function PriceSheetForm({ mode, locale, action, initialValues = getEmptyP
                         </div>
                       </div>
 
-                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm sm:p-5">
+                      <div className="rounded-[1.15rem] border border-border/70 bg-card/90 p-4 shadow-sm sm:p-5 dark:bg-card/70">
                         <div className="flex flex-col gap-3 border-b border-border/55 pb-3 sm:flex-row sm:items-center sm:justify-between">
                           <p className="text-sm font-medium">{formCopy.localizedContent}</p>
                           <ContentLanguageSelect
@@ -970,9 +979,11 @@ function createInitialItemContentTabs(itemsLength: number) {
 
 function getItemSummary(item: PriceSheetItemValues, interfaceLocale: InterfaceLocale) {
   const description = item.description.trim() || item.secondaryDescription.trim() || getMessages(interfaceLocale).priceSheetForm.noDescriptionYet;
+  const section = item.section.trim() || item.secondarySection.trim();
 
   return {
     description,
+    section,
   };
 }
 

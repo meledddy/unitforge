@@ -71,20 +71,20 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           title={priceSheet.title}
           description={messages.priceSheets.editDescription}
           actions={
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Badge className="h-8 rounded-full px-3" variant="secondary">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="h-8 rounded-full border-border/70 bg-card/70 px-3 text-muted-foreground" variant="outline">
                 {leadCountLabel}
               </Badge>
-              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href="#sheet-leads">
+              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full bg-card/70 sm:w-auto")} href="#sheet-leads">
                 {messages.priceSheets.leadsLink}
               </Link>
               <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
-                <Button className="w-full sm:w-auto" size="sm" type="submit" variant="outline">
+                <Button className="w-full bg-card/70 sm:w-auto" size="sm" type="submit" variant="outline">
                   {messages.shared.duplicate}
                 </Button>
               </form>
               {priceSheet.status === "published" ? (
-                <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full sm:w-auto")} href={priceSheet.publicUrl}>
+                <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full bg-card/70 sm:w-auto")} href={priceSheet.publicUrl}>
                   {messages.priceSheets.publicPage}
                 </Link>
               ) : null}
@@ -92,13 +92,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           }
         />
 
-        <PriceSheetLeadsSummary
-          inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
-          leads={leads}
-          locale={locale}
-          publicUrl={priceSheet.publicUrl}
-          status={priceSheet.status}
-        />
+        <PriceSheetLeadsSummary inquiryEnabled={priceSheet.publicSettings.inquiryEnabled} leads={leads} locale={locale} status={priceSheet.status} />
 
         <div className="grid gap-5 xl:grid-cols-[1fr,320px]">
           <PriceSheetForm
@@ -110,8 +104,8 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           />
 
           <div className="space-y-4">
-            <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent">
-              <CardHeader className="border-b border-border/55 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 p-5">
+            <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_18px_60px_rgba(0,0,0,0.22)] dark:before:via-primary/35">
+              <CardHeader className="border-b border-border/55 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 p-5 dark:from-primary/10 dark:via-card/80 dark:to-transparent">
                 <CardTitle>{messages.priceSheets.stateTitle}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 p-5">
@@ -122,10 +116,10 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border/70 bg-background/85 p-1">
+                <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border/70 bg-background/85 p-1 dark:bg-background/55">
                   <span
                     className={cn(
-                      "rounded-xl px-3 py-2 text-center text-xs font-medium",
+                      "rounded-xl px-3 py-2 text-center text-xs font-medium transition-colors",
                       priceSheet.status === "published" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground",
                     )}
                   >
@@ -133,7 +127,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                   </span>
                   <span
                     className={cn(
-                      "rounded-xl px-3 py-2 text-center text-xs font-medium",
+                      "rounded-xl px-3 py-2 text-center text-xs font-medium transition-colors",
                       priceSheet.status === "draft" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground",
                     )}
                   >
@@ -142,19 +136,19 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
                 </div>
 
                 <div className="space-y-2.5 text-sm">
-                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground dark:bg-background/45">
                     <span>{messages.priceSheets.slugLabel}</span>
                     <span className="font-mono text-xs uppercase tracking-[0.18em] text-foreground">/{priceSheet.slug}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground dark:bg-background/45">
                     <span>{messages.priceSheets.themeLabel}</span>
                     <span className="text-foreground">{priceSheet.theme}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground dark:bg-background/45">
                     <span>{messages.priceSheets.appearanceLabel}</span>
                     <span className="text-foreground">{presentationAppearanceLabel}</span>
                   </div>
-                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-background/70 px-3 py-2.5 text-muted-foreground dark:bg-background/45">
                     <span>{messages.priceSheets.currencyLabel}</span>
                     <span className="text-foreground">{priceSheet.currency}</span>
                   </div>
@@ -168,7 +162,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden rounded-[1.45rem] border-red-200/80 bg-red-50/70 shadow-[0_14px_38px_rgba(185,28,28,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-red-400/60 before:to-transparent">
+            <Card className="relative overflow-hidden rounded-[1.45rem] border-destructive/25 bg-card/85 shadow-[0_14px_38px_rgba(185,28,28,0.05)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-destructive/45 before:to-transparent dark:bg-card/80">
               <CardContent className="p-4">
                 <DeletePriceSheetConfirmation
                   action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}
@@ -186,13 +180,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           </div>
         </div>
 
-        <PriceSheetLeadsPanel
-          inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
-          leads={leads}
-          locale={locale}
-          publicUrl={priceSheet.publicUrl}
-          status={priceSheet.status}
-        />
+        <PriceSheetLeadsPanel inquiryEnabled={priceSheet.publicSettings.inquiryEnabled} leads={leads} locale={locale} status={priceSheet.status} />
       </div>
       </div>
     );

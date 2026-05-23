@@ -52,7 +52,7 @@ export function DeletePriceSheetConfirmation({
   return (
     <>
       <Button
-        className="w-full gap-2 border border-red-200 bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500"
+        className="w-full gap-2 border border-red-500/30 bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500 dark:border-red-400/35 dark:bg-red-500 dark:text-white dark:hover:bg-red-600"
         type="button"
         variant="destructive"
         onClick={() => setOpen(true)}
