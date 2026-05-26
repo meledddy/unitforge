@@ -38,7 +38,7 @@ export async function tracePriceSheetLeadCreated(input: PriceSheetLeadTraceInput
 }
 
 function getPriceSheetLeadTraceEvent(input: PriceSheetLeadTraceInput): PriceSheetLeadTraceEvent {
-  const leadInboxPath = `/app/price-sheets/${input.lead.priceSheetId}#sheet-leads`;
+  const leadInboxPath = `/app/price-sheets/${input.lead.priceSheetId}/inquiries`;
 
   return {
     event: "price_sheet_lead.created",

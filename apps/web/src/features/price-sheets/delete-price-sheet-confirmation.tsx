@@ -52,9 +52,9 @@ export function DeletePriceSheetConfirmation({
   return (
     <>
       <Button
-        className="w-full gap-2 border border-red-500/30 bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500 dark:border-red-400/35 dark:bg-red-500 dark:text-white dark:hover:bg-red-600"
+        className="w-full gap-2 border border-red-200/80 bg-red-50/80 text-red-700 shadow-sm hover:border-red-300 hover:bg-red-100/80 hover:text-red-800 focus-visible:ring-red-500 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:border-red-300/45 dark:hover:bg-red-500/16 dark:hover:text-red-100"
         type="button"
-        variant="destructive"
+        variant="outline"
         onClick={() => setOpen(true)}
       >
         {triggerLabel}

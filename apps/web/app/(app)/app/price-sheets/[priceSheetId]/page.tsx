@@ -1,4 +1,4 @@
-import { Badge, Button, buttonVariants, Card, CardContent, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import { Button, buttonVariants, Card, CardContent, CardHeader, CardTitle, cn } from "@unitforge/ui";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { PlaceholderPanel } from "@/components/app/placeholder-panel";
 import { DeletePriceSheetConfirmation } from "@/features/price-sheets/delete-price-sheet-confirmation";
 import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
-import { PriceSheetLeadsPanel, PriceSheetLeadsSummary } from "@/features/price-sheets/price-sheet-leads-panel";
+import { PriceSheetLeadsSummary } from "@/features/price-sheets/price-sheet-leads-panel";
 import { PriceSheetStatusBadge } from "@/features/price-sheets/price-sheet-status-badge";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
@@ -40,7 +40,6 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
     ]);
     const nextStatus = priceSheet.status === "published" ? "draft" : "published";
     const statusActionLabel = priceSheet.status === "published" ? messages.priceSheets.unpublish : messages.priceSheets.publish;
-    const leadCountLabel = `${messages.priceSheets.leadCountLabel}: ${leads.length}`;
     const presentationAppearanceLabel =
       priceSheet.publicSettings.presentationAppearance === "dark"
         ? messages.priceSheetForm.presentationAppearanceDark
@@ -72,12 +71,6 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           description={messages.priceSheets.editDescription}
           actions={
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="h-8 rounded-full border-border/70 bg-card/70 px-3 text-muted-foreground" variant="outline">
-                {leadCountLabel}
-              </Badge>
-              <Link className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full bg-card/70 sm:w-auto")} href="#sheet-leads">
-                {messages.priceSheets.leadsLink}
-              </Link>
               <form action={duplicatePriceSheetAction.bind(null, priceSheet.id)}>
                 <Button className="w-full bg-card/70 sm:w-auto" size="sm" type="submit" variant="outline">
                   {messages.shared.duplicate}
@@ -92,7 +85,13 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
           }
         />
 
-        <PriceSheetLeadsSummary inquiryEnabled={priceSheet.publicSettings.inquiryEnabled} leads={leads} locale={locale} status={priceSheet.status} />
+        <PriceSheetLeadsSummary
+          inquiriesHref={`/app/price-sheets/${priceSheet.id}/inquiries`}
+          inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
+          leads={leads}
+          locale={locale}
+          status={priceSheet.status}
+        />
 
         <div className="grid gap-5 xl:grid-cols-[1fr,320px]">
           <PriceSheetForm
@@ -162,7 +161,7 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden rounded-[1.45rem] border-destructive/25 bg-card/85 shadow-[0_14px_38px_rgba(185,28,28,0.05)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-destructive/45 before:to-transparent dark:bg-card/80">
+            <Card className="relative overflow-hidden rounded-[1.45rem] border-destructive/20 bg-card/80 shadow-[0_12px_30px_rgba(15,23,42,0.03)] dark:bg-card/70">
               <CardContent className="p-4">
                 <DeletePriceSheetConfirmation
                   action={deletePriceSheetAction.bind(null, priceSheet.id, "/app/price-sheets")}
@@ -179,8 +178,6 @@ export default async function PriceSheetEditPage({ params }: PriceSheetEditPageP
             </Card>
           </div>
         </div>
-
-        <PriceSheetLeadsPanel inquiryEnabled={priceSheet.publicSettings.inquiryEnabled} leads={leads} locale={locale} status={priceSheet.status} />
       </div>
       </div>
     );

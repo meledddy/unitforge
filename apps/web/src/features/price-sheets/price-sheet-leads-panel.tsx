@@ -11,7 +11,21 @@ interface PriceSheetLeadsPanelProps {
   inquiryEnabled: boolean;
 }
 
-export function PriceSheetLeadsSummary({ inquiryEnabled, leads, locale, status }: PriceSheetLeadsPanelProps) {
+interface PriceSheetLeadsSummaryProps extends PriceSheetLeadsPanelProps {
+  inquiriesHref: string;
+  actionLabel?: string;
+  showAction?: boolean;
+}
+
+export function PriceSheetLeadsSummary({
+  actionLabel,
+  inquiriesHref,
+  inquiryEnabled,
+  leads,
+  locale,
+  showAction = true,
+  status,
+}: PriceSheetLeadsSummaryProps) {
   const latestLead = leads[0];
   const messages = getMessages(locale);
   const isLive = status === "published" && inquiryEnabled;
@@ -22,15 +36,17 @@ export function PriceSheetLeadsSummary({ inquiryEnabled, leads, locale, status }
         <CardHeader className="gap-4 p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
-              <Badge variant="secondary">{messages.priceSheets.leadVisibilityBadge}</Badge>
+              <Badge variant="secondary">{messages.priceSheets.totalReceived}</Badge>
               <div className="flex items-end gap-3">
                 <CardTitle className="text-3xl sm:text-4xl">{leads.length}</CardTitle>
               </div>
             </div>
 
-            <a className="inline-flex h-9 items-center justify-center rounded-full border border-border/70 bg-background/80 px-4 text-sm font-medium transition-colors hover:border-primary/40 hover:text-primary dark:bg-background/55" href="#sheet-leads">
-              {messages.priceSheets.leadsLink}
-            </a>
+            {showAction ? (
+              <a className="inline-flex h-9 items-center justify-center rounded-full border border-border/70 bg-background/80 px-4 text-sm font-medium transition-colors hover:border-primary/40 hover:text-primary dark:bg-background/55" href={inquiriesHref}>
+                {actionLabel ?? messages.priceSheets.openInquiries}
+              </a>
+            ) : null}
           </div>
         </CardHeader>
       </Card>
@@ -38,7 +54,7 @@ export function PriceSheetLeadsSummary({ inquiryEnabled, leads, locale, status }
       <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_16px_45px_rgba(15,23,42,0.04)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_16px_45px_rgba(0,0,0,0.18)] dark:before:via-primary/35">
         <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 p-5 pb-3">
           <div className="space-y-2">
-            <CardDescription>{messages.priceSheets.latestInquiry}</CardDescription>
+            <CardDescription>{messages.priceSheets.latestRequest}</CardDescription>
             <CardTitle>{latestLead ? latestLead.contactName : messages.priceSheets.noInquiriesYet}</CardTitle>
           </div>
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/70 bg-gradient-to-br from-background/95 to-muted/30 dark:from-background/70 dark:to-primary/10" aria-hidden="true">
@@ -83,14 +99,14 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: 
       <div className="flex flex-col gap-4 border-b border-border/60 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:from-primary/10 dark:via-card/80 dark:to-transparent">
         <div className="flex min-w-0 items-center gap-3">
           <div className="space-y-1">
-            <Badge variant="secondary">{messages.priceSheets.leadsBadge}</Badge>
-            <h2 className="text-lg font-semibold tracking-tight">{messages.priceSheets.leadInboxTitle}</h2>
+            <Badge variant="secondary">{messages.priceSheets.inquiryReceived}</Badge>
+            <h2 className="text-lg font-semibold tracking-tight">{messages.priceSheets.inbox}</h2>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 sm:items-end">
           <div className="rounded-2xl border border-border/70 bg-background/85 px-4 py-3 shadow-sm sm:min-w-36 dark:bg-background/55">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{messages.priceSheets.leadCountLabel}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{messages.priceSheets.totalReceived}</p>
             <p className="mt-2 text-3xl font-semibold tracking-tight">{leads.length}</p>
           </div>
         </div>
@@ -115,6 +131,7 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: 
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-semibold tracking-tight">{lead.contactName}</h3>
                       <Badge variant="outline">{lead.locale}</Badge>
+                      <Badge variant="secondary">{messages.priceSheets.inquiryReceived}</Badge>
                     </div>
                     {lead.companyOrBusinessName ? <p className="text-sm text-muted-foreground">{lead.companyOrBusinessName}</p> : null}
                   </div>
@@ -149,6 +166,20 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: 
         )}
       </div>
     </section>
+  );
+}
+
+export function PriceSheetLeadNotificationHint({ locale }: { locale: InterfaceLocale }) {
+  const messages = getMessages(locale);
+
+  return (
+    <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-y-6 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-primary/50 before:to-transparent dark:bg-card/90 dark:shadow-[0_18px_60px_rgba(0,0,0,0.2)]">
+      <CardHeader className="space-y-3 p-5">
+        <Badge variant="secondary">{messages.priceSheets.notificationHintBadge}</Badge>
+        <CardTitle>{messages.priceSheets.notificationHintTitle}</CardTitle>
+        <CardDescription className="leading-6">{messages.priceSheets.notificationHintDescription}</CardDescription>
+      </CardHeader>
+    </Card>
   );
 }
 
