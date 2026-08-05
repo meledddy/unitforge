@@ -22,10 +22,6 @@ export const appEnvSchema = z.object({
   NEXT_PUBLIC_SALES_EMAIL: optionalEmail,
   DATABASE_URL: z.string().url(),
   TRUST_PROXY_HEADERS: z.enum(["true", "false"]).default("false"),
-  STRIPE_SECRET_KEY: optionalNonEmptyString,
-  STRIPE_WEBHOOK_SECRET: optionalNonEmptyString,
-  STRIPE_PRICE_STUDIO_MONTHLY_ID: optionalNonEmptyString,
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: optionalNonEmptyString,
   ANALYTICS_WRITE_KEY: optionalNonEmptyString,
 });
 

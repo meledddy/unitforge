@@ -9,7 +9,6 @@ const billingPlanSchema = z.object({
   annualPrice: z.number().int().nonnegative(),
   trialDays: z.number().int().nonnegative(),
   billingMode: z.literal("assisted_invoice"),
-  stripePriceLookupKey: z.string().min(1).optional(),
   features: z.array(z.string().min(1)).min(1),
 });
 
@@ -45,8 +44,4 @@ export function formatPlanPrice(
     style: "currency",
     maximumFractionDigits: 0,
   }).format(price);
-}
-
-export function getBillingPlan(planSlug: string) {
-  return studioPlans.find((plan) => plan.slug === planSlug) ?? null;
 }
