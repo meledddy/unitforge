@@ -114,3 +114,7 @@ pnpm verify:onboarding
 - `packages/config` — runtime configuration and environment validation
 
 Unitforge is an active pre-launch portfolio project. A hosted demo and production domain are the next release milestone.
+
+## License
+
+Unitforge is proprietary software. The source is publicly visible for portfolio review only; permission is not granted to copy, modify, redistribute, host, deploy, resell, or use it to provide a service. See [LICENSE](./LICENSE) for the full terms.

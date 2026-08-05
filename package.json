@@ -1,6 +1,7 @@
 {
   "name": "unitforge",
   "private": true,
+  "license": "UNLICENSED",
   "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=20.9.0",
