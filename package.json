@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=20.9.0",
     "pnpm": ">=9.0.0"
   },
   "scripts": {
@@ -16,6 +16,7 @@
     "db:seed:sales-demo": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/seed-sales-demo.ts --apply",
     "onboard:pilot": "tsx --tsconfig tsconfig.base.json packages/db/src/scripts/onboard-pilot-user.ts",
     "dev": "pnpm --filter @unitforge/web dev",
+    "start": "pnpm --filter @unitforge/web start",
     "build": "pnpm --filter \"./packages/**\" build && pnpm --filter @unitforge/web build",
     "lint": "pnpm --filter \"./packages/**\" lint && pnpm --filter @unitforge/web lint",
     "typecheck": "pnpm --filter \"./packages/**\" typecheck && pnpm --filter @unitforge/web typecheck",
@@ -33,7 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^15.1.0",
+    "eslint-config-next": "15.5.22",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.4.2",
@@ -41,5 +42,12 @@
     "tsx": "^4.20.3",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.25",
+      "sharp": "0.35.3",
+      "shell-quote": "1.10.0"
+    }
   }
 }
