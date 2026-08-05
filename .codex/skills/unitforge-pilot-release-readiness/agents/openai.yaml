@@ -1,8 +1,7 @@
 interface:
-  display_name: "Unitforge Pilot Readiness"
-  short_description: "Pilot audit and production hardening"
-  default_prompt: "Use $unitforge-pilot-release-readiness to audit or harden Unitforge before a public pilot."
+  display_name: "Unitforge Release Readiness"
+  short_description: "Evidence-based pilot and production release gate"
+  default_prompt: "Use $unitforge-pilot-release-readiness to run the final Unitforge production-readiness interview and produce a go/no-go dossier."
 
 policy:
   allow_implicit_invocation: true
-

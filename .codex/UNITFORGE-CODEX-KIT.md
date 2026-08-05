@@ -8,6 +8,8 @@ Use these project-local skills with an explicit path when you want Codex to bias
    Path: `.codex/skills/unitforge-auth-onboarding/SKILL.md`
 2. `$unitforge-price-sheets`
    Path: `.codex/skills/unitforge-price-sheets/SKILL.md`
+3. `$unitforge-pilot-release-readiness`
+   Path: `.codex/skills/unitforge-pilot-release-readiness/SKILL.md`
 
 ## Prompts
 
@@ -39,4 +41,10 @@ Use $unitforge-price-sheets at .codex/skills/unitforge-price-sheets/SKILL.md. Im
 
 ```text
 Use both $unitforge-auth-onboarding at .codex/skills/unitforge-auth-onboarding/SKILL.md and $unitforge-price-sheets at .codex/skills/unitforge-price-sheets/SKILL.md. Inspect the Unitforge repo and choose the single highest-value next fix across auth, onboarding, and price sheets. Prefer targeted verification over blanket commands, make one well-scoped improvement, and summarize any remaining blockers with file references.
+```
+
+6. Run the final production readiness interview
+
+```text
+Use $unitforge-pilot-release-readiness at .codex/skills/unitforge-pilot-release-readiness/SKILL.md in final production interview mode. Build evidence from the current Unitforge release candidate before asking questions, ask only one decision-bearing question at a time, run the required red-team pass, and maintain a private release dossier with a mechanical GO, CONDITIONAL GO, or NO-GO verdict.
 ```
