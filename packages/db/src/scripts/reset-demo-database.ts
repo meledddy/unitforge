@@ -25,7 +25,7 @@ import {
 } from "./sales-demo-fixture";
 
 const confirmationFlag = "--confirm-reset";
-const localAppHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+const localAppHosts = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
@@ -46,6 +46,7 @@ async function main() {
   }
 
   assertLocalAppConfiguration();
+  assertLocalDatabaseConfiguration(connectionString);
   const fixtureSummary = validateSalesDemoFixture();
   const db = createDb(connectionString);
   const passwordHash = hashPassword(bootstrapPassword);
@@ -208,6 +209,26 @@ function assertLocalAppConfiguration() {
   if (!localAppHosts.has(appHostname)) {
     throw new Error(
       `Refusing to reset while NEXT_PUBLIC_APP_URL points to ${appHostname}.`,
+    );
+  }
+}
+
+function assertLocalDatabaseConfiguration(connectionString: string) {
+  const databaseUrl = new URL(connectionString);
+  const databaseName = databaseUrl.pathname.replace(/^\//, "");
+
+  if (!localAppHosts.has(databaseUrl.hostname)) {
+    throw new Error(
+      `Refusing to reset a database hosted at ${databaseUrl.hostname}.`,
+    );
+  }
+
+  if (
+    !databaseName ||
+    ["postgres", "template0", "template1"].includes(databaseName)
+  ) {
+    throw new Error(
+      `Refusing to reset the protected database ${databaseName || "<empty>"}.`,
     );
   }
 }

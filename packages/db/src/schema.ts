@@ -176,7 +176,7 @@ export const subscriptions = pgTable(
     workspaceId: uuid("workspace_id")
       .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
-    provider: subscriptionProviderEnum("provider").default("stripe").notNull(),
+    provider: subscriptionProviderEnum("provider").default("manual").notNull(),
     status: subscriptionStatusEnum("status").default("trialing").notNull(),
     plan: varchar("plan", { length: 64 }).notNull(),
     externalCustomerId: text("external_customer_id"),

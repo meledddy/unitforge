@@ -57,6 +57,13 @@
       "when": 1784172673899,
       "tag": "0007_rare_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785901336857,
+      "tag": "0008_misty_nitro",
+      "breakpoints": true
     }
   ]
 }
