@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { InterfaceLanguageSwitcher } from "@/components/interface-language-switcher";
 import { MarketingThemeToggle } from "@/components/marketing/marketing-theme-toggle";
 import type { InterfaceLocale } from "@/i18n/interface-locale";
+import { signOutAction } from "@/server/auth/actions";
 
 interface SiteHeaderNavItem {
   href: string;
@@ -21,6 +22,8 @@ interface SiteHeaderControlsProps {
   mobileCtaLabel: string;
   mobileMenuLabel: string;
   nav: readonly SiteHeaderNavItem[];
+  showSignOut: boolean;
+  signOutLabel: string;
   themeLabel: string;
 }
 
@@ -32,6 +35,8 @@ export function SiteHeaderControls({
   mobileCtaLabel,
   mobileMenuLabel,
   nav,
+  showSignOut,
+  signOutLabel,
   themeLabel,
 }: SiteHeaderControlsProps) {
   const pathname = usePathname();
@@ -42,7 +47,7 @@ export function SiteHeaderControls({
   }
 
   return (
-    <div className="contents public-sheet-marketing-controls">
+    <div className="public-sheet-marketing-controls contents">
       <nav className="hidden items-center gap-1 rounded-full border border-[hsl(var(--marketing-border)/0.56)] bg-[hsl(var(--marketing-surface)/0.68)] px-2 py-1.5 shadow-[0_24px_60px_-44px_hsl(var(--marketing-shadow)/0.2)] transition-[background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:flex">
         {nav.map((item) => (
           <Link
@@ -55,8 +60,11 @@ export function SiteHeaderControls({
         ))}
       </nav>
 
-      <div className="hidden items-center gap-3 sm:flex">
-        <MarketingThemeToggle className="hidden md:inline-flex" label={themeLabel} />
+      <div className="hidden items-center gap-3 lg:flex">
+        <MarketingThemeToggle
+          className="inline-flex"
+          label={themeLabel}
+        />
         <InterfaceLanguageSwitcher
           activeClassName="bg-[hsl(var(--marketing-surface-elevated))] text-[hsl(var(--marketing-foreground))] shadow-[0_12px_24px_-18px_hsl(var(--marketing-shadow)/0.35)]"
           className="border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-surface)/0.55)] p-1.5 text-[hsl(var(--marketing-foreground-soft))] shadow-[0_18px_40px_-30px_hsl(var(--marketing-shadow)/0.18)] transition-[background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -66,17 +74,30 @@ export function SiteHeaderControls({
         <Link
           className={cn(
             buttonVariants({ size: "sm" }),
-            "marketing-focus-ring h-12 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.48)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:brightness-[1.02] hover:shadow-[0_28px_62px_-26px_hsl(var(--marketing-shadow)/0.56)] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
+            "marketing-focus-ring h-12 rounded-full border border-[hsl(var(--marketing-border-strong)/0.34)] bg-[hsl(var(--marketing-primary))] px-6 text-sm font-semibold text-[hsl(var(--marketing-primary-foreground))] shadow-[0_24px_54px_-28px_hsl(var(--marketing-shadow)/0.48)] transition-[transform,background-color,border-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px] hover:shadow-[0_28px_62px_-26px_hsl(var(--marketing-shadow)/0.56)] hover:brightness-[1.02] active:translate-y-0 active:scale-[0.985] motion-reduce:transition-none",
           )}
           href={ctaHref}
           prefetch={false}
         >
           {ctaLabel}
         </Link>
+        {showSignOut ? (
+          <form action={signOutAction}>
+            <button
+              className="marketing-focus-ring rounded-full px-2 py-2 text-sm font-medium text-[hsl(var(--marketing-foreground-muted))] transition-colors duration-200 hover:text-[hsl(var(--marketing-foreground))]"
+              type="submit"
+            >
+              {signOutLabel}
+            </button>
+          </form>
+        ) : null}
       </div>
 
-      <div className="flex items-center gap-2 sm:hidden">
-        <MarketingThemeToggle className="w-[4.05rem] min-[390px]:w-[4.25rem]" label={themeLabel} />
+      <div className="flex items-center gap-2 lg:hidden">
+        <MarketingThemeToggle
+          className="hidden w-[4.25rem] min-[390px]:inline-flex"
+          label={themeLabel}
+        />
         <Link
           className={cn(
             buttonVariants({ size: "sm" }),
@@ -97,8 +118,19 @@ export function SiteHeaderControls({
             </span>
           </summary>
           <div className="pointer-events-none absolute right-0 top-[calc(100%+0.75rem)] w-[min(21rem,calc(100vw-1.5rem))] origin-top-right scale-[0.97] rounded-[1.9rem] border border-[hsl(var(--marketing-border)/0.68)] bg-[hsl(var(--marketing-surface))] p-3 opacity-0 shadow-[0_30px_70px_-36px_hsl(var(--marketing-shadow)/0.42)] transition-[opacity,transform,background-color,border-color,box-shadow,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:pointer-events-auto group-open:scale-100 group-open:opacity-100">
+            <div className="mb-3 flex items-center justify-between gap-4 rounded-[1.4rem] border border-[hsl(var(--marketing-border)/0.55)] bg-[hsl(var(--marketing-surface-muted)/0.68)] p-3 min-[390px]:hidden">
+              <p className="text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--marketing-foreground-muted))]">
+                {locale === "ru" ? "Тема" : "Theme"}
+              </p>
+              <MarketingThemeToggle
+                className="w-[4.25rem]"
+                label={themeLabel}
+              />
+            </div>
             <div className="rounded-[1.4rem] border border-[hsl(var(--marketing-border)/0.55)] bg-[hsl(var(--marketing-surface-muted)/0.68)] p-3">
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--marketing-foreground-muted))]">{languageLabel}</p>
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-[hsl(var(--marketing-foreground-muted))]">
+                {languageLabel}
+              </p>
               <InterfaceLanguageSwitcher
                 activeClassName="bg-[hsl(var(--marketing-surface-elevated))] text-[hsl(var(--marketing-foreground))]"
                 className="w-full justify-center border-[hsl(var(--marketing-border)/0.6)] bg-[hsl(var(--marketing-surface)/0.82)] p-1"
@@ -117,18 +149,18 @@ export function SiteHeaderControls({
                 </Link>
               ))}
             </div>
-            <div className="mt-3 border-t border-[hsl(var(--marketing-border)/0.55)] pt-3">
-              <Link
-                className={cn(
-                  buttonVariants({ size: "default" }),
-                  "marketing-focus-ring h-12 w-full rounded-full bg-[hsl(var(--marketing-primary))] text-[hsl(var(--marketing-primary-foreground))] transition-[transform,background-color,box-shadow,color,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[1px] hover:brightness-[1.02] active:scale-[0.985] motion-reduce:transition-none",
-                )}
-                href={ctaHref}
-                prefetch={false}
-              >
-                {ctaLabel}
-              </Link>
-            </div>
+            {showSignOut ? (
+              <div className="mt-3 border-t border-[hsl(var(--marketing-border)/0.55)] pt-3">
+                <form action={signOutAction} className="mt-2">
+                  <button
+                    className="marketing-focus-ring h-11 w-full rounded-full text-sm font-medium text-[hsl(var(--marketing-foreground-muted))] transition-colors duration-200 hover:bg-[hsl(var(--marketing-surface-elevated))] hover:text-[hsl(var(--marketing-foreground))]"
+                    type="submit"
+                  >
+                    {signOutLabel}
+                  </button>
+                </form>
+              </div>
+            ) : null}
           </div>
         </details>
       </div>

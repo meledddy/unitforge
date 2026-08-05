@@ -1,6 +1,7 @@
 export type AppTheme = "light" | "dark";
 
 export const appThemeStorageKey = "unitforge-app-theme";
+export const legacyLoginThemeStorageKey = "unitforge-login-theme";
 
 export function getAppThemeBootstrapScript() {
   return `
@@ -8,7 +9,7 @@ export function getAppThemeBootstrapScript() {
       var root = document.documentElement;
       var path = window.location.pathname || "";
 
-      if (!path || path.indexOf("/app") !== 0) {
+      if (!path || (path.indexOf("/app") !== 0 && path.indexOf("/login") !== 0)) {
         return;
       }
 
@@ -16,7 +17,8 @@ export function getAppThemeBootstrapScript() {
 
       try {
         var stored = window.localStorage.getItem("${appThemeStorageKey}");
-        root.dataset.appTheme = stored === "dark" || stored === "light" ? stored : fallback;
+        var legacyLogin = window.localStorage.getItem("${legacyLoginThemeStorageKey}");
+        root.dataset.appTheme = stored === "dark" || stored === "light" ? stored : legacyLogin === "dark" || legacyLogin === "light" ? legacyLogin : fallback;
       } catch (error) {
         root.dataset.appTheme = fallback;
       }

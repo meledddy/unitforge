@@ -43,40 +43,107 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at top, hsl(var(--accent) / 0.16), transparent 30%),
+      radial-gradient(
+        circle at top,
+        hsl(var(--accent) / 0.16),
+        transparent 30%
+      ),
       linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
   }
 
   [data-app-shell] {
-    --background: 42 38% 97%;
-    --foreground: 220 28% 14%;
-    --card: 42 48% 99%;
-    --card-foreground: 220 28% 14%;
-    --popover: 42 48% 99%;
-    --popover-foreground: 220 28% 14%;
-    --primary: 220 32% 18%;
+    --background: 40 39% 91%;
+    --foreground: 288 26% 13%;
+    --card: 40 38% 94%;
+    --card-foreground: 288 26% 13%;
+    --popover: 42 44% 97%;
+    --popover-foreground: 288 26% 13%;
+    --primary: 288 25% 14%;
     --primary-foreground: 42 52% 98%;
-    --secondary: 40 30% 93%;
-    --secondary-foreground: 220 28% 18%;
-    --muted: 39 23% 92%;
-    --muted-foreground: 220 12% 42%;
-    --accent: 38 74% 68%;
-    --accent-foreground: 220 32% 18%;
+    --secondary: 38 31% 88%;
+    --secondary-foreground: 286 18% 20%;
+    --muted: 38 31% 90%;
+    --muted-foreground: 285 10% 39%;
+    --accent: 36 76% 63%;
+    --accent-foreground: 288 25% 13%;
     --destructive: 0 72% 52%;
     --destructive-foreground: 42 52% 98%;
-    --border: 35 22% 82%;
-    --input: 35 22% 82%;
-    --ring: 38 74% 58%;
+    --border: 34 31% 72%;
+    --input: 34 31% 72%;
+    --ring: 34 73% 44%;
+    --app-accent-soft: 38 68% 78%;
+    --app-ambient: 35 72% 68%;
+    --app-ambient-secondary: 286 24% 50%;
+    --app-canvas-start: 40 46% 95%;
+    --app-canvas-end: 39 34% 89%;
+    --app-panel: 41 40% 96%;
+    --app-panel-elevated: 42 48% 98%;
+    --app-grid: 287 18% 28%;
+    --app-shadow: 286 20% 30%;
+    --marketing-logo-plane-light: 39 48% 91%;
+    --marketing-logo-plane-shadow: 31 23% 64%;
+    --marketing-logo-ink: 292 23% 14%;
+    --marketing-logo-edge: 34 46% 78%;
+    --marketing-logo-copper: 27 54% 50%;
     color-scheme: light;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(circle at 56% 8%, hsl(var(--accent) / 0.14), transparent 28%),
-      radial-gradient(circle at 12% 94%, hsl(34 42% 74% / 0.13), transparent 24%),
-      linear-gradient(180deg, hsl(42 45% 98%), hsl(var(--background)));
+      radial-gradient(
+        ellipse 70rem 32rem at calc(50% + 8rem) -9rem,
+        hsl(var(--app-ambient) / 0.25),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 38rem 54rem at -10rem 48rem,
+        hsl(var(--app-ambient-secondary) / 0.075),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 40rem 48rem at calc(100% + 12rem) 70rem,
+        hsl(var(--app-ambient) / 0.095),
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--app-canvas-start)),
+        hsl(var(--app-canvas-end))
+      );
     transition:
-      background-color 320ms cubic-bezier(0.22, 1, 0.36, 1),
-      color 320ms cubic-bezier(0.22, 1, 0.36, 1),
-      background-image 360ms cubic-bezier(0.22, 1, 0.36, 1);
+      background-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-app-shell]::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
+    background-image:
+      linear-gradient(
+        to right,
+        hsl(var(--app-grid) / 0.16) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--app-grid) / 0.12) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.88),
+      rgb(0 0 0 / 0.26) 64rem,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.88),
+      rgb(0 0 0 / 0.26) 64rem,
+      transparent
+    );
   }
 
   :root[data-app-theme="dark"] [data-app-shell] {
@@ -99,12 +166,43 @@
     --border: 33 18% 24%;
     --input: 33 18% 24%;
     --ring: 38 74% 70%;
+    --app-accent-soft: 38 64% 58%;
+    --app-ambient: 38 78% 68%;
+    --app-ambient-secondary: 295 34% 42%;
+    --app-canvas-start: 286 22% 10%;
+    --app-canvas-end: 289 25% 7%;
+    --app-panel: 288 20% 11%;
+    --app-panel-elevated: 286 17% 14%;
+    --app-grid: 39 34% 82%;
+    --app-shadow: 289 26% 4%;
+    --marketing-logo-plane-light: 39 54% 88%;
+    --marketing-logo-plane-shadow: 30 18% 30%;
+    --marketing-logo-ink: 289 25% 12%;
+    --marketing-logo-edge: 33 48% 72%;
+    --marketing-logo-copper: 28 56% 48%;
     color-scheme: dark;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(circle at 55% 0%, hsl(var(--accent) / 0.13), transparent 24%),
-      radial-gradient(circle at 94% 14%, hsl(292 18% 15% / 0.72), transparent 26%),
-      linear-gradient(180deg, hsl(286 22% 10%), hsl(var(--background)));
+      radial-gradient(
+        ellipse 70rem 32rem at calc(50% + 8rem) -9rem,
+        hsl(var(--app-ambient) / 0.14),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 38rem 54rem at -10rem 48rem,
+        hsl(var(--app-ambient-secondary) / 0.11),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 40rem 48rem at calc(100% + 12rem) 70rem,
+        hsl(var(--app-ambient) / 0.065),
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--app-canvas-start)),
+        hsl(var(--app-canvas-end))
+      );
   }
 
   [data-marketing-shell] {
@@ -124,10 +222,12 @@
     --marketing-border-strong: 32 36% 64%;
     --marketing-accent: 33 44% 37%;
     --marketing-accent-soft: 40 58% 88%;
+    --marketing-error: 0 64% 38%;
     --marketing-primary: 289 27% 13%;
     --marketing-primary-foreground: 42 52% 98%;
     --marketing-shadow: 288 28% 9%;
     --marketing-glow: 37 60% 67%;
+    --marketing-grid: 289 19% 25%;
     --marketing-pricing-surface: 39 46% 92%;
     --marketing-pricing-edge: 33 38% 72%;
     --marketing-logo-plane-light: 39 48% 91%;
@@ -137,13 +237,40 @@
     --marketing-logo-copper: 27 54% 50%;
     color-scheme: light;
     background-image:
-      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.18), transparent 25%),
-      radial-gradient(circle at 75% 14%, hsl(var(--marketing-glow) / 0.14), transparent 17%),
-      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+      linear-gradient(
+        to right,
+        hsl(var(--marketing-grid) / 0.035) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--marketing-grid) / 0.03) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        ellipse 76rem 34rem at 50% -12rem,
+        hsl(var(--marketing-glow) / 0.18),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 44rem 52rem at calc(100% + 12rem) 34rem,
+        hsl(var(--marketing-glow) / 0.14),
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--marketing-bg-soft)),
+        hsl(var(--marketing-bg))
+      );
+    background-size:
+      72px 72px,
+      72px 72px,
+      auto,
+      auto,
+      auto;
     transition:
-      background-color 320ms var(--marketing-ease),
-      color 320ms var(--marketing-ease),
-      background-image 360ms var(--marketing-ease);
+      background-color 240ms var(--marketing-ease),
+      color 240ms var(--marketing-ease);
   }
 
   [data-marketing-shell]::after {
@@ -154,12 +281,21 @@
     z-index: 1;
     opacity: 0;
     background:
-      radial-gradient(circle at 20% 20%, hsl(var(--marketing-glow) / 0.12), transparent 28%),
-      radial-gradient(circle at 80% 16%, hsl(var(--marketing-glow) / 0.1), transparent 22%);
+      radial-gradient(
+        circle at 20% 20%,
+        hsl(var(--marketing-glow) / 0.12),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 80% 16%,
+        hsl(var(--marketing-glow) / 0.1),
+        transparent 22%
+      );
   }
 
-  :root[data-marketing-theme-transitioning="true"] [data-marketing-shell]::after {
-    animation: marketing-theme-wash 420ms var(--marketing-ease);
+  :root[data-marketing-theme-transitioning="true"]
+    [data-marketing-shell]::after {
+    animation: marketing-theme-wash 300ms var(--marketing-ease);
   }
 
   :root[data-marketing-theme="light"] [data-marketing-shell] {
@@ -180,10 +316,12 @@
     --marketing-border-strong: 33 30% 37%;
     --marketing-accent: 38 74% 70%;
     --marketing-accent-soft: 31 34% 18%;
+    --marketing-error: 0 74% 76%;
     --marketing-primary: 38 76% 72%;
     --marketing-primary-foreground: 289 25% 9%;
     --marketing-shadow: 289 26% 4%;
     --marketing-glow: 35 58% 56%;
+    --marketing-grid: 39 28% 84%;
     --marketing-pricing-surface: 31 24% 14%;
     --marketing-pricing-edge: 33 32% 29%;
     --marketing-logo-plane-light: 39 54% 88%;
@@ -193,10 +331,31 @@
     --marketing-logo-copper: 28 56% 48%;
     color-scheme: dark;
     background-image:
-      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 21%),
-      radial-gradient(circle at 76% 12%, hsl(var(--marketing-glow) / 0.08), transparent 17%),
-      radial-gradient(circle at bottom left, hsl(292 18% 15% / 0.75), transparent 24%),
-      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+      linear-gradient(
+        to right,
+        hsl(var(--marketing-grid) / 0.025) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--marketing-grid) / 0.02) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        ellipse 76rem 34rem at 50% -12rem,
+        hsl(var(--marketing-glow) / 0.14),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 44rem 52rem at calc(100% + 12rem) 34rem,
+        hsl(var(--marketing-glow) / 0.08),
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--marketing-bg-soft)),
+        hsl(var(--marketing-bg))
+      );
   }
 
   @media (prefers-color-scheme: dark) {
@@ -214,10 +373,12 @@
       --marketing-border-strong: 33 30% 37%;
       --marketing-accent: 38 74% 70%;
       --marketing-accent-soft: 31 34% 18%;
+      --marketing-error: 0 74% 76%;
       --marketing-primary: 38 76% 72%;
       --marketing-primary-foreground: 289 25% 9%;
       --marketing-shadow: 289 26% 4%;
       --marketing-glow: 35 58% 56%;
+      --marketing-grid: 39 28% 84%;
       --marketing-pricing-surface: 31 24% 14%;
       --marketing-pricing-edge: 33 32% 29%;
       --marketing-logo-plane-light: 39 54% 88%;
@@ -227,10 +388,31 @@
       --marketing-logo-copper: 28 56% 48%;
       color-scheme: dark;
       background-image:
-        radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 22%),
-        radial-gradient(circle at 80% 14%, hsl(var(--marketing-glow) / 0.1), transparent 18%),
-        radial-gradient(circle at bottom left, hsl(292 18% 15% / 0.75), transparent 24%),
-        linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+        linear-gradient(
+          to right,
+          hsl(var(--marketing-grid) / 0.025) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          to bottom,
+          hsl(var(--marketing-grid) / 0.02) 1px,
+          transparent 1px
+        ),
+        radial-gradient(
+          ellipse 76rem 34rem at 50% -12rem,
+          hsl(var(--marketing-glow) / 0.14),
+          transparent 72%
+        ),
+        radial-gradient(
+          ellipse 44rem 52rem at calc(100% + 12rem) 34rem,
+          hsl(var(--marketing-glow) / 0.1),
+          transparent 74%
+        ),
+        linear-gradient(
+          180deg,
+          hsl(var(--marketing-bg-soft)),
+          hsl(var(--marketing-bg))
+        );
     }
   }
 
@@ -258,13 +440,23 @@
     --ps-input-bg: 42 56% 99%;
     --ps-input-border: 35 28% 78%;
     --ps-ring: 33 44% 48%;
+    --ps-page-deep: 36 31% 91%;
+    --ps-grid: 289 18% 24%;
     --ps-shadow: 288 28% 9%;
     --ps-danger: 0 70% 48%;
     --ps-danger-text: 0 68% 42%;
     color-scheme: light;
     background-image:
-      radial-gradient(circle at 22% 4%, hsl(var(--ps-accent-soft) / 0.42), transparent 24rem),
-      radial-gradient(circle at 78% 6%, hsl(var(--ps-accent) / 0.12), transparent 18rem),
+      radial-gradient(
+        circle at 22% 4%,
+        hsl(var(--ps-accent-soft) / 0.42),
+        transparent 24rem
+      ),
+      radial-gradient(
+        circle at 78% 6%,
+        hsl(var(--ps-accent) / 0.12),
+        transparent 18rem
+      ),
       linear-gradient(180deg, hsl(var(--ps-page)), hsl(var(--ps-page)));
   }
 
@@ -285,6 +477,7 @@
     --ps-mark-bg: 224 36% 13%;
     --ps-mark-text: 42 48% 97%;
     --ps-ring: 215 22% 48%;
+    --ps-page-deep: 214 18% 91%;
   }
 
   [data-price-sheet-theme="stone"] {
@@ -306,6 +499,7 @@
     --ps-control-active: 28 14% 28%;
     --ps-control-active-hover: 28 13% 34%;
     --ps-ring: 30 18% 45%;
+    --ps-page-deep: 34 17% 90%;
   }
 
   [data-price-sheet-theme="amber"] {
@@ -329,6 +523,7 @@
     --ps-control-active-hover: 42 88% 52%;
     --ps-control-active-text: 289 27% 13%;
     --ps-ring: 42 80% 48%;
+    --ps-page-deep: 39 43% 90%;
   }
 
   [data-price-sheet-appearance="dark"][data-price-sheet-theme] {
@@ -355,13 +550,23 @@
     --ps-input-bg: 288 15% 17%;
     --ps-input-border: 33 17% 31%;
     --ps-ring: 38 74% 70%;
+    --ps-page-deep: 289 25% 6%;
+    --ps-grid: 39 28% 82%;
     --ps-shadow: 289 26% 4%;
     --ps-danger: 0 72% 64%;
     --ps-danger-text: 0 86% 76%;
     color-scheme: dark;
     background-image:
-      radial-gradient(circle at 32% 0%, hsl(var(--ps-accent) / 0.15), transparent 24rem),
-      radial-gradient(circle at 80% 12%, hsl(289 18% 21% / 0.8), transparent 22rem),
+      radial-gradient(
+        circle at 32% 0%,
+        hsl(var(--ps-accent) / 0.15),
+        transparent 24rem
+      ),
+      radial-gradient(
+        circle at 80% 12%,
+        hsl(289 18% 21% / 0.8),
+        transparent 22rem
+      ),
       linear-gradient(180deg, hsl(289 24% 10%), hsl(var(--ps-page)));
   }
 
@@ -413,16 +618,108 @@
   }
 
   .price-sheet-public-page {
+    position: relative;
+    background:
+      radial-gradient(
+        ellipse 72rem 34rem at calc(50% - 18rem) -10rem,
+        hsl(var(--ps-accent-soft) / 0.62),
+        transparent 72%
+      ),
+      radial-gradient(
+        ellipse 44rem 54rem at calc(100% + 14rem) 38rem,
+        hsl(var(--ps-accent) / 0.12),
+        transparent 74%
+      ),
+      radial-gradient(
+        ellipse 52rem 42rem at -14rem 72%,
+        hsl(var(--ps-accent-soft) / 0.3),
+        transparent 76%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--ps-page)) 0%,
+        hsl(var(--ps-page-deep)) 52%,
+        hsl(var(--ps-page)) 100%
+      );
+  }
+
+  .price-sheet-public-page::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.18;
     background-image:
-      radial-gradient(circle at 18% 4%, hsl(var(--ps-accent-soft) / 0.5), transparent 24rem),
-      radial-gradient(circle at 79% 6%, hsl(var(--ps-accent) / 0.13), transparent 20rem),
-      linear-gradient(180deg, hsl(var(--ps-page)), hsl(var(--ps-page)));
+      linear-gradient(
+        to right,
+        hsl(var(--ps-grid) / 0.16) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--ps-grid) / 0.11) 1px,
+        transparent 1px
+      );
+    background-size: 72px 72px;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.86),
+      rgb(0 0 0 / 0.36) 52%,
+      transparent 96%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.86),
+      rgb(0 0 0 / 0.36) 52%,
+      transparent 96%
+    );
   }
 
   .price-sheet-public-glow {
     background:
-      radial-gradient(circle at 35% 0%, hsl(var(--ps-accent) / 0.2), transparent 30rem),
-      radial-gradient(circle at 78% 10%, hsl(var(--ps-accent-soft) / 0.38), transparent 26rem);
+      radial-gradient(
+        ellipse 42rem 18rem at 22% 0%,
+        hsl(var(--ps-accent) / 0.13),
+        transparent 78%
+      ),
+      linear-gradient(
+        90deg,
+        transparent calc(50% - 38rem),
+        hsl(var(--ps-border) / 0.16) calc(50% - 38rem),
+        hsl(var(--ps-border) / 0.16) calc(50% - 38rem + 1px),
+        transparent calc(50% - 38rem + 1px),
+        transparent calc(50% + 38rem - 1px),
+        hsl(var(--ps-border) / 0.16) calc(50% + 38rem - 1px),
+        hsl(var(--ps-border) / 0.16) calc(50% + 38rem),
+        transparent calc(50% + 38rem)
+      );
+  }
+
+  .app-panel {
+    border-color: hsl(var(--border) / 0.72);
+    background: linear-gradient(
+      145deg,
+      hsl(var(--app-panel-elevated) / 0.9),
+      hsl(var(--app-panel) / 0.82)
+    );
+    box-shadow:
+      0 26px 70px -48px hsl(var(--app-shadow) / 0.42),
+      inset 0 1px 0 hsl(var(--foreground) / 0.045);
+  }
+
+  .app-dashboard-hero {
+    background:
+      radial-gradient(
+        ellipse 34rem 18rem at 94% -18%,
+        hsl(var(--app-ambient) / 0.16),
+        transparent 76%
+      ),
+      linear-gradient(
+        145deg,
+        hsl(var(--app-panel-elevated) / 0.94),
+        hsl(var(--app-panel) / 0.84)
+      );
   }
 
   :root [data-marketing-shell]:has([data-price-sheet-appearance="light"]) {
@@ -450,9 +747,21 @@
     --marketing-logo-copper: 27 54% 50%;
     color-scheme: light;
     background-image:
-      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.18), transparent 25%),
-      radial-gradient(circle at 75% 14%, hsl(var(--marketing-glow) / 0.14), transparent 17%),
-      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+      radial-gradient(
+        circle at top center,
+        hsl(var(--marketing-glow) / 0.18),
+        transparent 25%
+      ),
+      radial-gradient(
+        circle at 75% 14%,
+        hsl(var(--marketing-glow) / 0.14),
+        transparent 17%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--marketing-bg-soft)),
+        hsl(var(--marketing-bg))
+      );
   }
 
   :root [data-marketing-shell]:has([data-price-sheet-appearance="dark"]) {
@@ -480,13 +789,30 @@
     --marketing-logo-copper: 28 56% 48%;
     color-scheme: dark;
     background-image:
-      radial-gradient(circle at top center, hsl(var(--marketing-glow) / 0.14), transparent 21%),
-      radial-gradient(circle at 76% 12%, hsl(var(--marketing-glow) / 0.08), transparent 17%),
-      radial-gradient(circle at bottom left, hsl(292 18% 15% / 0.75), transparent 24%),
-      linear-gradient(180deg, hsl(var(--marketing-bg-soft)), hsl(var(--marketing-bg)));
+      radial-gradient(
+        circle at top center,
+        hsl(var(--marketing-glow) / 0.14),
+        transparent 21%
+      ),
+      radial-gradient(
+        circle at 76% 12%,
+        hsl(var(--marketing-glow) / 0.08),
+        transparent 17%
+      ),
+      radial-gradient(
+        circle at bottom left,
+        hsl(292 18% 15% / 0.75),
+        transparent 24%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--marketing-bg-soft)),
+        hsl(var(--marketing-bg))
+      );
   }
 
-  [data-marketing-shell]:has([data-price-sheet-theme]) .public-sheet-marketing-controls {
+  [data-marketing-shell]:has([data-price-sheet-theme])
+    .public-sheet-marketing-controls {
     display: none;
   }
 
@@ -495,7 +821,8 @@
     top: auto;
   }
 
-  [data-marketing-shell]:has([data-price-sheet-theme]) [data-public-sheet-footer-secondary] {
+  [data-marketing-shell]:has([data-price-sheet-theme])
+    [data-public-sheet-footer-secondary] {
     display: none;
   }
 }
@@ -512,18 +839,29 @@
 
   .marketing-enter-header {
     opacity: 0;
-    animation: marketing-header-in 500ms var(--marketing-ease) 40ms forwards;
+    animation: marketing-header-in 260ms var(--marketing-ease) 20ms forwards;
     will-change: transform, opacity;
   }
 
   .marketing-reveal {
-    --marketing-reveal-distance: 13px;
-    --marketing-reveal-duration: 540ms;
+    --marketing-reveal-distance: 10px;
+    --marketing-reveal-duration: 280ms;
     --marketing-reveal-scale: 1;
     --marketing-reveal-blur: 0px;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+
+  .marketing-reveal[data-marketing-reveal-state="hidden"] {
     opacity: 0;
-    transform: translate3d(0, var(--marketing-reveal-distance), 0) scale(var(--marketing-reveal-scale));
+    transform: translate3d(0, var(--marketing-reveal-distance), 0)
+      scale(var(--marketing-reveal-scale));
     filter: blur(var(--marketing-reveal-blur));
+    will-change: transform, opacity, filter;
+  }
+
+  .marketing-reveal[data-marketing-reveal-state="visible"] {
     transition:
       opacity var(--marketing-reveal-duration) var(--marketing-ease),
       transform var(--marketing-reveal-duration) var(--marketing-ease),
@@ -532,31 +870,26 @@
     will-change: transform, opacity, filter;
   }
 
-  .marketing-reveal[data-marketing-reveal-state="visible"] {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
-
   .marketing-reveal-quiet {
-    --marketing-reveal-distance: 8px;
-    --marketing-reveal-duration: 440ms;
+    --marketing-reveal-distance: 6px;
+    --marketing-reveal-duration: 220ms;
   }
 
   .marketing-reveal-showcase {
-    --marketing-reveal-distance: 14px;
-    --marketing-reveal-duration: 600ms;
-    --marketing-reveal-scale: 0.992;
-    --marketing-reveal-blur: 1.5px;
+    --marketing-reveal-distance: 10px;
+    --marketing-reveal-duration: 300ms;
+    --marketing-reveal-scale: 0.995;
+    --marketing-reveal-blur: 0.75px;
   }
 
   .marketing-reveal-pricing {
-    --marketing-reveal-distance: 12px;
-    --marketing-reveal-duration: 560ms;
+    --marketing-reveal-distance: 9px;
+    --marketing-reveal-duration: 260ms;
   }
 
   .pricing-hero-copy {
-    animation: pricing-hero-copy-in 520ms var(--marketing-ease) var(--pricing-hero-delay, 0ms) backwards;
+    animation: pricing-hero-copy-in 360ms var(--marketing-ease)
+      var(--pricing-hero-delay, 0ms) backwards;
     will-change: opacity, transform;
   }
 
@@ -661,17 +994,17 @@
   }
 
   .marketing-theme-toggle {
-    transition-duration: 320ms;
+    transition-duration: 220ms;
   }
 
   .marketing-theme-toggle-halo {
     transition:
-      opacity 320ms var(--marketing-ease),
-      scale 320ms var(--marketing-ease);
+      opacity 220ms var(--marketing-ease),
+      scale 220ms var(--marketing-ease);
   }
 
   .marketing-theme-toggle-thumb {
-    transition-duration: 340ms;
+    transition-duration: 230ms;
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -686,12 +1019,14 @@
   .pricing-artifact {
     --pricing-artifact-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --pricing-artifact-settle: cubic-bezier(0.16, 1, 0.3, 1);
-    animation: pricing-artifact-frame-in 560ms var(--pricing-artifact-ease) 40ms backwards;
+    animation: pricing-artifact-frame-in 360ms var(--pricing-artifact-ease) 20ms
+      backwards;
     will-change: opacity, filter;
   }
 
   .pricing-artifact-surface {
-    animation: pricing-artifact-surface-in 620ms var(--pricing-artifact-ease) 80ms backwards;
+    animation: pricing-artifact-surface-in 380ms var(--pricing-artifact-ease)
+      40ms backwards;
     transition:
       opacity 340ms var(--pricing-artifact-ease),
       scale 340ms var(--pricing-artifact-ease);
@@ -699,12 +1034,14 @@
   }
 
   .pricing-artifact-ground {
-    animation: pricing-artifact-ground-in 620ms var(--pricing-artifact-ease) 90ms backwards;
+    animation: pricing-artifact-ground-in 380ms var(--pricing-artifact-ease)
+      50ms backwards;
     will-change: opacity, scale;
   }
 
   .pricing-artifact-glow {
-    animation: pricing-artifact-glow-in 760ms var(--pricing-artifact-ease) 70ms backwards;
+    animation: pricing-artifact-glow-in 420ms var(--pricing-artifact-ease) 40ms
+      backwards;
     transition:
       opacity 420ms var(--pricing-artifact-ease),
       scale 420ms var(--pricing-artifact-ease);
@@ -720,15 +1057,18 @@
   }
 
   .pricing-artifact-plane-light {
-    animation: pricing-artifact-plane-light-in 760ms var(--pricing-artifact-settle) 160ms backwards;
+    animation: pricing-artifact-plane-light-in 420ms
+      var(--pricing-artifact-settle) 80ms backwards;
   }
 
   .pricing-artifact-plane-ink {
-    animation: pricing-artifact-plane-ink-in 760ms var(--pricing-artifact-settle) 190ms backwards;
+    animation: pricing-artifact-plane-ink-in 420ms
+      var(--pricing-artifact-settle) 100ms backwards;
   }
 
   .pricing-artifact-tile {
-    animation: pricing-artifact-tile-in 680ms var(--pricing-artifact-settle) 300ms backwards;
+    animation: pricing-artifact-tile-in 400ms var(--pricing-artifact-settle)
+      120ms backwards;
     transition:
       filter 340ms var(--pricing-artifact-ease),
       scale 340ms var(--pricing-artifact-ease),
@@ -737,16 +1077,19 @@
   }
 
   .pricing-artifact-tile-inner {
-    animation: pricing-artifact-detail-in 520ms var(--pricing-artifact-ease) 430ms backwards;
+    animation: pricing-artifact-detail-in 320ms var(--pricing-artifact-ease)
+      150ms backwards;
   }
 
   .pricing-artifact-line {
-    animation: pricing-artifact-line-in 520ms var(--pricing-artifact-ease) 500ms backwards;
+    animation: pricing-artifact-line-in 320ms var(--pricing-artifact-ease) 170ms
+      backwards;
     transform-origin: center;
   }
 
   .pricing-artifact-logo {
-    animation: pricing-artifact-logo-in 620ms var(--pricing-artifact-settle) 470ms backwards;
+    animation: pricing-artifact-logo-in 380ms var(--pricing-artifact-settle)
+      160ms backwards;
     transition:
       filter 340ms var(--pricing-artifact-ease),
       opacity 340ms var(--pricing-artifact-ease),
@@ -770,7 +1113,8 @@
   }
 
   .pricing-artifact:hover .pricing-artifact-logo {
-    filter: drop-shadow(0 20px 38px hsl(var(--marketing-shadow) / 0.31)) saturate(1.04) contrast(1.03);
+    filter: drop-shadow(0 20px 38px hsl(var(--marketing-shadow) / 0.31))
+      saturate(1.04) contrast(1.03);
   }
 
   .text-balance {
@@ -990,27 +1334,25 @@
 
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
   .pricing-artifact {
-    animation:
-      pricing-artifact-frame-in 560ms var(--pricing-artifact-ease) 40ms backwards,
-      pricing-artifact-idle 7800ms ease-in-out 1500ms infinite;
+    animation: pricing-artifact-frame-in 360ms var(--pricing-artifact-ease) 20ms
+      backwards;
   }
 
   .pricing-artifact-glow {
-    animation:
-      pricing-artifact-glow-in 760ms var(--pricing-artifact-ease) 70ms backwards,
-      pricing-artifact-light-breathe 6400ms ease-in-out 1280ms infinite;
+    animation: pricing-artifact-glow-in 420ms var(--pricing-artifact-ease) 40ms
+      backwards;
   }
 }
 
 @media (max-width: 768px) {
   .marketing-reveal {
     --marketing-reveal-distance: 8px;
-    --marketing-reveal-duration: 400ms;
+    --marketing-reveal-duration: 280ms;
   }
 
   .marketing-reveal-showcase {
     --marketing-reveal-distance: 9px;
-    --marketing-reveal-duration: 440ms;
+    --marketing-reveal-duration: 320ms;
     --marketing-reveal-scale: 1;
     --marketing-reveal-blur: 0px;
   }

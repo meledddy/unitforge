@@ -108,10 +108,12 @@ const siteHeaderMessages = {
 
 const footerMessages = {
   en: {
-    description: "Monorepo foundation for launching and operating vertical SaaS products.",
+    description:
+      "Monorepo foundation for launching and operating vertical SaaS products.",
   },
   ru: {
-    description: "Монорепо-основа для запуска и развития vertical SaaS продуктов.",
+    description:
+      "Монорепо-основа для запуска и развития vertical SaaS продуктов.",
   },
 } as const;
 
@@ -119,19 +121,23 @@ const marketingMessages = {
   en: {
     home: {
       badge: "Vertical SaaS studio starter",
-      title: "Forge repeatable products without rebuilding the platform every time.",
+      title:
+        "Forge repeatable products without rebuilding the platform every time.",
       description:
         "Monorepo foundation for launching and operating vertical SaaS products. The initial foundation includes one marketing surface, one authenticated app shell, and shared packages for data, billing, analytics, and UI.",
       primaryCta: "Open app",
       secondaryCta: "View pricing",
       foundationTitle: "Shared foundation",
-      foundationDescription: "Start each future product from the same platform contracts instead of a blank repo.",
+      foundationDescription:
+        "Start each future product from the same platform contracts instead of a blank repo.",
       readyTitle: "Ready for product number two.",
-      readyDescription: "Marketing pages, authenticated routes, billing hooks, and database scaffolding stay in one clean monorepo.",
+      readyDescription:
+        "Marketing pages, authenticated routes, billing hooks, and database scaffolding stay in one clean monorepo.",
       platformEyebrow: "Platform",
       platformTitle: "One studio foundation, multiple future products.",
       productAreasTitle: "Reserved product areas",
-      productAreasDescription: "The initial web app already holds space for future operational workflows.",
+      productAreasDescription:
+        "The initial web app already holds space for future operational workflows.",
       pricingSuffix: "per month, per deployed vertical baseline",
     },
     pricing: {
@@ -143,13 +149,15 @@ const marketingMessages = {
       dashboardCta: "Open app",
       baselineSuffix: "per month for the studio baseline",
       stripeTitle: "Stripe scaffold status",
-      stripeDescription: "The integration surface exists, but no live checkout session is created yet.",
+      stripeDescription:
+        "The integration surface exists, but no live checkout session is created yet.",
       readinessTitle: "Readiness",
       readinessConfigured: "Configuration looks complete.",
       readinessIncomplete: "Configuration is still incomplete.",
       missingKeysTitle: "Missing keys",
       nextStepTitle: "Next billing step",
-      nextStepDescription: "Connect checkout session creation and webhook processing when you are ready to enforce entitlements.",
+      nextStepDescription:
+        "Connect checkout session creation and webhook processing when you are ready to enforce entitlements.",
     },
   },
   ru: {
@@ -161,13 +169,16 @@ const marketingMessages = {
       primaryCta: "Открыть приложение",
       secondaryCta: "Посмотреть тарифы",
       foundationTitle: "Общая основа",
-      foundationDescription: "Запускайте каждый следующий продукт на одних и тех же платформенных контрактах, а не с пустого репозитория.",
+      foundationDescription:
+        "Запускайте каждый следующий продукт на одних и тех же платформенных контрактах, а не с пустого репозитория.",
       readyTitle: "Готово к следующему продукту.",
-      readyDescription: "Маркетинговые страницы, защищенные маршруты, биллинговые хуки и база данных остаются в одном чистом монорепо.",
+      readyDescription:
+        "Маркетинговые страницы, защищенные маршруты, биллинговые хуки и база данных остаются в одном чистом монорепо.",
       platformEyebrow: "Платформа",
       platformTitle: "Одна студийная основа, несколько будущих продуктов.",
       productAreasTitle: "Зарезервированные продуктовые зоны",
-      productAreasDescription: "Текущее веб-приложение уже держит место для будущих операционных потоков.",
+      productAreasDescription:
+        "Текущее веб-приложение уже держит место для будущих операционных потоков.",
       pricingSuffix: "в месяц за одну развернутую вертикальную базу",
     },
     pricing: {
@@ -179,13 +190,15 @@ const marketingMessages = {
       dashboardCta: "Открыть приложение",
       baselineSuffix: "в месяц за базовую студийную платформу",
       stripeTitle: "Статус Stripe scaffolding",
-      stripeDescription: "Интеграционная поверхность уже существует, но живой checkout session пока не создается.",
+      stripeDescription:
+        "Интеграционная поверхность уже существует, но живой checkout session пока не создается.",
       readinessTitle: "Готовность",
       readinessConfigured: "Конфигурация выглядит полной.",
       readinessIncomplete: "Конфигурация пока неполная.",
       missingKeysTitle: "Отсутствующие ключи",
       nextStepTitle: "Следующий шаг по биллингу",
-      nextStepDescription: "Подключите создание checkout session и обработку webhook, когда будете готовы включать entitlements.",
+      nextStepDescription:
+        "Подключите создание checkout session и обработку webhook, когда будете готовы включать entitlements.",
     },
   },
 } as const;
@@ -197,7 +210,7 @@ const authMessages = {
     welcomeBack: "Welcome back",
     formSubtitle: "Sign in to your Unitforge workspace",
     email: "Email",
-    emailPlaceholder: "operator@unitforge.dev",
+    emailPlaceholder: "name@business.am",
     password: "Password",
     passwordPlaceholder: "Enter your password",
     signingIn: "Signing in...",
@@ -215,7 +228,7 @@ const authMessages = {
     welcomeBack: "С возвращением",
     formSubtitle: "Войдите в рабочее пространство Unitforge",
     email: "Почта",
-    emailPlaceholder: "operator@unitforge.dev",
+    emailPlaceholder: "name@business.am",
     password: "Пароль",
     passwordPlaceholder: "Введите пароль",
     signingIn: "Вход...",
@@ -291,43 +304,55 @@ const dashboardMessages = {
   en: {
     eyebrow: "Authenticated app shell",
     title: "Workspace overview",
-    description: "The first functional slice now runs behind real login, session handling, and workspace-scoped data access.",
+    description:
+      "The first functional slice now runs behind real login, session handling, and workspace-scoped data access.",
     settingsCta: "Review settings",
     currentUserTitle: "Current user",
-    currentUserDescription: "The authenticated operator account now drives protected app access.",
+    currentUserDescription:
+      "The authenticated operator account now drives protected app access.",
     currentWorkspaceTitle: "Current workspace",
-    currentWorkspaceDescription: "The current workspace comes from the authenticated membership context.",
-    currentWorkspaceBody: "Workspace-scoped queries and billing ownership now resolve from the signed-in user session.",
+    currentWorkspaceDescription:
+      "The current workspace comes from the authenticated membership context.",
+    currentWorkspaceBody:
+      "Workspace-scoped queries and billing ownership now resolve from the signed-in user session.",
     billingTitle: "Billing status",
-    billingDescription: "Stripe is scaffolded, but final checkout and webhook handling are intentionally deferred.",
+    billingDescription:
+      "Stripe is scaffolded, but final checkout and webhook handling are intentionally deferred.",
     unconfigured: "Unconfigured",
     plan: "Plan",
     notAssigned: "Not assigned",
     provider: "Provider",
     notConfigured: "Not configured",
     reservedTitle: "Reserved product surfaces",
-    reservedDescription: "The workspace already has clear seams for product-specific operations without introducing fake application data.",
+    reservedDescription:
+      "The workspace already has clear seams for product-specific operations without introducing fake application data.",
     openPriceSheets: "Open price sheets",
   },
   ru: {
     eyebrow: "Защищенная оболочка приложения",
     title: "Обзор рабочего пространства",
-    description: "Первый рабочий продуктовый срез теперь работает через реальный логин, сессии и доступ к данным в рамках рабочего пространства.",
+    description:
+      "Первый рабочий продуктовый срез теперь работает через реальный логин, сессии и доступ к данным в рамках рабочего пространства.",
     settingsCta: "Проверить настройки",
     currentUserTitle: "Текущий пользователь",
-    currentUserDescription: "Защищенный доступ теперь управляется реальной операторской учетной записью.",
+    currentUserDescription:
+      "Защищенный доступ теперь управляется реальной операторской учетной записью.",
     currentWorkspaceTitle: "Текущее рабочее пространство",
-    currentWorkspaceDescription: "Текущее рабочее пространство определяется через активное участие пользователя.",
-    currentWorkspaceBody: "Запросы к данным и биллингу теперь привязаны к сессии пользователя и текущему рабочему пространству.",
+    currentWorkspaceDescription:
+      "Текущее рабочее пространство определяется через активное участие пользователя.",
+    currentWorkspaceBody:
+      "Запросы к данным и биллингу теперь привязаны к сессии пользователя и текущему рабочему пространству.",
     billingTitle: "Статус биллинга",
-    billingDescription: "Stripe уже заскэффолжен, но финальный checkout и webhooks намеренно отложены.",
+    billingDescription:
+      "Stripe уже заскэффолжен, но финальный checkout и webhooks намеренно отложены.",
     unconfigured: "Не настроено",
     plan: "План",
     notAssigned: "Не назначен",
     provider: "Провайдер",
     notConfigured: "Не настроен",
     reservedTitle: "Зарезервированные продуктовые зоны",
-    reservedDescription: "У рабочего пространства уже есть четкие границы для продуктовых операций без искусственных данных.",
+    reservedDescription:
+      "У рабочего пространства уже есть четкие границы для продуктовых операций без искусственных данных.",
     openPriceSheets: "Открыть прайс-листы",
   },
 } as const;
@@ -336,17 +361,23 @@ const settingsPageMessages = {
   en: {
     eyebrow: "Workspace settings",
     title: "Settings",
-    description: "This area holds workspace identity, authenticated user context, and Stripe readiness.",
+    description:
+      "This area holds workspace identity, authenticated user context, and Stripe readiness.",
     pricingCta: "Pricing page",
     workspaceTitle: "Workspace",
-    workspaceDescription: "Workspace access now resolves from the active authenticated membership.",
+    workspaceDescription:
+      "Workspace access now resolves from the active authenticated membership.",
     currentUserTitle: "Current user",
-    currentUserDescription: "The protected app now uses the real signed-in operator account.",
-    currentUserBody: "Sign out from the app shell to clear the current session cookie and block access again.",
+    currentUserDescription:
+      "The protected app now uses the real signed-in operator account.",
+    currentUserBody:
+      "Sign out from the app shell to clear the current session cookie and block access again.",
     subscriptionTitle: "Subscription",
-    subscriptionDescription: "Billing state is loaded from the workspace subscription record.",
+    subscriptionDescription:
+      "Billing state is loaded from the workspace subscription record.",
     stripeTitle: "Stripe scaffold",
-    stripeDescription: "The code path for billing setup exists, but checkout session creation is still intentionally blocked behind a scaffold response.",
+    stripeDescription:
+      "The code path for billing setup exists, but checkout session creation is still intentionally blocked behind a scaffold response.",
     configurationTitle: "Configuration",
     configurationReady: "All required Stripe keys are present.",
     configurationMissing: "Stripe is not fully configured yet.",
@@ -360,17 +391,23 @@ const settingsPageMessages = {
   ru: {
     eyebrow: "Настройки рабочего пространства",
     title: "Настройки",
-    description: "Здесь собраны данные рабочего пространства, контекст текущего пользователя и готовность Stripe.",
+    description:
+      "Здесь собраны данные рабочего пространства, контекст текущего пользователя и готовность Stripe.",
     pricingCta: "Страница тарифов",
     workspaceTitle: "Рабочее пространство",
-    workspaceDescription: "Доступ к рабочему пространству определяется через активное участие пользователя.",
+    workspaceDescription:
+      "Доступ к рабочему пространству определяется через активное участие пользователя.",
     currentUserTitle: "Текущий пользователь",
-    currentUserDescription: "Защищенное приложение теперь использует реальную вошедшую операторскую учетную запись.",
-    currentUserBody: "Выйдите через оболочку приложения, чтобы очистить cookie сессии и снова заблокировать доступ.",
+    currentUserDescription:
+      "Защищенное приложение теперь использует реальную вошедшую операторскую учетную запись.",
+    currentUserBody:
+      "Выйдите через оболочку приложения, чтобы очистить cookie сессии и снова заблокировать доступ.",
     subscriptionTitle: "Подписка",
-    subscriptionDescription: "Состояние биллинга загружается из записи подписки текущего рабочего пространства.",
+    subscriptionDescription:
+      "Состояние биллинга загружается из записи подписки текущего рабочего пространства.",
     stripeTitle: "Stripe scaffolding",
-    stripeDescription: "Кодовый путь для настройки биллинга уже существует, но создание checkout session по-прежнему намеренно заблокировано scaffold-ответом.",
+    stripeDescription:
+      "Кодовый путь для настройки биллинга уже существует, но создание checkout session по-прежнему намеренно заблокировано scaffold-ответом.",
     configurationTitle: "Конфигурация",
     configurationReady: "Все обязательные ключи Stripe присутствуют.",
     configurationMissing: "Stripe пока настроен не полностью.",
@@ -387,27 +424,32 @@ const importMarginMessages = {
   en: {
     badge: "Placeholder",
     title: "Import Margin",
-    description: "This route is intentionally reserved for a future import margin workflow and ships without demo content.",
+    description:
+      "This route is intentionally reserved for a future import margin workflow and ships without demo content.",
     nextStepTitle: "Next step",
-    nextStepDescription: "Add the domain model, ingestion flow, and reporting UI only when the product requirements are clear.",
+    nextStepDescription:
+      "Add the domain model, ingestion flow, and reporting UI only when the product requirements are clear.",
   },
   ru: {
     badge: "Заполнитель",
     title: "Import Margin",
-    description: "Этот маршрут намеренно зарезервирован под будущий workflow import margin и поставляется без демо-контента.",
+    description:
+      "Этот маршрут намеренно зарезервирован под будущий workflow import margin и поставляется без демо-контента.",
     nextStepTitle: "Следующий шаг",
-    nextStepDescription: "Добавляйте доменную модель, ingestion flow и отчетный UI только когда требования к продукту станут ясными.",
+    nextStepDescription:
+      "Добавляйте доменную модель, ingestion flow и отчетный UI только когда требования к продукту станут ясными.",
   },
 } as const;
 
 const priceSheetsMessages = {
   en: {
-    eyebrow: "Product area",
+    eyebrow: "Catalog",
     listTitle: "Price sheets",
-    listDescription: "Manage public price sheets for this workspace.",
-    listErrorDescription: "The workspace shell is ready, but the Price Sheets data layer could not be reached.",
+    listDescription: "Publish prices and review incoming requests.",
+    listErrorDescription:
+      "Price sheets could not be loaded. Try again in a moment.",
     newButton: "New Price Sheet",
-    searchPlaceholder: "Search by name, page address, or description",
+    searchPlaceholder: "Search price sheets",
     filterAll: "All",
     filterPublished: "Published",
     filterDraft: "Draft",
@@ -415,13 +457,15 @@ const priceSheetsMessages = {
     resultsOf: "of",
     loadMore: "Load more",
     noMatchingTitle: "No matching price sheets",
-    noMatchingDescription: "Try a different search or adjust the status filter for this workspace.",
+    noMatchingDescription: "Try another search or status.",
     clearSearchAndFilters: "Clear search and filters",
-    noMatchingHint: "Search checks names, page addresses, descriptions, and translated sheet content in this workspace.",
+    noMatchingHint:
+      "Search checks names, page addresses, descriptions, and translated sheet content in this workspace.",
     emptyTitle: "No price sheets yet",
-    emptyDescription: "Create the first sheet for this workspace and publish it when it is ready.",
+    emptyDescription: "Add services, prices, and a public request form.",
     firstSheetCta: "Create your first Price Sheet",
-    emptyHint: "Create the first sheet when you are ready to publish real pricing.",
+    emptyHint:
+      "Create the first sheet when you are ready to publish real pricing.",
     itemsCount: "items",
     publicPage: "Public page",
     editSheet: "Open",
@@ -433,9 +477,10 @@ const priceSheetsMessages = {
     unavailableTitle: "Price Sheets unavailable",
     createEyebrow: "Create",
     createTitle: "New Price Sheet",
-    createDescription: "Create a sheet for this workspace and add the first public pricing items.",
+    createDescription:
+      "Add the essentials first. You can refine the page before publishing.",
     editEyebrow: "Edit",
-    editDescription: "Update content, pricing, and publication settings for this sheet.",
+    editDescription: "Update the page, prices, and publication status.",
     backToList: "Back to price sheets",
     editUnavailableTitle: "Price Sheet unavailable",
     editUnavailableDescription: "The requested sheet could not be loaded.",
@@ -443,7 +488,7 @@ const priceSheetsMessages = {
     openInquiries: "Open inquiries",
     backToEditor: "Back to editor",
     inquiriesPageTitle: "Inbox",
-    inquiriesPageDescription: "Review inquiries received through this public price sheet.",
+    inquiriesPageDescription: "Requests received from this public page.",
     sheetContextTitle: "Price Sheet context",
     stateTitle: "Publishing",
     slugLabel: "Page address",
@@ -468,7 +513,8 @@ const priceSheetsMessages = {
     leadVisibilityBadge: "Inquiries",
     latestInquiry: "Latest inquiry",
     noInquiriesYet: "No inquiries yet",
-    latestInquiryEmpty: "New submissions from the public page will appear here.",
+    latestInquiryEmpty:
+      "New submissions from the public page will appear here.",
     inquiryReceived: "Received",
     notificationHintBadge: "Notifications",
     notificationHintTitle: "Inquiries and notifications",
@@ -484,9 +530,12 @@ const priceSheetsMessages = {
       "Submitted inquiries for this sheet appear here in one place, separate from pricing edits.",
     leadCountLabel: "Inquiries",
     noLeadsYet: "No inquiries yet",
-    draftLeadEmpty: "This Price Sheet is still in draft, so visitors cannot open it publicly or submit inquiries yet.",
-    hiddenLeadEmpty: "The public inquiry form is currently hidden. Enable it in the sheet settings when you want to start collecting inquiries.",
-    activeLeadEmpty: "The public inquiry form is active. When a visitor submits an inquiry from the published page, it will appear here immediately.",
+    draftLeadEmpty:
+      "This Price Sheet is still in draft, so visitors cannot open it publicly or submit inquiries yet.",
+    hiddenLeadEmpty:
+      "The public inquiry form is currently hidden. Enable it in the sheet settings when you want to start collecting inquiries.",
+    activeLeadEmpty:
+      "The public inquiry form is active. When a visitor submits an inquiry from the published page, it will appear here immediately.",
     email: "Email",
     phoneOrHandle: "Phone / handle",
     inquiry: "Inquiry",
@@ -494,12 +543,13 @@ const priceSheetsMessages = {
     statusDraft: "Draft",
   },
   ru: {
-    eyebrow: "Продуктовая зона",
+    eyebrow: "Каталог",
     listTitle: "Прайс-листы",
-    listDescription: "Управляйте публичными прайс-листами этого рабочего пространства.",
-    listErrorDescription: "Оболочка рабочего пространства готова, но слой данных прайс-листов сейчас недоступен.",
+    listDescription: "Публикуйте цены и просматривайте входящие заявки.",
+    listErrorDescription:
+      "Не удалось загрузить прайс-листы. Попробуйте ещё раз.",
     newButton: "Новый прайс-лист",
-    searchPlaceholder: "Поиск по названию, адресу страницы или описанию",
+    searchPlaceholder: "Поиск прайс-листов",
     filterAll: "Все",
     filterPublished: "Опубликованные",
     filterDraft: "Черновики",
@@ -507,13 +557,15 @@ const priceSheetsMessages = {
     resultsOf: "из",
     loadMore: "Показать еще",
     noMatchingTitle: "Подходящие прайс-листы не найдены",
-    noMatchingDescription: "Попробуйте другой запрос или измените статусный фильтр для этого рабочего пространства.",
+    noMatchingDescription: "Попробуйте другой запрос или статус.",
     clearSearchAndFilters: "Очистить поиск и фильтры",
-    noMatchingHint: "Поиск работает по названию, адресу страницы, описанию и переведенному контенту только внутри этого рабочего пространства.",
+    noMatchingHint:
+      "Поиск работает по названию, адресу страницы, описанию и переведенному контенту только внутри этого рабочего пространства.",
     emptyTitle: "Прайс-листов пока нет",
-    emptyDescription: "Создайте первый лист для этого рабочего пространства и опубликуйте его, когда он будет готов.",
+    emptyDescription: "Добавьте услуги, цены и публичную форму заявки.",
     firstSheetCta: "Создать первый прайс-лист",
-    emptyHint: "Создайте первый прайс-лист, когда будете готовы опубликовать реальные цены.",
+    emptyHint:
+      "Создайте первый прайс-лист, когда будете готовы опубликовать реальные цены.",
     itemsCount: "позиций",
     publicPage: "Публичная страница",
     editSheet: "Открыть",
@@ -525,9 +577,10 @@ const priceSheetsMessages = {
     unavailableTitle: "Прайс-листы недоступны",
     createEyebrow: "Создание",
     createTitle: "Новый прайс-лист",
-    createDescription: "Создайте лист в текущем рабочем пространстве и добавьте первые публичные ценовые позиции.",
+    createDescription:
+      "Начните с основного. Детали можно уточнить перед публикацией.",
     editEyebrow: "Редактирование",
-    editDescription: "Обновляйте контент, цены и настройки публикации этого прайс-листа.",
+    editDescription: "Обновляйте страницу, цены и статус публикации.",
     backToList: "Назад к прайс-листам",
     editUnavailableTitle: "Прайс-лист недоступен",
     editUnavailableDescription: "Запрошенный лист не удалось загрузить.",
@@ -535,7 +588,7 @@ const priceSheetsMessages = {
     openInquiries: "Открыть заявки",
     backToEditor: "Назад к редактору",
     inquiriesPageTitle: "Входящие",
-    inquiriesPageDescription: "Просматривайте заявки, полученные через публичный прайс-лист.",
+    inquiriesPageDescription: "Заявки, полученные с публичной страницы.",
     sheetContextTitle: "Контекст прайс-листа",
     stateTitle: "Публикация",
     slugLabel: "Адрес страницы",
@@ -560,7 +613,8 @@ const priceSheetsMessages = {
     leadVisibilityBadge: "Прием заявок",
     latestInquiry: "Последняя заявка",
     noInquiriesYet: "Заявок пока нет",
-    latestInquiryEmpty: "Новые заявки с публичной страницы будут появляться здесь.",
+    latestInquiryEmpty:
+      "Новые заявки с публичной страницы будут появляться здесь.",
     inquiryReceived: "Получено",
     notificationHintBadge: "Уведомления",
     notificationHintTitle: "Заявки и уведомления",
@@ -576,9 +630,12 @@ const priceSheetsMessages = {
       "Все заявки по этому прайс-листу собраны здесь отдельно от редактирования цен.",
     leadCountLabel: "Заявки",
     noLeadsYet: "Заявок пока нет",
-    draftLeadEmpty: "Этот прайс-лист пока в черновике, поэтому посетители не могут открыть его публично и отправить заявку.",
-    hiddenLeadEmpty: "Публичная форма заявок сейчас скрыта. Включите ее в настройках прайс-листа, когда захотите собирать заявки.",
-    activeLeadEmpty: "Публичная форма заявок активна. Когда посетитель отправит заявку с опубликованной страницы, она сразу появится здесь.",
+    draftLeadEmpty:
+      "Этот прайс-лист пока в черновике, поэтому посетители не могут открыть его публично и отправить заявку.",
+    hiddenLeadEmpty:
+      "Публичная форма заявок сейчас скрыта. Включите ее в настройках прайс-листа, когда захотите собирать заявки.",
+    activeLeadEmpty:
+      "Публичная форма заявок активна. Когда посетитель отправит заявку с опубликованной страницы, она сразу появится здесь.",
     email: "Почта",
     phoneOrHandle: "Телефон / контакт",
     inquiry: "Заявка",
@@ -591,7 +648,8 @@ const priceSheetFormMessages = {
   en: {
     validationErrors: "Validation errors",
     detailsTitleCreate: "Price Sheet details",
-    detailsDescription: "Choose the main content language and add a translation only if you need one.",
+    detailsDescription:
+      "Choose the main content language and add a translation only if you need one.",
     publishingSetupTitle: "Publishing setup",
     defaultContentLocale: "Default content locale",
     contentLanguage: "Content language",
@@ -654,7 +712,8 @@ const priceSheetFormMessages = {
   ru: {
     validationErrors: "Ошибки валидации",
     detailsTitleCreate: "Детали прайс-листа",
-    detailsDescription: "Выберите основной язык контента и при необходимости добавьте перевод.",
+    detailsDescription:
+      "Выберите основной язык контента и при необходимости добавьте перевод.",
     publishingSetupTitle: "Настройка публикации",
     defaultContentLocale: "Язык контента по умолчанию",
     contentLanguage: "Язык контента",
@@ -664,22 +723,22 @@ const priceSheetFormMessages = {
     slug: "Адрес страницы",
     appearanceSetupTitle: "Вид публичной страницы",
     theme: "Тема оформления",
-    themeAmber: "Amber",
-    themeSlate: "Slate",
-    themeStone: "Stone",
+    themeAmber: "Янтарная",
+    themeSlate: "Графитовая",
+    themeStone: "Каменная",
     presentationAppearance: "Внешний вид",
     presentationAppearanceDark: "Темный",
     presentationAppearanceLight: "Светлый",
     currency: "Валюта",
-    contactAndCtaTitle: "Публичные контакты и CTA",
+    contactAndCtaTitle: "Публичные контакты и кнопки",
     contactLabel: "Название бизнеса или контакта",
     contactEmail: "Контактная почта",
     contactPhone: "Телефон или мессенджер",
-    primaryCtaLabel: "Текст основной CTA",
+    primaryCtaLabel: "Текст основной кнопки",
     publicInquiryState: "Публичная форма заявок",
     publicInquiryEnabled: "Включена",
     publicInquiryHidden: "Скрыта",
-    secondaryCtaLabel: "Текст вторичной CTA",
+    secondaryCtaLabel: "Текст вторичной кнопки",
     inquiryText: "Подсказка под формой",
     businessDetailsTitle: "Детали бизнеса",
     businessLocation: "Локация или адрес",
@@ -703,7 +762,7 @@ const priceSheetFormMessages = {
     remove: "Удалить",
     sharedFields: "Общие поля",
     price: "Цена",
-    localizedContent: "Локализованный контент",
+    localizedContent: "Переведённый контент",
     name: "Название",
     category: "Категория / раздел",
     translatedName: "Название",
@@ -731,7 +790,8 @@ const priceSheetActionMessages = {
     createFailed: "Не удалось создать прайс-лист.",
     updateFailed: "Не удалось обновить прайс-лист.",
     chooseDifferentSlug: "Выберите другой адрес страницы.",
-    saveSuccess: "Изменения сохранены. Можно продолжать редактирование или публиковать лист.",
+    saveSuccess:
+      "Изменения сохранены. Можно продолжать редактирование или публиковать лист.",
   },
 } as const;
 
@@ -747,7 +807,8 @@ const priceSheetValidationMessages = {
     translatedSectionLong: "Category / section is too long.",
     priceRequired: "Price is required.",
     priceInvalid: "Price must be a valid amount.",
-    translatedItemNameRequired: "Item name is required when adding item copy for this language.",
+    translatedItemNameRequired:
+      "Item name is required when adding item copy for this language.",
     titleRequired: "Title is required.",
     titleLong: "Title is too long.",
     translatedTitleLong: "Title is too long.",
@@ -764,10 +825,12 @@ const priceSheetValidationMessages = {
     businessNoteLong: "Business note is too long.",
     slugRequired: "Page address is required.",
     slugLong: "Page address is too long.",
-    slugFormat: "Use lowercase letters, numbers, and hyphens in the page address.",
+    slugFormat:
+      "Use lowercase letters, numbers, and hyphens in the page address.",
     currencyCode: "Currency must be a 3-letter ISO code.",
     addOneItem: "Add at least one item.",
-    translatedTitleRequired: "Title is required when adding description copy for this language.",
+    translatedTitleRequired:
+      "Title is required when adding description copy for this language.",
   },
   ru: {
     payloadUnreadable: "Не удалось прочитать данные формы.",
@@ -780,7 +843,8 @@ const priceSheetValidationMessages = {
     translatedSectionLong: "Категория / раздел слишком длинные.",
     priceRequired: "Цена обязательна.",
     priceInvalid: "Цена должна быть корректной суммой.",
-    translatedItemNameRequired: "Укажите название позиции, если добавляете контент для этого языка.",
+    translatedItemNameRequired:
+      "Укажите название позиции, если добавляете контент для этого языка.",
     titleRequired: "Название обязательно.",
     titleLong: "Название слишком длинное.",
     translatedTitleLong: "Название слишком длинное.",
@@ -797,10 +861,12 @@ const priceSheetValidationMessages = {
     businessNoteLong: "Заметка о бизнесе слишком длинная.",
     slugRequired: "Укажите адрес страницы.",
     slugLong: "Адрес страницы слишком длинный.",
-    slugFormat: "Используйте в адресе страницы только строчные буквы, цифры и дефисы.",
+    slugFormat:
+      "Используйте в адресе страницы только строчные буквы, цифры и дефисы.",
     currencyCode: "Валюта должна быть 3-буквенным ISO-кодом.",
     addOneItem: "Добавьте хотя бы одну позицию.",
-    translatedTitleRequired: "Укажите название, если добавляете описание для этого языка.",
+    translatedTitleRequired:
+      "Укажите название, если добавляете описание для этого языка.",
   },
 } as const;
 

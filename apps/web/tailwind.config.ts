@@ -1,8 +1,12 @@
 import type { Config } from "tailwindcss";
 
 const config = {
-  darkMode: ["class"],
-  content: ["./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}", "../../packages/ui/src/**/*.{ts,tsx}"],
+  darkMode: ["selector", '[data-app-theme="dark"]'],
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "../../packages/ui/src/**/*.{ts,tsx}",
+  ],
   theme: {
     container: {
       center: true,
@@ -24,6 +28,8 @@ const config = {
         border: "hsl(var(--border))",
         card: "hsl(var(--card))",
         "card-foreground": "hsl(var(--card-foreground))",
+        destructive: "hsl(var(--destructive))",
+        "destructive-foreground": "hsl(var(--destructive-foreground))",
         foreground: "hsl(var(--foreground))",
         input: "hsl(var(--input))",
         muted: "hsl(var(--muted))",

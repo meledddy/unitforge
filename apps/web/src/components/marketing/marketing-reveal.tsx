@@ -20,7 +20,9 @@ export function MarketingReveal({
   ...props
 }: MarketingRevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [revealState, setRevealState] = useState<
+    "static" | "hidden" | "visible"
+  >("static");
 
   useEffect(() => {
     const element = ref.current;
@@ -29,10 +31,22 @@ export function MarketingReveal({
       return;
     }
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setIsVisible(true);
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      setRevealState("visible");
       return;
     }
+
+    const bounds = element.getBoundingClientRect();
+
+    if (bounds.bottom >= 0 && bounds.top <= window.innerHeight * 0.9) {
+      setRevealState("visible");
+      return;
+    }
+
+    setRevealState("hidden");
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -42,7 +56,8 @@ export function MarketingReveal({
           return;
         }
 
-        setIsVisible(true);
+        setRevealState("visible");
+        window.clearTimeout(failOpenTimer);
         observer.disconnect();
       },
       {
@@ -51,9 +66,14 @@ export function MarketingReveal({
       },
     );
 
+    const failOpenTimer = window.setTimeout(() => {
+      setRevealState("visible");
+      observer.disconnect();
+    }, 1_400);
     observer.observe(element);
 
     return () => {
+      window.clearTimeout(failOpenTimer);
       observer.disconnect();
     };
   }, []);
@@ -68,7 +88,7 @@ export function MarketingReveal({
         variant === "pricing" && "marketing-reveal-pricing",
         className,
       )}
-      data-marketing-reveal-state={isVisible ? "visible" : "hidden"}
+      data-marketing-reveal-state={revealState}
       style={
         {
           ...style,
