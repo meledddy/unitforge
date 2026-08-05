@@ -2,11 +2,19 @@ import { z } from "zod";
 
 import { getBillingPlan } from "./plans";
 
+const emptyStringToUndefined = (value: unknown) =>
+  typeof value === "string" && value.trim().length === 0 ? undefined : value;
+
+const optionalStripeValue = z.preprocess(
+  emptyStringToUndefined,
+  z.string().min(1).optional(),
+);
+
 const stripeScaffoldEnvSchema = z.object({
-  STRIPE_SECRET_KEY: z.string().min(1).optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-  STRIPE_PRICE_STUDIO_MONTHLY_ID: z.string().min(1).optional(),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
+  STRIPE_SECRET_KEY: optionalStripeValue,
+  STRIPE_WEBHOOK_SECRET: optionalStripeValue,
+  STRIPE_PRICE_STUDIO_MONTHLY_ID: optionalStripeValue,
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: optionalStripeValue,
 });
 
 export const stripeCheckoutRequestSchema = z.object({
@@ -18,13 +26,19 @@ export const stripeCheckoutRequestSchema = z.object({
 
 export type StripeCheckoutRequest = z.infer<typeof stripeCheckoutRequestSchema>;
 
-export function getStripeScaffoldState(env: Record<string, string | undefined>) {
+export function getStripeScaffoldState(
+  env: Record<string, string | undefined>,
+) {
   const parsed = stripeScaffoldEnvSchema.parse(env);
   const missingKeys = [
     !parsed.STRIPE_SECRET_KEY ? "STRIPE_SECRET_KEY" : null,
-    !parsed.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" : null,
+    !parsed.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      ? "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+      : null,
     !parsed.STRIPE_WEBHOOK_SECRET ? "STRIPE_WEBHOOK_SECRET" : null,
-    !parsed.STRIPE_PRICE_STUDIO_MONTHLY_ID ? "STRIPE_PRICE_STUDIO_MONTHLY_ID" : null,
+    !parsed.STRIPE_PRICE_STUDIO_MONTHLY_ID
+      ? "STRIPE_PRICE_STUDIO_MONTHLY_ID"
+      : null,
   ].filter((value): value is string => value !== null);
 
   return {
@@ -37,7 +51,10 @@ export function getStripeScaffoldState(env: Record<string, string | undefined>) 
   };
 }
 
-export function buildStripeCheckoutUrls(appUrl: string, input: Pick<StripeCheckoutRequest, "successPath" | "cancelPath">) {
+export function buildStripeCheckoutUrls(
+  appUrl: string,
+  input: Pick<StripeCheckoutRequest, "successPath" | "cancelPath">,
+) {
   const baseUrl = new URL(appUrl);
 
   return {

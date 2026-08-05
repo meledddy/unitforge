@@ -1,6 +1,5 @@
 export const appConfig = {
   name: "Unitforge",
-  description: "Monorepo foundation for launching and operating vertical SaaS products.",
-  supportEmail: "ops@unitforge.dev",
+  description:
+    "Public price pages and inquiry management for service businesses.",
 } as const;
-
