@@ -1,6 +1,7 @@
 import type { PriceSheetContentLocale } from "@/features/price-sheets/localization";
 import type { AppShellSession } from "@/server/current-session";
 import { findPublishedPriceSheetRecordBySlug } from "@/server/price-sheets/repository";
+import { hasSubscriptionAccess } from "@/server/subscription-access";
 
 import { PriceSheetLeadServiceError } from "./errors";
 import { tracePriceSheetLeadCreated } from "./notifications";
@@ -9,7 +10,10 @@ import {
   listPriceSheetLeadRecordsByWorkspaceAndPriceSheetId,
 } from "./repository";
 
-export { isPriceSheetLeadServiceError, PriceSheetLeadServiceError } from "./errors";
+export {
+  isPriceSheetLeadServiceError,
+  PriceSheetLeadServiceError,
+} from "./errors";
 
 export interface PriceSheetLeadView {
   id: string;
@@ -38,11 +42,20 @@ export async function createPublishedPriceSheetLead(
   const priceSheet = await findPublishedPriceSheetRecordBySlug(slug);
 
   if (!priceSheet) {
-    throw new PriceSheetLeadServiceError("NOT_PUBLIC", "This inquiry page is unavailable.");
+    throw new PriceSheetLeadServiceError(
+      "NOT_PUBLIC",
+      "This inquiry page is unavailable.",
+    );
   }
 
-  if (!priceSheet.publicSettings.inquiryEnabled) {
-    throw new PriceSheetLeadServiceError("INQUIRY_DISABLED", "This price sheet is not accepting inquiries.");
+  if (
+    !priceSheet.publicSettings.inquiryEnabled ||
+    !hasSubscriptionAccess(priceSheet.workspaceSubscription)
+  ) {
+    throw new PriceSheetLeadServiceError(
+      "INQUIRY_DISABLED",
+      "This price sheet is not accepting inquiries.",
+    );
   }
 
   const lead = await createPriceSheetLeadRecord({
@@ -69,8 +82,14 @@ export async function createPublishedPriceSheetLead(
   return lead;
 }
 
-export async function listWorkspacePriceSheetLeads(session: AppShellSession, priceSheetId: string) {
-  const records = await listPriceSheetLeadRecordsByWorkspaceAndPriceSheetId(session.currentWorkspace.id, priceSheetId);
+export async function listWorkspacePriceSheetLeads(
+  session: AppShellSession,
+  priceSheetId: string,
+) {
+  const records = await listPriceSheetLeadRecordsByWorkspaceAndPriceSheetId(
+    session.currentWorkspace.id,
+    priceSheetId,
+  );
 
   return records satisfies PriceSheetLeadView[];
 }

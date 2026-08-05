@@ -1,15 +1,31 @@
-import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from "@unitforge/ui";
+import {
+  Badge,
+  buttonVariants,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  cn,
+} from "@unitforge/ui";
 import Link from "next/link";
 
 import type { PriceSheetInterfaceLanguage } from "@/features/price-sheets/localization";
 import {
+  isPriceSheetContentLocaleAvailable,
   mapInterfaceLanguageToPriceSheetContentLocale,
   resolvePriceSheetContent,
   resolvePriceSheetInterfaceLanguage,
   resolvePriceSheetItemContent,
 } from "@/features/price-sheets/localization";
+import {
+  getPublicPriceSheetDisplayTitle,
+} from "@/features/price-sheets/public-display";
 import { PublicPriceSheetLeadForm } from "@/features/price-sheets/public-price-sheet-lead-form";
-import { getPublicPriceSheetTheme, type PublicPriceSheetTheme } from "@/features/price-sheets/public-theme";
+import {
+  getPublicPriceSheetTheme,
+  type PublicPriceSheetTheme,
+} from "@/features/price-sheets/public-theme";
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import type { PublishedPriceSheet } from "@/server/price-sheets/service";
 
@@ -20,23 +36,15 @@ interface PublicPriceSheetProps {
 }
 
 interface PublicPriceSheetCopy {
-  publishedEyebrow: string;
+  demoEyebrow: string;
   languageLabel: string;
-  catalogEyebrow: string;
-  summaryEyebrow: string;
-  summaryTitle: string;
   browseTitle: string;
-  browseDescription: string;
   allServicesTitle: string;
   generalSectionTitle: string;
   updatedLabel: string;
-  currencyLabel: string;
-  localeLabel: string;
   itemCountLabel: string;
-  sectionCountLabel: string;
-  contactEyebrow: string;
+  inquiryCta: string;
   contactTitle: string;
-  businessDetailsEyebrow: string;
   businessDetailsTitle: string;
   businessLocationLabel: string;
   businessHoursLabel: string;
@@ -66,25 +74,20 @@ interface BusinessDetail {
   value: string;
 }
 
-const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheetCopy> = {
+const publicPriceSheetCopy: Record<
+  PriceSheetInterfaceLanguage,
+  PublicPriceSheetCopy
+> = {
   en: {
-    publishedEyebrow: "Public price list",
+    demoEyebrow: "Unitforge demo",
     languageLabel: "Language",
-    catalogEyebrow: "Price list",
-    summaryEyebrow: "At a glance",
-    summaryTitle: "Pricing details",
     browseTitle: "Services and rates",
-    browseDescription: "Browse available services, compare sections, and use this page as the current customer-facing price reference.",
     allServicesTitle: "Services",
     generalSectionTitle: "General",
     updatedLabel: "Updated",
-    currencyLabel: "Currency",
-    localeLabel: "Content locale",
     itemCountLabel: "Items",
-    sectionCountLabel: "Sections",
-    contactEyebrow: "Contact",
+    inquiryCta: "Request a quote",
     contactTitle: "Get in touch",
-    businessDetailsEyebrow: "Business details",
     businessDetailsTitle: "Useful details",
     businessLocationLabel: "Address",
     businessHoursLabel: "Working hours",
@@ -96,23 +99,15 @@ const publicPriceSheetCopy: Record<PriceSheetInterfaceLanguage, PublicPriceSheet
     noItemsDescription: "Published service items have not been added yet.",
   },
   ru: {
-    publishedEyebrow: "Публичный прайс-лист",
+    demoEyebrow: "Демо Unitforge",
     languageLabel: "Язык",
-    catalogEyebrow: "Прайс-лист",
-    summaryEyebrow: "Кратко",
-    summaryTitle: "Детали прайса",
     browseTitle: "Услуги и цены",
-    browseDescription: "Просмотрите доступные услуги, сравните разделы и используйте эту страницу как актуальный прайс для клиентов.",
     allServicesTitle: "Услуги",
     generalSectionTitle: "Общее",
     updatedLabel: "Обновлено",
-    currencyLabel: "Валюта",
-    localeLabel: "Язык контента",
     itemCountLabel: "Позиции",
-    sectionCountLabel: "Разделы",
-    contactEyebrow: "Контакты",
+    inquiryCta: "Оставить заявку",
     contactTitle: "Связаться",
-    businessDetailsEyebrow: "О бизнесе",
     businessDetailsTitle: "Полезные детали",
     businessLocationLabel: "Адрес",
     businessHoursLabel: "Рабочие часы",
@@ -130,11 +125,39 @@ const supportedLanguageOptions = [
   { value: "ru", label: "RU" },
 ] as const;
 
-export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContentLanguage }: PublicPriceSheetProps) {
-  const interfaceLanguage: PriceSheetInterfaceLanguage = interfaceLocale;
+export function PublicPriceSheet({
+  interfaceLocale,
+  priceSheet,
+  requestedContentLanguage,
+}: PublicPriceSheetProps) {
+  const resolvedContentLanguage = resolvePriceSheetInterfaceLanguage(
+    requestedContentLanguage ?? interfaceLocale,
+    priceSheet.defaultContentLocale,
+  );
+  const requestedContentLocale = mapInterfaceLanguageToPriceSheetContentLocale(
+    resolvedContentLanguage,
+  );
+  const contentLocale = isPriceSheetContentLocaleAvailable({
+    defaultContentLocale: priceSheet.defaultContentLocale,
+    requestedContentLocale,
+    translations: priceSheet.translations,
+    items: priceSheet.items,
+  })
+    ? requestedContentLocale
+    : priceSheet.defaultContentLocale;
+  const interfaceLanguage: PriceSheetInterfaceLanguage =
+    contentLocale === "ru-RU" ? "ru" : "en";
   const copy = publicPriceSheetCopy[interfaceLanguage];
-  const contentLanguage = resolvePriceSheetInterfaceLanguage(requestedContentLanguage ?? interfaceLanguage, priceSheet.defaultContentLocale);
-  const contentLocale = mapInterfaceLanguageToPriceSheetContentLocale(contentLanguage);
+  const availableLanguageOptions = supportedLanguageOptions.filter((option) =>
+    isPriceSheetContentLocaleAvailable({
+      defaultContentLocale: priceSheet.defaultContentLocale,
+      requestedContentLocale: mapInterfaceLanguageToPriceSheetContentLocale(
+        option.value,
+      ),
+      translations: priceSheet.translations,
+      items: priceSheet.items,
+    }),
+  );
   const localizedSheet = resolvePriceSheetContent({
     defaultContentLocale: priceSheet.defaultContentLocale,
     requestedContentLocale: contentLocale,
@@ -161,205 +184,368 @@ export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContent
     } satisfies LocalizedPublicPriceSheetItem;
   });
   const theme = getPublicPriceSheetTheme(priceSheet.theme);
+  const isDemo = priceSheet.slug.startsWith("demo-");
+  const displayTitle = getPublicPriceSheetDisplayTitle({
+    isDemo,
+    title: localizedSheet.title,
+  });
   const sections = groupPriceSheetItems(localizedItems, copy);
-  const updatedAt = new Intl.DateTimeFormat(contentLocale, { dateStyle: "medium" }).format(priceSheet.updatedAt);
-  const introText = buildIntroText(priceSheet, sections.length, interfaceLanguage, contentLocale);
-  const summaryText = localizedSheet.description?.trim() || introText;
-  const publicContactActions = getPublicContactActions(priceSheet, localizedSheet.title, interfaceLanguage);
-  const businessDetails = getBusinessDetails(priceSheet, copy);
+  const updatedAt = new Intl.DateTimeFormat(contentLocale, {
+    dateStyle: "medium",
+  }).format(priceSheet.updatedAt);
+  const summaryText = localizedSheet.description?.trim() || null;
+  const publicContactActions = getPublicContactActions(
+    priceSheet,
+    displayTitle,
+    interfaceLanguage,
+  );
+  const businessDetails = getBusinessDetails(priceSheet, copy, {
+    includeBusinessNote: !isDemo,
+  });
   const hasPublicContactBlock =
     Boolean(priceSheet.publicSettings.contactEmail) ||
     Boolean(priceSheet.publicSettings.contactPhone) ||
     publicContactActions.length > 0;
+  const hasPublicRail =
+    priceSheet.publicSettings.inquiryEnabled ||
+    businessDetails.length > 0 ||
+    hasPublicContactBlock;
 
   return (
     <div
-      className={cn("relative isolate overflow-hidden pb-12 sm:pb-16", theme.pageClassName)}
-      data-price-sheet-appearance={priceSheet.publicSettings.presentationAppearance}
+      className={cn(
+        "relative isolate overflow-hidden pb-12 sm:pb-16",
+        priceSheet.publicSettings.inquiryEnabled && "pb-28 sm:pb-16",
+        theme.pageClassName,
+      )}
+      data-price-sheet-appearance={
+        priceSheet.publicSettings.presentationAppearance
+      }
       data-price-sheet-theme={theme.id}
     >
-      <div aria-hidden className={cn("absolute inset-x-0 top-0 h-[22rem] blur-3xl", theme.glowClassName)} />
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-0",
+          theme.glowClassName,
+        )}
+      />
 
-      <section className="container relative pt-7 sm:pt-10">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <Badge className={cn("w-fit px-3 py-1 text-xs uppercase tracking-[0.22em]", theme.eyebrowBadgeClassName)} variant="secondary">
-            {copy.publishedEyebrow}
-          </Badge>
+      <section className="container relative z-10 max-w-[1180px] pt-7 sm:pt-10">
+        {isDemo || availableLanguageOptions.length > 1 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {isDemo ? (
+              <Badge
+                className={cn(
+                  "w-fit px-3 py-1 text-xs uppercase tracking-[0.22em]",
+                  theme.eyebrowBadgeClassName,
+                )}
+                variant="secondary"
+              >
+                {copy.demoEyebrow}
+              </Badge>
+            ) : null}
 
+            {availableLanguageOptions.length > 1 ? (
+              <div
+                aria-label={copy.languageLabel}
+                className={cn(
+                  "ml-auto inline-flex items-center gap-1 rounded-full border p-1 shadow-sm",
+                  theme.languageShellClassName,
+                )}
+                role="group"
+              >
+                <span className="sr-only">{copy.languageLabel}</span>
+                {availableLanguageOptions.map((option) => {
+                  const isActive = option.value === interfaceLanguage;
+
+                  return (
+                    <Link
+                      key={option.value}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                        isActive
+                          ? theme.languageActiveClassName
+                          : theme.languageInactiveClassName,
+                      )}
+                      href={`/price-sheets/${priceSheet.slug}?lang=${option.value}`}
+                    >
+                      {option.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div
+          className={cn(
+            "grid gap-5 xl:items-start",
+            hasPublicRail && "xl:grid-cols-[minmax(0,1fr),300px]",
+            isDemo || availableLanguageOptions.length > 1
+              ? "mt-5 sm:mt-6"
+              : "mt-0",
+          )}
+        >
           <div
             className={cn(
-              "inline-flex w-full max-w-full items-center justify-between gap-2 rounded-full border px-2 py-2 shadow-sm sm:w-auto sm:justify-start",
-              theme.languageShellClassName,
+              "order-1 min-w-0 rounded-[1.85rem] border p-5 shadow-sm sm:p-7 xl:order-none xl:col-start-1 xl:row-start-1",
+              theme.heroSurfaceClassName,
             )}
           >
-            <span className={cn("px-2 text-xs font-medium uppercase tracking-[0.22em]", theme.languageLabelClassName)}>{copy.languageLabel}</span>
-            {supportedLanguageOptions.map((option) => {
-              const isActive = option.value === interfaceLanguage;
-
-              return (
-                <Link
-                  key={option.value}
-                  className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                    isActive ? theme.languageActiveClassName : theme.languageInactiveClassName,
-                  )}
-                  href={`/price-sheets/${priceSheet.slug}?lang=${option.value}`}
-                >
-                  {option.label}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-5 sm:mt-6 lg:grid-cols-[minmax(0,1fr),300px] lg:items-start xl:grid-cols-[minmax(0,1fr),320px]">
-          <div className="min-w-0 space-y-6 lg:space-y-7">
-            <div className={cn("min-w-0 rounded-[1.85rem] border p-5 shadow-sm sm:p-7", theme.heroSurfaceClassName)}>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                <div
-                  className={cn(
-                    "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm sm:h-16 sm:w-16",
-                    theme.heroMarkClassName,
-                  )}
-                >
-                  {getSheetMark(localizedSheet.title)}
-                </div>
-
-                <div className="min-w-0 space-y-2.5">
-                  <p className={cn("font-mono text-xs uppercase tracking-[0.28em]", theme.heroEyebrowClassName)}>{copy.catalogEyebrow}</p>
-                  <h1 className={cn("text-balance break-words text-3xl font-semibold tracking-tight sm:text-5xl", theme.heroTitleClassName)}>
-                    {localizedSheet.title}
-                  </h1>
-                  <p className={cn("max-w-3xl text-base leading-7 sm:text-lg sm:leading-8", theme.heroBodyClassName)}>{summaryText}</p>
-                </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div
+                aria-hidden="true"
+                className={cn(
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm sm:h-16 sm:w-16",
+                  theme.heroMarkClassName,
+                )}
+              >
+                {getSheetMark(displayTitle)}
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2.5">
-                <MetricChip label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
-                <MetricChip label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
-                <MetricChip label={copy.localeLabel} theme={theme} value={contentLocale} />
-                <MetricChip label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
-                <MetricChip label={copy.updatedLabel} theme={theme} value={updatedAt} />
+              <div className="min-w-0 space-y-2.5">
+                <h1
+                  className={cn(
+                    "text-balance break-words text-3xl font-semibold tracking-tight sm:text-5xl",
+                    theme.heroTitleClassName,
+                  )}
+                >
+                  {displayTitle}
+                </h1>
+                {summaryText ? (
+                  <p
+                    className={cn(
+                      "max-w-3xl text-base leading-7 sm:text-lg sm:leading-8",
+                      theme.heroBodyClassName,
+                    )}
+                  >
+                    {summaryText}
+                  </p>
+                ) : null}
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className={cn("font-mono text-xs uppercase tracking-[0.24em]", theme.heroEyebrowClassName)}>{copy.catalogEyebrow}</p>
-                <h2 className={cn("text-2xl font-semibold tracking-tight sm:text-3xl", theme.heroTitleClassName)}>{copy.browseTitle}</h2>
-                <p className={cn("max-w-2xl", theme.heroBodyClassName)}>{copy.browseDescription}</p>
-              </div>
-
-              {sections.length === 0 ? (
-                <Card className={cn("rounded-[1.6rem]", theme.sectionCardClassName)}>
-                  <CardHeader>
-                    <CardTitle className={theme.heroTitleClassName}>{copy.noItemsTitle}</CardTitle>
-                    <CardDescription className={theme.heroBodyClassName}>{copy.noItemsDescription}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ) : (
-                sections.map((section) => (
-                  <Card key={section.title} className={cn("overflow-hidden rounded-[1.6rem]", theme.sectionCardClassName)}>
-                    <CardHeader className={cn("gap-2 border-b p-5", theme.sectionHeaderClassName)}>
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <CardTitle className={cn("text-xl", theme.heroTitleClassName)}>{section.title}</CardTitle>
-                        <Badge className={theme.sectionBadgeClassName} variant="outline">
-                          {formatSectionItemCount(section.items.length, interfaceLanguage)}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3 p-4 sm:p-5">
-                      {section.items.map((item) => (
-                        <article
-                          key={item.id}
-                          className={cn(
-                            "grid gap-3 rounded-[1.25rem] border p-4 sm:grid-cols-[minmax(0,1fr),auto] sm:items-start sm:gap-5 sm:p-5",
-                            theme.itemSurfaceClassName,
-                          )}
-                        >
-                          <div className="space-y-1.5">
-                            <h3 className={cn("text-lg font-semibold", theme.itemTitleClassName)}>{item.name}</h3>
-                            {item.description ? <p className={cn("max-w-2xl text-sm leading-6", theme.itemDescriptionClassName)}>{item.description}</p> : null}
-                          </div>
-
-                          <div className="sm:text-right">
-                            <p className={cn("text-xl font-semibold tracking-tight", theme.priceClassName)}>
-                              {formatPublicPrice(item.priceCents, priceSheet.currency, contentLocale)}
-                            </p>
-                          </div>
-                        </article>
-                      ))}
-                    </CardContent>
-                  </Card>
-                ))
+            <div
+              className={cn(
+                "mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-4 text-sm",
+                theme.heroMetaClassName,
               )}
+            >
+              <span>
+                {copy.itemCountLabel}: {priceSheet.items.length}
+              </span>
+              <span aria-hidden>·</span>
+              <span>
+                {copy.updatedLabel}: {updatedAt}
+              </span>
             </div>
+
+            {priceSheet.publicSettings.inquiryEnabled ? (
+              <Link
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "mt-5 w-full rounded-full sm:w-auto",
+                  theme.primaryButtonClassName,
+                )}
+                href="#inquiry"
+              >
+                {copy.inquiryCta}
+              </Link>
+            ) : null}
           </div>
 
-          <aside className="space-y-4 lg:space-y-5">
-            <Card className={cn("rounded-[1.6rem]", theme.summaryCardClassName)}>
-              <CardHeader className="space-y-3 p-5 pb-3">
-                <Badge className={cn("w-fit", theme.summaryBadgeClassName)} variant="outline">
-                  {copy.summaryEyebrow}
-                </Badge>
-                <CardTitle className={cn("text-xl", theme.summaryTitleClassName)}>{copy.summaryTitle}</CardTitle>
-                <CardDescription className={theme.summaryDescriptionClassName}>{introText}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 p-5 pt-0">
-                <DetailRow label={copy.currencyLabel} theme={theme} value={priceSheet.currency} />
-                <DetailRow label={copy.localeLabel} theme={theme} value={contentLocale} />
-                <DetailRow label={copy.updatedLabel} theme={theme} value={updatedAt} />
-                <DetailRow label={copy.itemCountLabel} theme={theme} value={String(priceSheet.items.length)} />
-                <DetailRow label={copy.sectionCountLabel} theme={theme} value={String(sections.length)} />
-                {priceSheet.publicSettings.contactLabel ? <DetailRow label={copy.contactEyebrow} theme={theme} value={priceSheet.publicSettings.contactLabel} /> : null}
-              </CardContent>
-            </Card>
+          <div className="order-2 min-w-0 space-y-4 xl:order-none xl:col-start-1 xl:row-start-2">
+            <div>
+              <h2
+                className={cn(
+                  "text-2xl font-semibold tracking-tight sm:text-3xl",
+                  theme.heroTitleClassName,
+                )}
+              >
+                {copy.browseTitle}
+              </h2>
+            </div>
+
+            {sections.length === 0 ? (
+              <Card
+                className={cn("rounded-[1.6rem]", theme.sectionCardClassName)}
+              >
+                <CardHeader>
+                  <CardTitle className={theme.heroTitleClassName}>
+                    {copy.noItemsTitle}
+                  </CardTitle>
+                  <CardDescription className={theme.heroBodyClassName}>
+                    {copy.noItemsDescription}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ) : (
+              sections.map((section) => (
+                <Card
+                  key={section.title}
+                  className={cn(
+                    "overflow-hidden rounded-[1.6rem]",
+                    theme.sectionCardClassName,
+                  )}
+                >
+                  <CardHeader
+                    className={cn(
+                      "border-b px-5 py-4",
+                      theme.sectionHeaderClassName,
+                    )}
+                  >
+                    <CardTitle
+                      className={cn("text-lg", theme.heroTitleClassName)}
+                    >
+                      {section.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="divide-y divide-[hsl(var(--ps-border)/0.58)] p-0">
+                    {section.items.map((item) => (
+                      <article
+                        key={item.id}
+                        className={cn(
+                          "grid gap-2 px-5 py-4 sm:grid-cols-[minmax(0,1fr),9.5rem] sm:items-start sm:gap-6 sm:py-5",
+                          theme.itemSurfaceClassName,
+                        )}
+                      >
+                        <div className="space-y-1.5">
+                          <h3
+                            className={cn(
+                              "text-lg font-semibold",
+                              theme.itemTitleClassName,
+                            )}
+                          >
+                            {item.name}
+                          </h3>
+                          {item.description ? (
+                            <p
+                              className={cn(
+                                "max-w-2xl text-sm leading-6",
+                                theme.itemDescriptionClassName,
+                              )}
+                            >
+                              {item.description}
+                            </p>
+                          ) : null}
+                        </div>
+
+                        <div className="min-w-[9.5rem] sm:text-right">
+                          <p
+                            className={cn(
+                              "whitespace-nowrap text-lg font-semibold tabular-nums tracking-tight",
+                              theme.priceClassName,
+                            )}
+                          >
+                            {formatPublicPrice(
+                              item.priceCents,
+                              priceSheet.currency,
+                              contentLocale,
+                            )}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+
+          {hasPublicRail ? (
+            <aside
+              className={cn(
+                "order-3 space-y-4 xl:order-none xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:space-y-5",
+                !priceSheet.publicSettings.inquiryEnabled &&
+                  "xl:sticky xl:top-24",
+              )}
+            >
+            {priceSheet.publicSettings.inquiryEnabled ? (
+              <PublicPriceSheetLeadForm
+                inquiryEnabled
+                interfaceLanguage={interfaceLanguage}
+                locale={contentLocale}
+                priceSheetSlug={priceSheet.slug}
+                theme={theme}
+              />
+            ) : null}
 
             {businessDetails.length > 0 ? (
               <Card className={cn("rounded-[1.6rem]", theme.railCardClassName)}>
-                <CardHeader className="space-y-3 p-5 pb-3">
-                  <Badge className={cn("w-fit", theme.railBadgeClassName)} variant="secondary">
-                    {copy.businessDetailsEyebrow}
-                  </Badge>
-                  <CardTitle className={theme.summaryTitleClassName}>{copy.businessDetailsTitle}</CardTitle>
+                <CardHeader className="border-b border-[hsl(var(--ps-border)/0.58)] px-5 py-4">
+                  <CardTitle
+                    className={cn("text-base", theme.summaryTitleClassName)}
+                  >
+                    {copy.businessDetailsTitle}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 p-5 pt-0">
+                <CardContent className="divide-y divide-[hsl(var(--ps-border)/0.58)] p-0">
                   {businessDetails.map((detail, index) => (
-                    <DetailRow key={`${detail.label}-${index}`} label={detail.label} theme={theme} value={detail.value} />
+                    <DetailRow
+                      key={`${detail.label}-${index}`}
+                      label={detail.label}
+                      theme={theme}
+                      value={detail.value}
+                    />
                   ))}
                 </CardContent>
               </Card>
             ) : null}
 
             {hasPublicContactBlock ? (
-              <Card id="contact" className={cn("rounded-[1.6rem]", theme.railCardClassName)}>
-                <CardHeader className="space-y-3 p-5 pb-3">
-                  <Badge className={cn("w-fit", theme.railBadgeClassName)} variant="secondary">
-                    {copy.contactEyebrow}
-                  </Badge>
-                  <CardTitle className={theme.summaryTitleClassName}>{priceSheet.publicSettings.contactLabel || copy.contactTitle}</CardTitle>
+              <Card
+                id="contact"
+                className={cn("rounded-[1.6rem]", theme.railCardClassName)}
+              >
+                <CardHeader className="border-b border-[hsl(var(--ps-border)/0.58)] px-5 py-4">
+                  <CardTitle
+                    className={cn("text-base", theme.summaryTitleClassName)}
+                  >
+                    {priceSheet.publicSettings.contactLabel ||
+                      copy.contactTitle}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 p-5 pt-0">
-                  {priceSheet.publicSettings.contactEmail ? (
-                    <ContactRow
-                      href={buildEmailHref(priceSheet.publicSettings.contactEmail, localizedSheet.title, interfaceLanguage)}
-                      label={copy.emailLabel}
-                      theme={theme}
-                      value={priceSheet.publicSettings.contactEmail}
-                    />
-                  ) : null}
+                <CardContent className="p-0">
+                  <div className="divide-y divide-[hsl(var(--ps-border)/0.58)]">
+                    {priceSheet.publicSettings.contactEmail ? (
+                      <ContactRow
+                        href={buildEmailHref(
+                          priceSheet.publicSettings.contactEmail,
+                          displayTitle,
+                          interfaceLanguage,
+                        )}
+                        label={copy.emailLabel}
+                        theme={theme}
+                        value={priceSheet.publicSettings.contactEmail}
+                      />
+                    ) : null}
 
-                  {priceSheet.publicSettings.contactPhone ? (
-                    <ContactRow
-                      href={buildPhoneHref(priceSheet.publicSettings.contactPhone) ?? undefined}
-                      label={copy.phoneLabel}
-                      theme={theme}
-                      value={priceSheet.publicSettings.contactPhone}
-                    />
-                  ) : null}
+                    {priceSheet.publicSettings.contactPhone ? (
+                      <ContactRow
+                        href={
+                          buildPhoneHref(
+                            priceSheet.publicSettings.contactPhone,
+                          ) ?? undefined
+                        }
+                        label={copy.phoneLabel}
+                        theme={theme}
+                        value={priceSheet.publicSettings.contactPhone}
+                      />
+                    ) : null}
+                  </div>
 
                   {publicContactActions.length > 0 ? (
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    <div
+                      className={cn(
+                        "grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-1",
+                        (priceSheet.publicSettings.contactEmail ||
+                          priceSheet.publicSettings.contactPhone) &&
+                          "border-t border-[hsl(var(--ps-border)/0.58)]",
+                      )}
+                    >
                       {publicContactActions.map((action, index) => (
                         <Link
                           key={`${action.label}-${action.href}`}
@@ -369,7 +555,9 @@ export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContent
                               variant: index === 0 ? "default" : "outline",
                             }),
                             "w-full",
-                            index === 0 ? theme.primaryButtonClassName : theme.secondaryButtonClassName,
+                            index === 0
+                              ? theme.primaryButtonClassName
+                              : theme.secondaryButtonClassName,
                           )}
                           href={action.href}
                         >
@@ -381,35 +569,56 @@ export function PublicPriceSheet({ interfaceLocale, priceSheet, requestedContent
                 </CardContent>
               </Card>
             ) : null}
-
-            <PublicPriceSheetLeadForm
-              inquiryEnabled={priceSheet.publicSettings.inquiryEnabled}
-              interfaceLanguage={interfaceLanguage}
-              locale={contentLocale}
-              priceSheetSlug={priceSheet.slug}
-              theme={theme}
-            />
-          </aside>
+            </aside>
+          ) : null}
         </div>
       </section>
+
+      {priceSheet.publicSettings.inquiryEnabled ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[hsl(var(--ps-border)/0.76)] bg-[hsl(var(--ps-surface)/0.92)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-18px_48px_-30px_hsl(var(--ps-shadow)/0.42)] backdrop-blur-xl xl:hidden">
+          <Link
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "mx-auto flex w-full max-w-md rounded-full",
+              theme.primaryButtonClassName,
+            )}
+            href="#inquiry"
+          >
+            {copy.inquiryCta}
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function MetricChip({ label, theme, value }: { label: string; theme: PublicPriceSheetTheme; value: string }) {
+function DetailRow({
+  label,
+  theme,
+  value,
+}: {
+  label: string;
+  theme: PublicPriceSheetTheme;
+  value: string;
+}) {
   return (
-    <div className={cn("rounded-full border px-3.5 py-2 shadow-sm", theme.metricChipClassName)}>
-      <p className={cn("text-xs uppercase tracking-[0.18em]", theme.metricChipLabelClassName)}>{label}</p>
-      <p className={cn("mt-1 text-sm font-semibold", theme.metricChipValueClassName)}>{value}</p>
-    </div>
-  );
-}
-
-function DetailRow({ label, theme, value }: { label: string; theme: PublicPriceSheetTheme; value: string }) {
-  return (
-    <div className={cn("flex items-center justify-between gap-4 rounded-2xl border px-4 py-3", theme.detailRowClassName)}>
-      <span className={cn("text-sm", theme.detailRowLabelClassName)}>{label}</span>
-      <span className={cn("min-w-0 text-right text-sm font-medium", theme.detailRowValueClassName)}>{value}</span>
+    <div className={cn("grid gap-1 px-5 py-3.5", theme.detailRowClassName)}>
+      <span
+        className={cn(
+          "text-xs uppercase tracking-[0.14em]",
+          theme.detailRowLabelClassName,
+        )}
+      >
+        {label}
+      </span>
+      <span
+        className={cn(
+          "min-w-0 break-words text-sm font-medium leading-5",
+          theme.detailRowValueClassName,
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -426,22 +635,40 @@ function ContactRow({
   theme: PublicPriceSheetTheme;
 }) {
   const content = href ? (
-    <Link className={cn("break-all font-medium hover:underline", theme.contactValueClassName)} href={href}>
+    <Link
+      className={cn(
+        "break-all font-medium hover:underline",
+        theme.contactValueClassName,
+      )}
+      href={href}
+    >
       {value}
     </Link>
   ) : (
-    <span className={cn("break-all font-medium", theme.contactValueClassName)}>{value}</span>
+    <span className={cn("break-all font-medium", theme.contactValueClassName)}>
+      {value}
+    </span>
   );
 
   return (
-    <div className={cn("rounded-2xl border px-4 py-3", theme.contactRowClassName)}>
-      <p className={cn("text-xs uppercase tracking-[0.18em]", theme.contactLabelClassName)}>{label}</p>
-      <div className="mt-2 text-sm">{content}</div>
+    <div className={cn("px-5 py-3.5", theme.contactRowClassName)}>
+      <p
+        className={cn(
+          "text-xs uppercase tracking-[0.18em]",
+          theme.contactLabelClassName,
+        )}
+      >
+        {label}
+      </p>
+      <div className="mt-1.5 text-sm leading-5">{content}</div>
     </div>
   );
 }
 
-function groupPriceSheetItems(items: LocalizedPublicPriceSheetItem[], copy: PublicPriceSheetCopy) {
+function groupPriceSheetItems(
+  items: LocalizedPublicPriceSheetItem[],
+  copy: PublicPriceSheetCopy,
+) {
   if (items.length === 0) {
     return [] satisfies PriceSheetSection[];
   }
@@ -454,31 +681,27 @@ function groupPriceSheetItems(items: LocalizedPublicPriceSheetItem[], copy: Publ
     groups.set(key, [...existingItems, item]);
   }
 
-  const hasNamedSections = Array.from(groups.keys()).some((key) => key.length > 0);
+  const hasNamedSections = Array.from(groups.keys()).some(
+    (key) => key.length > 0,
+  );
 
   return Array.from(groups.entries()).map(([key, groupedItems]) => ({
-    title: key || (hasNamedSections ? copy.generalSectionTitle : copy.allServicesTitle),
+    title:
+      key ||
+      (hasNamedSections ? copy.generalSectionTitle : copy.allServicesTitle),
     items: groupedItems,
   })) satisfies PriceSheetSection[];
 }
 
-function buildIntroText(
-  priceSheet: PublishedPriceSheet,
-  sectionCount: number,
-  interfaceLanguage: PriceSheetInterfaceLanguage,
-  contentLocale: string,
+function buildEmailHref(
+  contactEmail: string,
+  title: string,
+  language: PriceSheetInterfaceLanguage,
 ) {
-  const updatedAt = new Intl.DateTimeFormat(contentLocale, { dateStyle: "long" }).format(priceSheet.updatedAt);
-
-  if (interfaceLanguage === "ru") {
-    return `В прайс-листе ${priceSheet.items.length} позиций в ${sectionCount} разделах. Цены указаны в ${priceSheet.currency}, обновлено ${updatedAt}.`;
-  }
-
-  return `This sheet includes ${priceSheet.items.length} priced items across ${sectionCount} sections. Prices are shown in ${priceSheet.currency}, updated ${updatedAt}.`;
-}
-
-function buildEmailHref(contactEmail: string, title: string, language: PriceSheetInterfaceLanguage) {
-  const subject = language === "ru" ? `Запрос по прайс-листу: ${title}` : `Price sheet inquiry: ${title}`;
+  const subject =
+    language === "ru"
+      ? `Запрос по прайс-листу: ${title}`
+      : `Price sheet inquiry: ${title}`;
 
   return `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}`;
 }
@@ -486,7 +709,10 @@ function buildEmailHref(contactEmail: string, title: string, language: PriceShee
 function buildPhoneHref(contactPhone: string) {
   const trimmedValue = contactPhone.trim();
 
-  if (trimmedValue.startsWith("http://") || trimmedValue.startsWith("https://")) {
+  if (
+    trimmedValue.startsWith("http://") ||
+    trimmedValue.startsWith("https://")
+  ) {
     return trimmedValue;
   }
 
@@ -495,7 +721,9 @@ function buildPhoneHref(contactPhone: string) {
   }
 
   if (trimmedValue.includes("t.me/")) {
-    return trimmedValue.startsWith("http") ? trimmedValue : `https://${trimmedValue}`;
+    return trimmedValue.startsWith("http")
+      ? trimmedValue
+      : `https://${trimmedValue}`;
   }
 
   const normalizedPhone = trimmedValue.replace(/(?!^\+)[^\d]/g, "");
@@ -503,12 +731,22 @@ function buildPhoneHref(contactPhone: string) {
   return normalizedPhone.length >= 6 ? `tel:${normalizedPhone}` : null;
 }
 
-function getPublicContactActions(priceSheet: PublishedPriceSheet, localizedTitle: string, interfaceLanguage: PriceSheetInterfaceLanguage) {
+function getPublicContactActions(
+  priceSheet: PublishedPriceSheet,
+  localizedTitle: string,
+  interfaceLanguage: PriceSheetInterfaceLanguage,
+) {
   const actions: Array<{ label: string; href: string }> = [];
   const emailHref = priceSheet.publicSettings.contactEmail
-    ? buildEmailHref(priceSheet.publicSettings.contactEmail, localizedTitle, interfaceLanguage)
+    ? buildEmailHref(
+        priceSheet.publicSettings.contactEmail,
+        localizedTitle,
+        interfaceLanguage,
+      )
     : null;
-  const phoneHref = priceSheet.publicSettings.contactPhone ? buildPhoneHref(priceSheet.publicSettings.contactPhone) : null;
+  const phoneHref = priceSheet.publicSettings.contactPhone
+    ? buildPhoneHref(priceSheet.publicSettings.contactPhone)
+    : null;
 
   if (emailHref && priceSheet.publicSettings.primaryCtaLabel) {
     actions.push({
@@ -519,7 +757,8 @@ function getPublicContactActions(priceSheet: PublishedPriceSheet, localizedTitle
 
   const phoneLabel = emailHref
     ? priceSheet.publicSettings.secondaryCtaLabel
-    : priceSheet.publicSettings.primaryCtaLabel ?? priceSheet.publicSettings.secondaryCtaLabel;
+    : (priceSheet.publicSettings.primaryCtaLabel ??
+      priceSheet.publicSettings.secondaryCtaLabel);
 
   if (phoneHref && phoneLabel) {
     actions.push({
@@ -531,28 +770,56 @@ function getPublicContactActions(priceSheet: PublishedPriceSheet, localizedTitle
   return actions;
 }
 
-function getBusinessDetails(priceSheet: PublishedPriceSheet, copy: PublicPriceSheetCopy) {
+function getBusinessDetails(
+  priceSheet: PublishedPriceSheet,
+  copy: PublicPriceSheetCopy,
+  { includeBusinessNote }: { includeBusinessNote: boolean },
+) {
   const details = [
-    createBusinessDetail(copy.businessLocationLabel, priceSheet.publicSettings.businessLocation),
-    createBusinessDetail(copy.businessHoursLabel, priceSheet.publicSettings.businessHours),
-    createBusinessDetail(copy.businessResponseTimeLabel, priceSheet.publicSettings.businessResponseTime),
-    createBusinessDetail(copy.businessNoteLabel, priceSheet.publicSettings.businessNote),
+    createBusinessDetail(
+      copy.businessLocationLabel,
+      priceSheet.publicSettings.businessLocation,
+    ),
+    createBusinessDetail(
+      copy.businessHoursLabel,
+      priceSheet.publicSettings.businessHours,
+    ),
+    createBusinessDetail(
+      copy.businessResponseTimeLabel,
+      priceSheet.publicSettings.businessResponseTime,
+    ),
+    includeBusinessNote
+      ? createBusinessDetail(
+          copy.businessNoteLabel,
+          priceSheet.publicSettings.businessNote,
+        )
+      : null,
   ].filter((detail): detail is BusinessDetail => Boolean(detail));
 
   if (details.length > 0) {
     return details;
   }
 
-  return parseLegacyBusinessDetails(priceSheet.publicSettings.inquiryText, copy);
+  return parseLegacyBusinessDetails(
+    priceSheet.publicSettings.inquiryText,
+    copy,
+    { includeBusinessNote },
+  );
 }
 
 function createBusinessDetail(label: string, value: string | null) {
   const trimmedValue = value?.trim();
 
-  return trimmedValue ? ({ label, value: trimmedValue } satisfies BusinessDetail) : null;
+  return trimmedValue
+    ? ({ label, value: trimmedValue } satisfies BusinessDetail)
+    : null;
 }
 
-function parseLegacyBusinessDetails(value: string | null, copy: PublicPriceSheetCopy) {
+function parseLegacyBusinessDetails(
+  value: string | null,
+  copy: PublicPriceSheetCopy,
+  { includeBusinessNote }: { includeBusinessNote: boolean },
+) {
   const trimmedValue = value?.trim();
 
   if (!trimmedValue) {
@@ -575,16 +842,29 @@ function parseLegacyBusinessDetails(value: string | null, copy: PublicPriceSheet
         value: match[2]!.trim(),
       } satisfies BusinessDetail;
     })
-    .filter((detail): detail is BusinessDetail => Boolean(detail && detail.value));
+    .filter((detail): detail is BusinessDetail =>
+      Boolean(
+        detail &&
+        detail.value &&
+        (includeBusinessNote || detail.label !== copy.businessNoteLabel),
+      ),
+    );
 
   if (parsedRows.length > 0) {
     return parsedRows;
   }
 
-  return [{ label: copy.businessNoteLabel, value: trimmedValue }] satisfies BusinessDetail[];
+  return includeBusinessNote
+    ? ([
+        { label: copy.businessNoteLabel, value: trimmedValue },
+      ] satisfies BusinessDetail[])
+    : ([] satisfies BusinessDetail[]);
 }
 
-function resolveLegacyBusinessDetailLabel(label: string, copy: PublicPriceSheetCopy) {
+function resolveLegacyBusinessDetailLabel(
+  label: string,
+  copy: PublicPriceSheetCopy,
+) {
   const normalizedLabel = label.toLowerCase();
 
   if (/(address|location|адрес|локац)/i.test(normalizedLabel)) {
@@ -606,19 +886,18 @@ function resolveLegacyBusinessDetailLabel(label: string, copy: PublicPriceSheetC
   return label;
 }
 
-function formatPublicPrice(priceCents: number, currency: string, locale: string) {
+function formatPublicPrice(
+  priceCents: number,
+  currency: string,
+  locale: string,
+) {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
+    ...(currency.toUpperCase() === "AMD"
+      ? { minimumFractionDigits: 0, maximumFractionDigits: 0 }
+      : {}),
   }).format(priceCents / 100);
-}
-
-function formatSectionItemCount(itemCount: number, language: PriceSheetInterfaceLanguage) {
-  if (language === "ru") {
-    return `${itemCount} поз.`;
-  }
-
-  return itemCount === 1 ? "1 item" : `${itemCount} items`;
 }
 
 function getSheetMark(title: string) {

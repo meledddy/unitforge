@@ -2,7 +2,10 @@ import { z } from "zod";
 
 import { priceSheetContentLocaleSchema } from "@/features/price-sheets/validation";
 
-import type { PriceSheetContentLocale, PriceSheetInterfaceLanguage } from "./localization";
+import type {
+  PriceSheetContentLocale,
+  PriceSheetInterfaceLanguage,
+} from "./localization";
 
 export interface PriceSheetLeadFormCopy {
   eyebrow: string;
@@ -21,8 +24,12 @@ export interface PriceSheetLeadFormCopy {
   successTitle: string;
   successDescription: string;
   submitAnotherLabel: string;
+  privacyNotice: string;
+  privacyLinkLabel: string;
   hiddenTitle: string;
   hiddenDescription: string;
+  demoHiddenTitle: string;
+  demoHiddenDescription: string;
   errorMessage: string;
   unavailableMessage: string;
   validationTitle: string;
@@ -38,49 +45,66 @@ export interface PriceSheetLeadSubmissionInput {
   message: string;
 }
 
-const priceSheetLeadCopy: Record<PriceSheetInterfaceLanguage, PriceSheetLeadFormCopy> = {
+const priceSheetLeadCopy: Record<
+  PriceSheetInterfaceLanguage,
+  PriceSheetLeadFormCopy
+> = {
   en: {
-    eyebrow: "Inquiry",
-    title: "Send an inquiry",
-    description: "Share your request and leave the best contact details for a follow-up.",
-    helperText: "Ask about listed services, timing, price details, or a custom request.",
+    eyebrow: "",
+    title: "Request a quote",
+    description: "Tell this business what you need and how to contact you.",
+    helperText: "",
     contactNameLabel: "Contact name",
     companyNameLabel: "Company or business name",
     emailLabel: "Email",
     phoneLabel: "Phone or handle",
     messageLabel: "What do you need?",
-    openFormLabel: "Ask about these services",
+    openFormLabel: "Request a quote",
     closeFormLabel: "Hide form",
     submitLabel: "Send inquiry",
     submittingLabel: "Sending...",
-    successTitle: "Inquiry sent",
-    successDescription: "Your request has been saved. Follow-up can continue through the contact details you provided.",
+    successTitle: "Thank you",
+    successDescription:
+      "Your request and contact details have been shared with this business.",
     submitAnotherLabel: "Send another inquiry",
+    privacyNotice:
+      "Your details are shared with this business. Unitforge processes them to deliver the inquiry.",
+    privacyLinkLabel: "Privacy",
     hiddenTitle: "Inquiry form unavailable",
-    hiddenDescription: "This price sheet is currently not accepting public inquiries.",
+    hiddenDescription:
+      "This price sheet is currently not accepting public inquiries.",
+    demoHiddenTitle: "Inquiry preview",
+    demoHiddenDescription:
+      "Submissions are disabled in this demo. On a live page, the form sends each request to the operator inbox.",
     errorMessage: "Check the highlighted fields and try again.",
     unavailableMessage: "This inquiry page is unavailable.",
     validationTitle: "Please review the form",
   },
   ru: {
-    eyebrow: "Запрос",
-    title: "Отправить запрос",
-    description: "Опишите задачу и оставьте удобные контакты для ответа.",
-    helperText: "Можно спросить об услугах, сроках, деталях цены или нестандартной задаче.",
+    eyebrow: "",
+    title: "Оставить заявку",
+    description: "Опишите задачу и оставьте контакты для связи.",
+    helperText: "",
     contactNameLabel: "Контактное лицо",
     companyNameLabel: "Компания или бизнес",
     emailLabel: "Почта",
     phoneLabel: "Телефон или аккаунт",
     messageLabel: "Что вам нужно?",
-    openFormLabel: "Задать вопрос по услугам",
+    openFormLabel: "Оставить заявку",
     closeFormLabel: "Скрыть форму",
     submitLabel: "Отправить запрос",
     submittingLabel: "Отправка...",
-    successTitle: "Запрос отправлен",
-    successDescription: "Ваш запрос сохранен. Дальнейшая связь может продолжиться по указанным контактам.",
+    successTitle: "Спасибо",
+    successDescription: "Заявка и ваши контакты переданы этому бизнесу.",
     submitAnotherLabel: "Отправить еще один запрос",
+    privacyNotice:
+      "Ваши данные получит этот бизнес. Unitforge обрабатывает их для передачи заявки.",
+    privacyLinkLabel: "Конфиденциальность",
     hiddenTitle: "Форма запроса недоступна",
     hiddenDescription: "Этот прайс-лист сейчас не принимает публичные запросы.",
+    demoHiddenTitle: "Как работают заявки",
+    demoHiddenDescription:
+      "В демо отправка отключена. На рабочей странице форма передаёт каждую заявку во входящие владельца.",
     errorMessage: "Проверьте выделенные поля и попробуйте снова.",
     unavailableMessage: "Страница запроса недоступна.",
     validationTitle: "Проверьте форму",
@@ -91,7 +115,9 @@ export function getPriceSheetLeadCopy(language: PriceSheetInterfaceLanguage) {
   return priceSheetLeadCopy[language];
 }
 
-export function getPriceSheetLeadFormSchema(language: PriceSheetInterfaceLanguage) {
+export function getPriceSheetLeadFormSchema(
+  language: PriceSheetInterfaceLanguage,
+) {
   const copy = getPriceSheetLeadCopy(language);
 
   return z.object({
@@ -100,30 +126,74 @@ export function getPriceSheetLeadFormSchema(language: PriceSheetInterfaceLanguag
     contactName: z
       .string()
       .trim()
-      .min(1, language === "ru" ? "Укажите контактное лицо." : "Contact name is required.")
-      .max(120, language === "ru" ? "Имя слишком длинное." : "Contact name is too long."),
+      .min(
+        1,
+        language === "ru"
+          ? "Укажите контактное лицо."
+          : "Contact name is required.",
+      )
+      .max(
+        120,
+        language === "ru"
+          ? "Имя слишком длинное."
+          : "Contact name is too long.",
+      ),
     companyOrBusinessName: z
       .string()
       .trim()
-      .max(160, language === "ru" ? "Название компании слишком длинное." : "Company name is too long."),
+      .max(
+        160,
+        language === "ru"
+          ? "Название компании слишком длинное."
+          : "Company name is too long.",
+      ),
     email: z
       .string()
       .trim()
       .min(1, language === "ru" ? "Укажите почту." : "Email is required.")
-      .max(160, language === "ru" ? "Почта слишком длинная." : "Email is too long.")
-      .refine((value) => z.string().email().safeParse(value).success, language === "ru" ? "Укажите корректную почту." : "Enter a valid email."),
-    phoneOrHandle: z.string().trim().max(120, language === "ru" ? "Контакт слишком длинный." : "Phone or handle is too long."),
+      .max(
+        160,
+        language === "ru" ? "Почта слишком длинная." : "Email is too long.",
+      )
+      .refine(
+        (value) => z.string().email().safeParse(value).success,
+        language === "ru"
+          ? "Укажите корректную почту."
+          : "Enter a valid email.",
+      ),
+    phoneOrHandle: z
+      .string()
+      .trim()
+      .max(
+        120,
+        language === "ru"
+          ? "Контакт слишком длинный."
+          : "Phone or handle is too long.",
+      ),
     message: z
       .string()
       .trim()
-      .min(1, language === "ru" ? "Опишите запрос." : "Inquiry text is required.")
-      .max(2000, language === "ru" ? "Сообщение слишком длинное." : "Inquiry text is too long."),
+      .min(
+        1,
+        language === "ru" ? "Опишите запрос." : "Inquiry text is required.",
+      )
+      .max(
+        2000,
+        language === "ru"
+          ? "Сообщение слишком длинное."
+          : "Inquiry text is too long.",
+      ),
   });
 }
 
-export type PriceSheetLeadFormValues = z.input<ReturnType<typeof getPriceSheetLeadFormSchema>>;
+export type PriceSheetLeadFormValues = z.input<
+  ReturnType<typeof getPriceSheetLeadFormSchema>
+>;
 
-export function parsePriceSheetLeadFormData(formData: FormData, language: PriceSheetInterfaceLanguage) {
+export function parsePriceSheetLeadFormData(
+  formData: FormData,
+  language: PriceSheetInterfaceLanguage,
+) {
   return getPriceSheetLeadFormSchema(language).safeParse({
     priceSheetSlug: formData.get("priceSheetSlug"),
     locale: formData.get("locale"),
@@ -149,7 +219,9 @@ export function getPriceSheetLeadFieldErrors(error: z.ZodError) {
   return fieldErrors;
 }
 
-export function toPriceSheetLeadSubmissionInput(values: PriceSheetLeadFormValues): PriceSheetLeadSubmissionInput {
+export function toPriceSheetLeadSubmissionInput(
+  values: PriceSheetLeadFormValues,
+): PriceSheetLeadSubmissionInput {
   return {
     priceSheetSlug: values.priceSheetSlug,
     locale: values.locale,

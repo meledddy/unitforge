@@ -15,6 +15,7 @@ import {
   toPriceSheetFormValues,
 } from "@/features/price-sheets/validation";
 import type { AppShellSession } from "@/server/current-session";
+import { hasSubscriptionAccess } from "@/server/subscription-access";
 
 import { isPriceSheetServiceError, PriceSheetServiceError } from "./errors";
 import {
@@ -81,8 +82,14 @@ export interface PublishedPriceSheet {
   items: PriceSheetItemView[];
 }
 
-export async function listWorkspacePriceSheets(session: AppShellSession, filters: PriceSheetListFilters = {}) {
-  const records = await listPriceSheetRecordsByWorkspace(session.currentWorkspace.id, filters);
+export async function listWorkspacePriceSheets(
+  session: AppShellSession,
+  filters: PriceSheetListFilters = {},
+) {
+  const records = await listPriceSheetRecordsByWorkspace(
+    session.currentWorkspace.id,
+    filters,
+  );
 
   return records.map((record) => ({
     id: record.id,
@@ -99,8 +106,14 @@ export async function listWorkspacePriceSheets(session: AppShellSession, filters
   })) satisfies PriceSheetListItem[];
 }
 
-export async function getWorkspacePriceSheetForEdit(session: AppShellSession, priceSheetId: string) {
-  const record = await findPriceSheetRecordById(session.currentWorkspace.id, priceSheetId);
+export async function getWorkspacePriceSheetForEdit(
+  session: AppShellSession,
+  priceSheetId: string,
+) {
+  const record = await findPriceSheetRecordById(
+    session.currentWorkspace.id,
+    priceSheetId,
+  );
 
   if (!record) {
     throw new PriceSheetServiceError("NOT_FOUND", "Price Sheet not found.");
@@ -109,46 +122,65 @@ export async function getWorkspacePriceSheetForEdit(session: AppShellSession, pr
   return mapPriceSheetDetail(record);
 }
 
-export async function createWorkspacePriceSheet(session: AppShellSession, input: PriceSheetMutationInput) {
+export async function createWorkspacePriceSheet(
+  session: AppShellSession,
+  input: PriceSheetMutationInput,
+) {
   await assertSlugAvailable(input.slug);
 
-  const record = await createPriceSheetRecord(session.currentWorkspace.id, session.currentUser.id, input);
+  const record = await createPriceSheetRecord(
+    session.currentWorkspace.id,
+    session.currentUser.id,
+    input,
+  );
 
   return mapPriceSheetDetail(record);
 }
 
-export async function duplicateWorkspacePriceSheet(session: AppShellSession, sourcePriceSheetId: string) {
-  const sourceRecord = await findPriceSheetRecordById(session.currentWorkspace.id, sourcePriceSheetId);
+export async function duplicateWorkspacePriceSheet(
+  session: AppShellSession,
+  sourcePriceSheetId: string,
+) {
+  const sourceRecord = await findPriceSheetRecordById(
+    session.currentWorkspace.id,
+    sourcePriceSheetId,
+  );
 
   if (!sourceRecord) {
     throw new PriceSheetServiceError("NOT_FOUND", "Price Sheet not found.");
   }
 
-  const workspaceRecords = await listPriceSheetRecordsByWorkspace(session.currentWorkspace.id);
+  const workspaceRecords = await listPriceSheetRecordsByWorkspace(
+    session.currentWorkspace.id,
+  );
   const nextTitle = getUniqueCopyTitle(
     sourceRecord.title,
     workspaceRecords.map((record) => record.title),
   );
   const nextSlug = await getUniqueCopySlug(sourceRecord.slug);
 
-  const record = await createPriceSheetRecord(session.currentWorkspace.id, session.currentUser.id, {
-    title: nextTitle,
-    description: sourceRecord.description,
-    translations: sourceRecord.translations,
-    publicSettings: sourceRecord.publicSettings,
-    slug: nextSlug,
-    status: "draft",
-    currency: sourceRecord.currency,
-    defaultContentLocale: sourceRecord.defaultContentLocale,
-    theme: sourceRecord.theme,
-    items: sourceRecord.items.map((item) => ({
-      name: item.name,
-      description: item.description,
-      section: item.section,
-      translations: item.translations,
-      priceCents: item.priceCents,
-    })),
-  });
+  const record = await createPriceSheetRecord(
+    session.currentWorkspace.id,
+    session.currentUser.id,
+    {
+      title: nextTitle,
+      description: sourceRecord.description,
+      translations: sourceRecord.translations,
+      publicSettings: sourceRecord.publicSettings,
+      slug: nextSlug,
+      status: "draft",
+      currency: sourceRecord.currency,
+      defaultContentLocale: sourceRecord.defaultContentLocale,
+      theme: sourceRecord.theme,
+      items: sourceRecord.items.map((item) => ({
+        name: item.name,
+        description: item.description,
+        section: item.section,
+        translations: item.translations,
+        priceCents: item.priceCents,
+      })),
+    },
+  );
 
   return mapPriceSheetDetail(record);
 }
@@ -160,7 +192,11 @@ export async function updateWorkspacePriceSheet(
 ) {
   await assertSlugAvailable(input.slug, priceSheetId);
 
-  const record = await updatePriceSheetRecord(session.currentWorkspace.id, priceSheetId, input);
+  const record = await updatePriceSheetRecord(
+    session.currentWorkspace.id,
+    priceSheetId,
+    input,
+  );
 
   return mapPriceSheetDetail(record);
 }
@@ -170,12 +206,19 @@ export async function setWorkspacePriceSheetStatus(
   priceSheetId: string,
   status: PriceSheetStatus,
 ) {
-  const record = await setPriceSheetRecordStatus(session.currentWorkspace.id, priceSheetId, status);
+  const record = await setPriceSheetRecordStatus(
+    session.currentWorkspace.id,
+    priceSheetId,
+    status,
+  );
 
   return mapPriceSheetDetail(record);
 }
 
-export async function deleteWorkspacePriceSheet(session: AppShellSession, priceSheetId: string) {
+export async function deleteWorkspacePriceSheet(
+  session: AppShellSession,
+  priceSheetId: string,
+) {
   return deletePriceSheetRecord(session.currentWorkspace.id, priceSheetId);
 }
 
@@ -186,12 +229,19 @@ export async function getPublishedPriceSheetBySlug(slug: string) {
     return null;
   }
 
+  const inquiryEnabled =
+    record.publicSettings.inquiryEnabled &&
+    hasSubscriptionAccess(record.workspaceSubscription);
+
   return {
     id: record.id,
     title: record.title,
     description: record.description,
     translations: record.translations,
-    publicSettings: record.publicSettings,
+    publicSettings: {
+      ...record.publicSettings,
+      inquiryEnabled,
+    },
     slug: record.slug,
     currency: record.currency,
     defaultContentLocale: record.defaultContentLocale,
@@ -206,10 +256,12 @@ export function getPriceSheetErrorMessage(error: unknown) {
     return error.message;
   }
 
-  return "Price Sheets are unavailable until the database schema is applied.";
+  return "Price Sheets are temporarily unavailable. Please try again.";
 }
 
-export function isKnownPriceSheetError(error: unknown): error is PriceSheetServiceError {
+export function isKnownPriceSheetError(
+  error: unknown,
+): error is PriceSheetServiceError {
   return isPriceSheetServiceError(error);
 }
 
@@ -217,13 +269,17 @@ async function assertSlugAvailable(slug: string, currentPriceSheetId?: string) {
   const existingRecord = await findPriceSheetRecordBySlug(slug);
 
   if (existingRecord && existingRecord.id !== currentPriceSheetId) {
-    throw new PriceSheetServiceError("SLUG_CONFLICT", "Slug is already in use.");
+    throw new PriceSheetServiceError(
+      "SLUG_CONFLICT",
+      "Slug is already in use.",
+    );
   }
 }
 
 async function getUniqueCopySlug(sourceSlug: string) {
   const sourceSlugRoot = stripCopySlugSuffix(sourceSlug);
-  const baseSlug = slugifyPriceSheetValue(`${sourceSlugRoot}-copy`) || "price-sheet-copy";
+  const baseSlug =
+    slugifyPriceSheetValue(`${sourceSlugRoot}-copy`) || "price-sheet-copy";
   let suffix = 1;
 
   for (;;) {
@@ -239,7 +295,9 @@ async function getUniqueCopySlug(sourceSlug: string) {
 }
 
 function getUniqueCopyTitle(sourceTitle: string, existingTitles: string[]) {
-  const normalizedExistingTitles = new Set(existingTitles.map((title) => title.trim().toLowerCase()));
+  const normalizedExistingTitles = new Set(
+    existingTitles.map((title) => title.trim().toLowerCase()),
+  );
   const sourceTitleRoot = stripCopyTitleSuffix(sourceTitle);
   const baseTitle = `${sourceTitleRoot} Copy`;
   let suffix = 1;
@@ -256,7 +314,10 @@ function getUniqueCopyTitle(sourceTitle: string, existingTitles: string[]) {
 }
 
 function stripCopyTitleSuffix(title: string) {
-  const strippedTitle = title.trim().replace(/\s+copy(?:\s+\d+)?$/i, "").trim();
+  const strippedTitle = title
+    .trim()
+    .replace(/\s+copy(?:\s+\d+)?$/i, "")
+    .trim();
 
   return strippedTitle.length > 0 ? strippedTitle : title.trim();
 }
@@ -307,7 +368,9 @@ function mapPriceSheetDetail(record: PriceSheetRecord) {
   } satisfies PriceSheetDetail;
 }
 
-function mapPriceSheetItems(record: Pick<PriceSheetRecord, "currency" | "defaultContentLocale" | "items">) {
+function mapPriceSheetItems(
+  record: Pick<PriceSheetRecord, "currency" | "defaultContentLocale" | "items">,
+) {
   return record.items.map((item) => ({
     id: item.id,
     name: item.name,
@@ -315,6 +378,10 @@ function mapPriceSheetItems(record: Pick<PriceSheetRecord, "currency" | "default
     section: item.section,
     translations: item.translations,
     priceCents: item.priceCents,
-    formattedPrice: formatPriceSheetAmount(item.priceCents, record.currency, record.defaultContentLocale),
+    formattedPrice: formatPriceSheetAmount(
+      item.priceCents,
+      record.currency,
+      record.defaultContentLocale,
+    ),
   })) satisfies PriceSheetItemView[];
 }

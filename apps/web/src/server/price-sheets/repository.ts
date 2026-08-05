@@ -1,5 +1,5 @@
 import type { PriceSheetPublicSettings } from "@unitforge/db";
-import { priceSheetItems, priceSheets } from "@unitforge/db";
+import { priceSheetItems, priceSheets, subscriptions } from "@unitforge/db";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import {
@@ -12,7 +12,10 @@ import {
   type PriceSheetTranslations,
 } from "@/features/price-sheets/localization";
 import { normalizePriceSheetPublicSettings } from "@/features/price-sheets/public-settings";
-import type { PriceSheetMutationInput, PriceSheetStatus } from "@/features/price-sheets/validation";
+import type {
+  PriceSheetMutationInput,
+  PriceSheetStatus,
+} from "@/features/price-sheets/validation";
 import { getServerDb } from "@/server/db";
 
 import { PriceSheetServiceError } from "./errors";
@@ -97,7 +100,10 @@ function getDbOrThrow() {
   return db;
 }
 
-export async function listPriceSheetRecordsByWorkspace(workspaceId: string, options: ListPriceSheetRecordsOptions = {}) {
+export async function listPriceSheetRecordsByWorkspace(
+  workspaceId: string,
+  options: ListPriceSheetRecordsOptions = {},
+) {
   const db = getDbOrThrow();
   const whereClauses = [eq(priceSheets.workspaceId, workspaceId)];
   const normalizedQuery = options.query?.trim();
@@ -133,10 +139,16 @@ export async function listPriceSheetRecordsByWorkspace(workspaceId: string, opti
   return records.map(mapPriceSheetRecord);
 }
 
-export async function findPriceSheetRecordById(workspaceId: string, priceSheetId: string) {
+export async function findPriceSheetRecordById(
+  workspaceId: string,
+  priceSheetId: string,
+) {
   const db = getDbOrThrow();
   const record = await db.query.priceSheets.findFirst({
-    where: and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)),
+    where: and(
+      eq(priceSheets.workspaceId, workspaceId),
+      eq(priceSheets.id, priceSheetId),
+    ),
     with: {
       items: {
         orderBy: [asc(priceSheetItems.position)],
@@ -172,10 +184,29 @@ export async function findPublishedPriceSheetRecordBySlug(slug: string) {
     },
   });
 
-  return record ? mapPriceSheetRecord(record) : null;
+  if (!record) {
+    return null;
+  }
+
+  const workspaceSubscription = await db.query.subscriptions.findFirst({
+    where: eq(subscriptions.workspaceId, record.workspaceId),
+    columns: {
+      status: true,
+      currentPeriodEnd: true,
+    },
+  });
+
+  return {
+    ...mapPriceSheetRecord(record),
+    workspaceSubscription: workspaceSubscription ?? null,
+  };
 }
 
-export async function createPriceSheetRecord(workspaceId: string, createdById: string, input: PriceSheetMutationInput) {
+export async function createPriceSheetRecord(
+  workspaceId: string,
+  createdById: string,
+  input: PriceSheetMutationInput,
+) {
   const db = getDbOrThrow();
 
   return db.transaction(async (tx) => {
@@ -198,7 +229,10 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
       .returning({ id: priceSheets.id });
 
     if (!createdRecord) {
-      throw new PriceSheetServiceError("UNAVAILABLE", "Price Sheet could not be created.");
+      throw new PriceSheetServiceError(
+        "UNAVAILABLE",
+        "Price Sheet could not be created.",
+      );
     }
 
     await tx.insert(priceSheetItems).values(
@@ -223,19 +257,29 @@ export async function createPriceSheetRecord(workspaceId: string, createdById: s
     });
 
     if (!createdSheet) {
-      throw new PriceSheetServiceError("UNAVAILABLE", "Created Price Sheet could not be loaded.");
+      throw new PriceSheetServiceError(
+        "UNAVAILABLE",
+        "Created Price Sheet could not be loaded.",
+      );
     }
 
     return mapPriceSheetRecord(createdSheet);
   });
 }
 
-export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: string, input: PriceSheetMutationInput) {
+export async function updatePriceSheetRecord(
+  workspaceId: string,
+  priceSheetId: string,
+  input: PriceSheetMutationInput,
+) {
   const db = getDbOrThrow();
 
   return db.transaction(async (tx) => {
     const existingRecord = await tx.query.priceSheets.findFirst({
-      where: and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)),
+      where: and(
+        eq(priceSheets.workspaceId, workspaceId),
+        eq(priceSheets.id, priceSheetId),
+      ),
     });
 
     if (!existingRecord) {
@@ -254,12 +298,22 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
         currency: input.currency,
         locale: input.defaultContentLocale,
         theme: input.theme,
-        publishedAt: input.status === "published" ? existingRecord.publishedAt ?? new Date() : null,
+        publishedAt:
+          input.status === "published"
+            ? (existingRecord.publishedAt ?? new Date())
+            : null,
         updatedAt: new Date(),
       })
-      .where(and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)));
+      .where(
+        and(
+          eq(priceSheets.workspaceId, workspaceId),
+          eq(priceSheets.id, priceSheetId),
+        ),
+      );
 
-    await tx.delete(priceSheetItems).where(eq(priceSheetItems.priceSheetId, priceSheetId));
+    await tx
+      .delete(priceSheetItems)
+      .where(eq(priceSheetItems.priceSheetId, priceSheetId));
 
     await tx.insert(priceSheetItems).values(
       input.items.map((item, index) => ({
@@ -283,19 +337,29 @@ export async function updatePriceSheetRecord(workspaceId: string, priceSheetId: 
     });
 
     if (!updatedRecord) {
-      throw new PriceSheetServiceError("UNAVAILABLE", "Updated Price Sheet could not be loaded.");
+      throw new PriceSheetServiceError(
+        "UNAVAILABLE",
+        "Updated Price Sheet could not be loaded.",
+      );
     }
 
     return mapPriceSheetRecord(updatedRecord);
   });
 }
 
-export async function setPriceSheetRecordStatus(workspaceId: string, priceSheetId: string, status: PriceSheetStatus) {
+export async function setPriceSheetRecordStatus(
+  workspaceId: string,
+  priceSheetId: string,
+  status: PriceSheetStatus,
+) {
   const db = getDbOrThrow();
 
   return db.transaction(async (tx) => {
     const existingRecord = await tx.query.priceSheets.findFirst({
-      where: and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)),
+      where: and(
+        eq(priceSheets.workspaceId, workspaceId),
+        eq(priceSheets.id, priceSheetId),
+      ),
       with: {
         items: {
           orderBy: [asc(priceSheetItems.position)],
@@ -311,10 +375,18 @@ export async function setPriceSheetRecordStatus(workspaceId: string, priceSheetI
       .update(priceSheets)
       .set({
         status,
-        publishedAt: status === "published" ? existingRecord.publishedAt ?? new Date() : null,
+        publishedAt:
+          status === "published"
+            ? (existingRecord.publishedAt ?? new Date())
+            : null,
         updatedAt: new Date(),
       })
-      .where(and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)));
+      .where(
+        and(
+          eq(priceSheets.workspaceId, workspaceId),
+          eq(priceSheets.id, priceSheetId),
+        ),
+      );
 
     const updatedRecord = await tx.query.priceSheets.findFirst({
       where: eq(priceSheets.id, priceSheetId),
@@ -326,18 +398,29 @@ export async function setPriceSheetRecordStatus(workspaceId: string, priceSheetI
     });
 
     if (!updatedRecord) {
-      throw new PriceSheetServiceError("UNAVAILABLE", "Updated Price Sheet could not be loaded.");
+      throw new PriceSheetServiceError(
+        "UNAVAILABLE",
+        "Updated Price Sheet could not be loaded.",
+      );
     }
 
     return mapPriceSheetRecord(updatedRecord);
   });
 }
 
-export async function deletePriceSheetRecord(workspaceId: string, priceSheetId: string) {
+export async function deletePriceSheetRecord(
+  workspaceId: string,
+  priceSheetId: string,
+) {
   const db = getDbOrThrow();
   const [deletedRecord] = await db
     .delete(priceSheets)
-    .where(and(eq(priceSheets.workspaceId, workspaceId), eq(priceSheets.id, priceSheetId)))
+    .where(
+      and(
+        eq(priceSheets.workspaceId, workspaceId),
+        eq(priceSheets.id, priceSheetId),
+      ),
+    )
     .returning({
       id: priceSheets.id,
       slug: priceSheets.slug,

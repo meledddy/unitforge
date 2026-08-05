@@ -4,7 +4,12 @@ import { z } from "zod";
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import { getMessages } from "@/i18n/messages";
 
-import type { PriceSheetContentLocale, PriceSheetItemTranslations, PriceSheetTheme, PriceSheetTranslations } from "./localization";
+import type {
+  PriceSheetContentLocale,
+  PriceSheetItemTranslations,
+  PriceSheetTheme,
+  PriceSheetTranslations,
+} from "./localization";
 import {
   getAlternatePriceSheetContentLocale,
   priceSheetContentLocaleValues,
@@ -17,8 +22,12 @@ export const priceSheetStatusValues = ["draft", "published"] as const;
 
 export const priceSheetStatusSchema = z.enum(priceSheetStatusValues);
 export const priceSheetThemeSchema = z.enum(priceSheetThemeValues);
-export const priceSheetPresentationAppearanceSchema = z.enum(priceSheetPresentationAppearanceValues);
-export const priceSheetContentLocaleSchema = z.enum(priceSheetContentLocaleValues);
+export const priceSheetPresentationAppearanceSchema = z.enum(
+  priceSheetPresentationAppearanceValues,
+);
+export const priceSheetContentLocaleSchema = z.enum(
+  priceSheetContentLocaleValues,
+);
 export const priceSheetPublicInquiryStateSchema = z.enum(["enabled", "hidden"]);
 
 const pricePattern = /^\d+(?:\.\d{1,2})?$/;
@@ -29,16 +38,31 @@ export function getPriceSheetItemFormSchema(locale: InterfaceLocale) {
   return z
     .object({
       id: z.string().uuid().optional(),
-      name: z.string().trim().min(1, copy.itemNameRequired).max(160, copy.itemNameLong),
+      name: z
+        .string()
+        .trim()
+        .min(1, copy.itemNameRequired)
+        .max(160, copy.itemNameLong),
       description: z.string().trim().max(600, copy.descriptionLong),
       section: z.string().trim().max(120, copy.sectionLong),
       secondaryName: z.string().trim().max(160, copy.translatedItemNameLong),
-      secondaryDescription: z.string().trim().max(600, copy.translatedDescriptionLong),
+      secondaryDescription: z
+        .string()
+        .trim()
+        .max(600, copy.translatedDescriptionLong),
       secondarySection: z.string().trim().max(120, copy.translatedSectionLong),
-      price: z.string().trim().min(1, copy.priceRequired).refine((value) => pricePattern.test(value), copy.priceInvalid),
+      price: z
+        .string()
+        .trim()
+        .min(1, copy.priceRequired)
+        .refine((value) => pricePattern.test(value), copy.priceInvalid),
     })
     .superRefine((value, ctx) => {
-      if ((value.secondaryDescription.length > 0 || value.secondarySection.length > 0) && value.secondaryName.length === 0) {
+      if (
+        (value.secondaryDescription.length > 0 ||
+          value.secondarySection.length > 0) &&
+        value.secondaryName.length === 0
+      ) {
         ctx.addIssue({
           code: "custom",
           message: copy.translatedItemNameRequired,
@@ -53,35 +77,63 @@ export function getPriceSheetFormSchema(locale: InterfaceLocale) {
 
   return z
     .object({
-      title: z.string().trim().min(1, copy.titleRequired).max(120, copy.titleLong),
+      title: z
+        .string()
+        .trim()
+        .min(1, copy.titleRequired)
+        .max(120, copy.titleLong),
       description: z.string().trim().max(600, copy.descriptionLong),
       secondaryTitle: z.string().trim().max(120, copy.translatedTitleLong),
-      secondaryDescription: z.string().trim().max(600, copy.translatedDescriptionLong),
+      secondaryDescription: z
+        .string()
+        .trim()
+        .max(600, copy.translatedDescriptionLong),
       contactLabel: z.string().trim().max(120, copy.contactLabelLong),
       contactEmail: z
         .string()
         .trim()
         .max(160, copy.contactEmailLong)
-        .refine((value) => value.length === 0 || z.string().email().safeParse(value).success, copy.contactEmailInvalid),
+        .refine(
+          (value) =>
+            value.length === 0 || z.string().email().safeParse(value).success,
+          copy.contactEmailInvalid,
+        ),
       contactPhone: z.string().trim().max(120, copy.contactPhoneLong),
       primaryCtaLabel: z.string().trim().max(48, copy.primaryCtaLong),
       secondaryCtaLabel: z.string().trim().max(48, copy.secondaryCtaLong),
       inquiryText: z.string().trim().max(320, copy.inquiryTextLong),
       businessLocation: z.string().trim().max(180, copy.businessLocationLong),
       businessHours: z.string().trim().max(160, copy.businessHoursLong),
-      businessResponseTime: z.string().trim().max(120, copy.businessResponseTimeLong),
+      businessResponseTime: z
+        .string()
+        .trim()
+        .max(120, copy.businessResponseTimeLong),
       businessNote: z.string().trim().max(320, copy.businessNoteLong),
       publicInquiryState: priceSheetPublicInquiryStateSchema,
-      slug: z.string().trim().min(1, copy.slugRequired).max(160, copy.slugLong).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, copy.slugFormat),
+      slug: z
+        .string()
+        .trim()
+        .min(1, copy.slugRequired)
+        .max(160, copy.slugLong)
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, copy.slugFormat),
       status: priceSheetStatusSchema,
-      currency: z.string().trim().length(3, copy.currencyCode).transform((value) => value.toUpperCase()),
+      currency: z
+        .string()
+        .trim()
+        .length(3, copy.currencyCode)
+        .transform((value) => value.toUpperCase()),
       defaultContentLocale: priceSheetContentLocaleSchema,
       theme: priceSheetThemeSchema,
       presentationAppearance: priceSheetPresentationAppearanceSchema,
-      items: z.array(getPriceSheetItemFormSchema(locale)).min(1, copy.addOneItem),
+      items: z
+        .array(getPriceSheetItemFormSchema(locale))
+        .min(1, copy.addOneItem),
     })
     .superRefine((value, ctx) => {
-      if (value.secondaryDescription.length > 0 && value.secondaryTitle.length === 0) {
+      if (
+        value.secondaryDescription.length > 0 &&
+        value.secondaryTitle.length === 0
+      ) {
         ctx.addIssue({
           code: "custom",
           message: copy.translatedTitleRequired,
@@ -92,7 +144,9 @@ export function getPriceSheetFormSchema(locale: InterfaceLocale) {
 }
 
 export type PriceSheetStatus = z.infer<typeof priceSheetStatusSchema>;
-export type PriceSheetFormValues = z.input<ReturnType<typeof getPriceSheetFormSchema>>;
+export type PriceSheetFormValues = z.input<
+  ReturnType<typeof getPriceSheetFormSchema>
+>;
 
 export interface PriceSheetMutationInput {
   title: string;
@@ -162,7 +216,10 @@ export function getEmptyPriceSheetFormValues(): PriceSheetFormValues {
   };
 }
 
-export function parsePriceSheetFormPayload(payload: string, locale: InterfaceLocale = "en") {
+export function parsePriceSheetFormPayload(
+  payload: string,
+  locale: InterfaceLocale = "en",
+) {
   try {
     return getPriceSheetFormSchema(locale).safeParse(JSON.parse(payload));
   } catch {
@@ -179,9 +236,13 @@ export function parsePriceSheetFormPayload(payload: string, locale: InterfaceLoc
   }
 }
 
-export function toPriceSheetMutationInput(values: PriceSheetFormValues): PriceSheetMutationInput {
+export function toPriceSheetMutationInput(
+  values: PriceSheetFormValues,
+): PriceSheetMutationInput {
   const parsed = getPriceSheetFormSchema("en").parse(values);
-  const secondaryLocale = getAlternatePriceSheetContentLocale(parsed.defaultContentLocale);
+  const secondaryLocale = getAlternatePriceSheetContentLocale(
+    parsed.defaultContentLocale,
+  );
 
   return {
     title: parsed.title,
@@ -223,7 +284,9 @@ export function toPriceSheetFormValues(input: {
     priceCents: number;
   }>;
 }): PriceSheetFormValues {
-  const secondaryLocale = getAlternatePriceSheetContentLocale(input.defaultContentLocale);
+  const secondaryLocale = getAlternatePriceSheetContentLocale(
+    input.defaultContentLocale,
+  );
   const secondarySheetTranslation = input.translations[secondaryLocale];
 
   return {
@@ -241,7 +304,9 @@ export function toPriceSheetFormValues(input: {
     businessHours: input.publicSettings.businessHours ?? "",
     businessResponseTime: input.publicSettings.businessResponseTime ?? "",
     businessNote: input.publicSettings.businessNote ?? "",
-    publicInquiryState: input.publicSettings.inquiryEnabled ? "enabled" : "hidden",
+    publicInquiryState: input.publicSettings.inquiryEnabled
+      ? "enabled"
+      : "hidden",
     slug: input.slug,
     status: input.status,
     currency: input.currency,
@@ -286,10 +351,17 @@ export function formatPriceFromCents(priceCents: number) {
   return (priceCents / 100).toFixed(2);
 }
 
-export function formatPriceSheetAmount(priceCents: number, currency: string, locale: string) {
+export function formatPriceSheetAmount(
+  priceCents: number,
+  currency: string,
+  locale: string,
+) {
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
+    ...(currency.toUpperCase() === "AMD"
+      ? { minimumFractionDigits: 0, maximumFractionDigits: 0 }
+      : {}),
   }).format(priceCents / 100);
 }
 
@@ -346,7 +418,10 @@ function getPublicSettings(
 }
 
 function getItemTranslations(
-  values: Pick<PriceSheetFormValues["items"][number], "secondaryName" | "secondaryDescription" | "secondarySection">,
+  values: Pick<
+    PriceSheetFormValues["items"][number],
+    "secondaryName" | "secondaryDescription" | "secondarySection"
+  >,
   secondaryLocale: PriceSheetContentLocale,
 ): PriceSheetItemTranslations {
   if (values.secondaryName.trim().length === 0) {

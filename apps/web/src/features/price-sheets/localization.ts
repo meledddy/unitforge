@@ -3,10 +3,15 @@ import type { PriceSheetPresentationAppearance } from "@unitforge/db";
 export const priceSheetContentLocaleValues = ["en-US", "ru-RU"] as const;
 export const priceSheetInterfaceLanguageValues = ["en", "ru"] as const;
 export const priceSheetThemeValues = ["amber", "slate", "stone"] as const;
-export const priceSheetPresentationAppearanceValues = ["light", "dark"] as const satisfies readonly PriceSheetPresentationAppearance[];
+export const priceSheetPresentationAppearanceValues = [
+  "light",
+  "dark",
+] as const satisfies readonly PriceSheetPresentationAppearance[];
 
-export type PriceSheetContentLocale = (typeof priceSheetContentLocaleValues)[number];
-export type PriceSheetInterfaceLanguage = (typeof priceSheetInterfaceLanguageValues)[number];
+export type PriceSheetContentLocale =
+  (typeof priceSheetContentLocaleValues)[number];
+export type PriceSheetInterfaceLanguage =
+  (typeof priceSheetInterfaceLanguageValues)[number];
 export type PriceSheetTheme = (typeof priceSheetThemeValues)[number];
 
 export interface PriceSheetTranslation {
@@ -20,18 +25,28 @@ export interface PriceSheetItemTranslation {
   section: string | null;
 }
 
-export type PriceSheetTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetTranslation>>;
-export type PriceSheetItemTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetItemTranslation>>;
+export type PriceSheetTranslations = Partial<
+  Record<PriceSheetContentLocale, PriceSheetTranslation>
+>;
+export type PriceSheetItemTranslations = Partial<
+  Record<PriceSheetContentLocale, PriceSheetItemTranslation>
+>;
 
-export function getAlternatePriceSheetContentLocale(locale: PriceSheetContentLocale): PriceSheetContentLocale {
+export function getAlternatePriceSheetContentLocale(
+  locale: PriceSheetContentLocale,
+): PriceSheetContentLocale {
   return locale === "en-US" ? "ru-RU" : "en-US";
 }
 
-export function getPriceSheetContentLocaleLabel(locale: PriceSheetContentLocale) {
+export function getPriceSheetContentLocaleLabel(
+  locale: PriceSheetContentLocale,
+) {
   return locale === "ru-RU" ? "Russian (ru-RU)" : "English (en-US)";
 }
 
-export function mapInterfaceLanguageToPriceSheetContentLocale(language: PriceSheetInterfaceLanguage): PriceSheetContentLocale {
+export function mapInterfaceLanguageToPriceSheetContentLocale(
+  language: PriceSheetInterfaceLanguage,
+): PriceSheetContentLocale {
   return language === "ru" ? "ru-RU" : "en-US";
 }
 
@@ -50,7 +65,9 @@ export function resolvePriceSheetInterfaceLanguage(
   return defaultContentLocale === "ru-RU" ? "ru" : "en";
 }
 
-export function normalizePriceSheetContentLocale(value: string | null | undefined): PriceSheetContentLocale {
+export function normalizePriceSheetContentLocale(
+  value: string | null | undefined,
+): PriceSheetContentLocale {
   const normalizedValue = value?.trim().toLowerCase().replace(/_/g, "-");
 
   if (normalizedValue?.startsWith("ru")) {
@@ -60,11 +77,15 @@ export function normalizePriceSheetContentLocale(value: string | null | undefine
   return "en-US";
 }
 
-export function normalizePriceSheetTranslations(value: unknown): PriceSheetTranslations {
+export function normalizePriceSheetTranslations(
+  value: unknown,
+): PriceSheetTranslations {
   return normalizeLocalizedContentMap(value, isValidPriceSheetTranslation);
 }
 
-export function normalizePriceSheetItemTranslations(value: unknown): PriceSheetItemTranslations {
+export function normalizePriceSheetItemTranslations(
+  value: unknown,
+): PriceSheetItemTranslations {
   return normalizeLocalizedContentMap(value, isValidPriceSheetItemTranslation);
 }
 
@@ -77,7 +98,10 @@ export function resolvePriceSheetContent(input: {
 }) {
   const translation = input.translations[input.requestedContentLocale];
 
-  if (input.requestedContentLocale !== input.defaultContentLocale && translation?.title) {
+  if (
+    input.requestedContentLocale !== input.defaultContentLocale &&
+    translation?.title
+  ) {
     return {
       title: translation.title,
       description: translation.description,
@@ -102,7 +126,10 @@ export function resolvePriceSheetItemContent(input: {
 }) {
   const translation = input.translations[input.requestedContentLocale];
 
-  if (input.requestedContentLocale !== input.defaultContentLocale && translation?.name) {
+  if (
+    input.requestedContentLocale !== input.defaultContentLocale &&
+    translation?.name
+  ) {
     return {
       name: translation.name,
       description: translation.description,
@@ -117,6 +144,28 @@ export function resolvePriceSheetItemContent(input: {
     section: input.section,
     contentLocale: input.defaultContentLocale,
   };
+}
+
+export function isPriceSheetContentLocaleAvailable(input: {
+  defaultContentLocale: PriceSheetContentLocale;
+  requestedContentLocale: PriceSheetContentLocale;
+  translations: PriceSheetTranslations;
+  items: Array<{
+    translations: PriceSheetItemTranslations;
+  }>;
+}) {
+  if (input.requestedContentLocale === input.defaultContentLocale) {
+    return true;
+  }
+
+  const sheetTranslation = input.translations[input.requestedContentLocale];
+
+  return Boolean(
+    sheetTranslation?.title &&
+    input.items.every((item) =>
+      item.translations[input.requestedContentLocale]?.name.trim(),
+    ),
+  );
 }
 
 function normalizeLocalizedContentMap<T>(
@@ -140,16 +189,28 @@ function normalizeLocalizedContentMap<T>(
   return normalizedContent;
 }
 
-function isValidPriceSheetTranslation(value: unknown): value is PriceSheetTranslation {
-  if (!isPlainObject(value) || typeof value.title !== "string" || value.title.trim().length === 0) {
+function isValidPriceSheetTranslation(
+  value: unknown,
+): value is PriceSheetTranslation {
+  if (
+    !isPlainObject(value) ||
+    typeof value.title !== "string" ||
+    value.title.trim().length === 0
+  ) {
     return false;
   }
 
   return typeof value.description === "string" || value.description === null;
 }
 
-function isValidPriceSheetItemTranslation(value: unknown): value is PriceSheetItemTranslation {
-  if (!isPlainObject(value) || typeof value.name !== "string" || value.name.trim().length === 0) {
+function isValidPriceSheetItemTranslation(
+  value: unknown,
+): value is PriceSheetItemTranslation {
+  if (
+    !isPlainObject(value) ||
+    typeof value.name !== "string" ||
+    value.name.trim().length === 0
+  ) {
     return false;
   }
 

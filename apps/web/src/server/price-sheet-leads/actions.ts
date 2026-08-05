@@ -7,9 +7,16 @@ import {
   toPriceSheetLeadSubmissionInput,
 } from "@/features/price-sheets/lead-form";
 import type { PriceSheetInterfaceLanguage } from "@/features/price-sheets/localization";
-import { consumeRateLimit, getRateLimitClientIp, type RateLimitResult } from "@/server/rate-limit";
+import {
+  consumeRateLimit,
+  getRateLimitClientIp,
+  type RateLimitResult,
+} from "@/server/rate-limit";
 
-import { createPublishedPriceSheetLead, isPriceSheetLeadServiceError } from "./service";
+import {
+  createPublishedPriceSheetLead,
+  isPriceSheetLeadServiceError,
+} from "./service";
 
 export interface PriceSheetLeadActionState {
   status: "idle" | "error" | "success";
@@ -48,34 +55,41 @@ export async function submitPriceSheetLeadAction(
   }
 
   const clientIp = await getRateLimitClientIp();
-  const globalIpLimit = consumeRateLimit({
-    namespace: "price-sheet-lead:ip",
-    identityParts: [clientIp],
-    ...LEAD_IP_RATE_LIMIT,
-  });
+  const globalIpLimit = clientIp
+    ? consumeRateLimit({
+        namespace: "price-sheet-lead:ip",
+        identityParts: [clientIp],
+        ...LEAD_IP_RATE_LIMIT,
+      })
+    : null;
 
-  if (!globalIpLimit.allowed) {
-    return getRateLimitedLeadState(globalIpLimit);
+  if (globalIpLimit && !globalIpLimit.allowed) {
+    return getRateLimitedLeadState(globalIpLimit, language);
   }
 
-  const sheetIpLimit = consumeRateLimit({
-    namespace: "price-sheet-lead:sheet-ip",
-    identityParts: [parsedFormData.data.priceSheetSlug, clientIp],
-    ...LEAD_SHEET_IP_RATE_LIMIT,
-  });
+  const sheetIpLimit = clientIp
+    ? consumeRateLimit({
+        namespace: "price-sheet-lead:sheet-ip",
+        identityParts: [parsedFormData.data.priceSheetSlug, clientIp],
+        ...LEAD_SHEET_IP_RATE_LIMIT,
+      })
+    : null;
 
-  if (!sheetIpLimit.allowed) {
-    return getRateLimitedLeadState(sheetIpLimit);
+  if (sheetIpLimit && !sheetIpLimit.allowed) {
+    return getRateLimitedLeadState(sheetIpLimit, language);
   }
 
   const sheetEmailLimit = consumeRateLimit({
     namespace: "price-sheet-lead:sheet-email",
-    identityParts: [parsedFormData.data.priceSheetSlug, parsedFormData.data.email],
+    identityParts: [
+      parsedFormData.data.priceSheetSlug,
+      parsedFormData.data.email,
+    ],
     ...LEAD_SHEET_EMAIL_RATE_LIMIT,
   });
 
   if (!sheetEmailLimit.allowed) {
-    return getRateLimitedLeadState(sheetEmailLimit);
+    return getRateLimitedLeadState(sheetEmailLimit, language);
   }
 
   try {
@@ -91,12 +105,16 @@ export async function submitPriceSheetLeadAction(
     } satisfies PriceSheetLeadActionState;
   } catch (error) {
     if (isPriceSheetLeadServiceError(error)) {
+      console.error("[price-sheet-leads] Lead submission failed.", {
+        code: error.code,
+      });
+
       return {
         status: "error",
         message:
           error.code === "NOT_PUBLIC" || error.code === "INQUIRY_DISABLED"
             ? copy.unavailableMessage
-            : error.message,
+            : copy.unavailableMessage,
       } satisfies PriceSheetLeadActionState;
     }
 
@@ -107,19 +125,54 @@ export async function submitPriceSheetLeadAction(
   }
 }
 
-function normalizeInterfaceLanguage(value: FormDataEntryValue | null): PriceSheetInterfaceLanguage {
+function normalizeInterfaceLanguage(
+  value: FormDataEntryValue | null,
+): PriceSheetInterfaceLanguage {
   return value === "ru" ? "ru" : "en";
 }
 
-function getRateLimitedLeadState(rateLimit: RateLimitResult): PriceSheetLeadActionState {
+function getRateLimitedLeadState(
+  rateLimit: RateLimitResult,
+  language: PriceSheetInterfaceLanguage,
+): PriceSheetLeadActionState {
+  const retryMinutes = formatRetryMinutes(
+    rateLimit.retryAfterSeconds,
+    language,
+  );
+
   return {
     status: "error",
-    message: `Too many requests. Wait about ${formatRetryMinutes(rateLimit.retryAfterSeconds)} and try again.`,
+    message:
+      language === "ru"
+        ? `Слишком много запросов. Подождите около ${retryMinutes} и попробуйте снова.`
+        : `Too many requests. Wait about ${retryMinutes} and try again.`,
   };
 }
 
-function formatRetryMinutes(retryAfterSeconds: number) {
+function formatRetryMinutes(
+  retryAfterSeconds: number,
+  language: PriceSheetInterfaceLanguage,
+) {
   const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+
+  if (language === "ru") {
+    const lastTwoDigits = minutes % 100;
+    const lastDigit = minutes % 10;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+      return `${minutes} минут`;
+    }
+
+    if (lastDigit === 1) {
+      return `${minutes} минуту`;
+    }
+
+    if (lastDigit >= 2 && lastDigit <= 4) {
+      return `${minutes} минуты`;
+    }
+
+    return `${minutes} минут`;
+  }
 
   return minutes === 1 ? "1 minute" : `${minutes} minutes`;
 }
