@@ -15,10 +15,6 @@ export function getServerDb() {
     return null;
   }
 
-  if (process.env.NODE_ENV === "production") {
-    return createDb(connectionString);
-  }
-
   if (!globalForDb.__unitforgeDb) {
     globalForDb.__unitforgeDb = createDb(connectionString);
   }

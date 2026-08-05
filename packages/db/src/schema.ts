@@ -15,8 +15,11 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const priceSheetContentLocaleValues = ["en-US", "ru-RU"] as const;
+export const accessRequestLocaleValues = ["en", "ru"] as const;
 
-export type PriceSheetContentLocale = (typeof priceSheetContentLocaleValues)[number];
+export type PriceSheetContentLocale =
+  (typeof priceSheetContentLocaleValues)[number];
+export type AccessRequestLocale = (typeof accessRequestLocaleValues)[number];
 
 export interface PriceSheetTranslation {
   title: string;
@@ -46,18 +49,47 @@ export interface PriceSheetItemTranslation {
   section: string | null;
 }
 
-export type PriceSheetTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetTranslation>>;
-export type PriceSheetItemTranslations = Partial<Record<PriceSheetContentLocale, PriceSheetItemTranslation>>;
+export type PriceSheetTranslations = Partial<
+  Record<PriceSheetContentLocale, PriceSheetTranslation>
+>;
+export type PriceSheetItemTranslations = Partial<
+  Record<PriceSheetContentLocale, PriceSheetItemTranslation>
+>;
 
 const timestamps = {
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 };
 
-export const membershipRoleEnum = pgEnum("membership_role", ["owner", "admin", "member"]);
-export const subscriptionProviderEnum = pgEnum("subscription_provider", ["stripe", "manual"]);
-export const subscriptionStatusEnum = pgEnum("subscription_status", ["trialing", "active", "past_due", "canceled"]);
-export const priceSheetStatusEnum = pgEnum("price_sheet_status", ["draft", "published"]);
+export const membershipRoleEnum = pgEnum("membership_role", [
+  "owner",
+  "admin",
+  "member",
+]);
+export const subscriptionProviderEnum = pgEnum("subscription_provider", [
+  "stripe",
+  "manual",
+]);
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+]);
+export const priceSheetStatusEnum = pgEnum("price_sheet_status", [
+  "draft",
+  "published",
+]);
+export const accessRequestStatusEnum = pgEnum("access_request_status", [
+  "new",
+  "contacted",
+  "qualified",
+  "closed",
+]);
 
 export const users = pgTable(
   "users",
@@ -85,10 +117,14 @@ export const authSessions = pgTable(
       .references(() => workspaces.id, { onDelete: "cascade" }),
     tokenHash: varchar("token_hash", { length: 64 }).notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    tokenHashIdx: uniqueIndex("auth_sessions_token_hash_idx").on(table.tokenHash),
+    tokenHashIdx: uniqueIndex("auth_sessions_token_hash_idx").on(
+      table.tokenHash,
+    ),
     userIdx: index("auth_sessions_user_idx").on(table.userId),
     workspaceIdx: index("auth_sessions_workspace_idx").on(table.workspaceId),
     expiresAtIdx: index("auth_sessions_expires_at_idx").on(table.expiresAt),
@@ -101,7 +137,9 @@ export const workspaces = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
     slug: varchar("slug", { length: 64 }).notNull(),
-    ownerId: uuid("owner_id").references(() => users.id, { onDelete: "set null" }),
+    ownerId: uuid("owner_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     ...timestamps,
   },
   (table) => ({
@@ -119,10 +157,15 @@ export const memberships = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: membershipRoleEnum("role").default("member").notNull(),
-    joinedAt: timestamp("joined_at", { withTimezone: true }).defaultNow().notNull(),
+    joinedAt: timestamp("joined_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.workspaceId, table.userId], name: "memberships_pkey" }),
+    pk: primaryKey({
+      columns: [table.workspaceId, table.userId],
+      name: "memberships_pkey",
+    }),
   }),
 );
 
@@ -138,12 +181,16 @@ export const subscriptions = pgTable(
     plan: varchar("plan", { length: 64 }).notNull(),
     externalCustomerId: text("external_customer_id"),
     externalSubscriptionId: text("external_subscription_id"),
-    currentPeriodStart: timestamp("current_period_start", { withTimezone: true }),
+    currentPeriodStart: timestamp("current_period_start", {
+      withTimezone: true,
+    }),
     currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
     ...timestamps,
   },
   (table) => ({
-    workspaceIdx: uniqueIndex("subscriptions_workspace_idx").on(table.workspaceId),
+    workspaceIdx: uniqueIndex("subscriptions_workspace_idx").on(
+      table.workspaceId,
+    ),
   }),
 );
 
@@ -159,18 +206,32 @@ export const priceSheets = pgTable(
     slug: varchar("slug", { length: 160 }).notNull(),
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
     locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
-    translations: jsonb("translations").$type<PriceSheetTranslations>().default(sql`'{}'::jsonb`).notNull(),
-    publicSettings: jsonb("public_settings").$type<PriceSheetPublicSettings>().default(sql`'{}'::jsonb`).notNull(),
+    translations: jsonb("translations")
+      .$type<PriceSheetTranslations>()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
+    publicSettings: jsonb("public_settings")
+      .$type<PriceSheetPublicSettings>()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     theme: varchar("theme", { length: 32 }).default("amber").notNull(),
     status: priceSheetStatusEnum("status").default("draft").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
-    createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+    createdById: uuid("created_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     ...timestamps,
   },
   (table) => ({
     slugIdx: uniqueIndex("price_sheets_slug_idx").on(table.slug),
-    workspaceTitleIdx: index("price_sheets_workspace_title_idx").on(table.workspaceId, table.title),
-    localeCheck: check("price_sheets_locale_check", sql`${table.locale} in ('en-US', 'ru-RU')`),
+    workspaceTitleIdx: index("price_sheets_workspace_title_idx").on(
+      table.workspaceId,
+      table.title,
+    ),
+    localeCheck: check(
+      "price_sheets_locale_check",
+      sql`${table.locale} in ('en-US', 'ru-RU')`,
+    ),
   }),
 );
 
@@ -184,13 +245,18 @@ export const priceSheetItems = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     section: varchar("section", { length: 120 }),
-    translations: jsonb("translations").$type<PriceSheetItemTranslations>().default(sql`'{}'::jsonb`).notNull(),
+    translations: jsonb("translations")
+      .$type<PriceSheetItemTranslations>()
+      .default(sql`'{}'::jsonb`)
+      .notNull(),
     priceCents: integer("price_cents").notNull(),
     position: integer("position").default(0).notNull(),
     ...timestamps,
   },
   (table) => ({
-    priceSheetIdx: index("price_sheet_items_price_sheet_idx").on(table.priceSheetId),
+    priceSheetIdx: index("price_sheet_items_price_sheet_idx").on(
+      table.priceSheetId,
+    ),
   }),
 );
 
@@ -201,18 +267,62 @@ export const priceSheetLeads = pgTable(
     priceSheetId: uuid("price_sheet_id")
       .notNull()
       .references(() => priceSheets.id, { onDelete: "cascade" }),
-    sheetSlugSnapshot: varchar("sheet_slug_snapshot", { length: 160 }).notNull(),
+    sheetSlugSnapshot: varchar("sheet_slug_snapshot", {
+      length: 160,
+    }).notNull(),
     contactName: text("contact_name").notNull(),
     companyOrBusinessName: text("company_or_business_name"),
     email: text("email").notNull(),
     phoneOrHandle: text("phone_or_handle"),
     message: text("message").notNull(),
     locale: varchar("locale", { length: 32 }).default("en-US").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    priceSheetIdx: index("price_sheet_leads_price_sheet_idx").on(table.priceSheetId),
-    localeCheck: check("price_sheet_leads_locale_check", sql`${table.locale} in ('en-US', 'ru-RU')`),
+    priceSheetIdx: index("price_sheet_leads_price_sheet_idx").on(
+      table.priceSheetId,
+    ),
+    localeCheck: check(
+      "price_sheet_leads_locale_check",
+      sql`${table.locale} in ('en-US', 'ru-RU')`,
+    ),
+  }),
+);
+
+export const accessRequests = pgTable(
+  "access_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    businessName: text("business_name").notNull(),
+    contactName: text("contact_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    note: text("note"),
+    locale: varchar("locale", { length: 8 }).default("en").notNull(),
+    status: accessRequestStatusEnum("status").default("new").notNull(),
+    source: varchar("source", { length: 64 })
+      .default("request-access")
+      .notNull(),
+    statusUpdatedAt: timestamp("status_updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    ...timestamps,
+  },
+  (table) => ({
+    emailCreatedAtIdx: index("access_requests_email_created_at_idx").on(
+      table.email,
+      table.createdAt,
+    ),
+    statusCreatedAtIdx: index("access_requests_status_created_at_idx").on(
+      table.status,
+      table.createdAt,
+    ),
+    localeCheck: check(
+      "access_requests_locale_check",
+      sql`${table.locale} in ('en', 'ru')`,
+    ),
   }),
 );
 
@@ -279,19 +389,25 @@ export const priceSheetsRelations = relations(priceSheets, ({ many, one }) => ({
   }),
 }));
 
-export const priceSheetItemsRelations = relations(priceSheetItems, ({ one }) => ({
-  priceSheet: one(priceSheets, {
-    fields: [priceSheetItems.priceSheetId],
-    references: [priceSheets.id],
+export const priceSheetItemsRelations = relations(
+  priceSheetItems,
+  ({ one }) => ({
+    priceSheet: one(priceSheets, {
+      fields: [priceSheetItems.priceSheetId],
+      references: [priceSheets.id],
+    }),
   }),
-}));
+);
 
-export const priceSheetLeadsRelations = relations(priceSheetLeads, ({ one }) => ({
-  priceSheet: one(priceSheets, {
-    fields: [priceSheetLeads.priceSheetId],
-    references: [priceSheets.id],
+export const priceSheetLeadsRelations = relations(
+  priceSheetLeads,
+  ({ one }) => ({
+    priceSheet: one(priceSheets, {
+      fields: [priceSheetLeads.priceSheetId],
+      references: [priceSheets.id],
+    }),
   }),
-}));
+);
 
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
@@ -300,6 +416,7 @@ export type Subscription = typeof subscriptions.$inferSelect;
 export type PriceSheet = typeof priceSheets.$inferSelect;
 export type PriceSheetItem = typeof priceSheetItems.$inferSelect;
 export type PriceSheetLead = typeof priceSheetLeads.$inferSelect;
+export type AccessRequest = typeof accessRequests.$inferSelect;
 export type AuthSession = typeof authSessions.$inferSelect;
 
 export type NewUser = typeof users.$inferInsert;
@@ -309,4 +426,5 @@ export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NewPriceSheet = typeof priceSheets.$inferInsert;
 export type NewPriceSheetItem = typeof priceSheetItems.$inferInsert;
 export type NewPriceSheetLead = typeof priceSheetLeads.$inferInsert;
+export type NewAccessRequest = typeof accessRequests.$inferInsert;
 export type NewAuthSession = typeof authSessions.$inferInsert;

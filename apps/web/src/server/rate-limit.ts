@@ -36,7 +36,10 @@ const globalForRateLimit = globalThis as typeof globalThis & {
 
 function getRateLimitBuckets() {
   if (!globalForRateLimit.__unitforgeRateLimitBuckets) {
-    globalForRateLimit.__unitforgeRateLimitBuckets = new Map<string, RateLimitBucket>();
+    globalForRateLimit.__unitforgeRateLimitBuckets = new Map<
+      string,
+      RateLimitBucket
+    >();
   }
 
   return globalForRateLimit.__unitforgeRateLimitBuckets;
@@ -46,11 +49,13 @@ export async function getRateLimitClientIp() {
   try {
     return getClientIpFromHeaders(await headers());
   } catch {
-    return "local-script";
+    return null;
   }
 }
 
-export function consumeRateLimit(input: ConsumeRateLimitInput): RateLimitResult {
+export function consumeRateLimit(
+  input: ConsumeRateLimitInput,
+): RateLimitResult {
   const now = Date.now();
   const buckets = getRateLimitBuckets();
   const key = getBucketKey(input.namespace, input.identityParts);
@@ -68,7 +73,10 @@ export function consumeRateLimit(input: ConsumeRateLimitInput): RateLimitResult 
   bucket.count += 1;
   buckets.set(key, bucket);
 
-  const retryAfterSeconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+  const retryAfterSeconds = Math.max(
+    1,
+    Math.ceil((bucket.resetAt - now) / 1000),
+  );
   const remaining = Math.max(0, input.limit - bucket.count);
 
   return {
@@ -78,24 +86,42 @@ export function consumeRateLimit(input: ConsumeRateLimitInput): RateLimitResult 
   };
 }
 
-export function resetRateLimit(namespace: string, identityParts: Array<string | null | undefined>) {
+export function resetRateLimit(
+  namespace: string,
+  identityParts: Array<string | null | undefined>,
+) {
   getRateLimitBuckets().delete(getBucketKey(namespace, identityParts));
 }
 
 function getClientIpFromHeaders(headerStore: HeaderStore) {
+  if (!trustProxyHeaders()) {
+    return null;
+  }
+
   const forwardedFor = headerStore.get("x-forwarded-for");
   const forwardedIp = forwardedFor?.split(",")[0]?.trim();
 
   return (
-    forwardedIp ||
     headerStore.get("cf-connecting-ip")?.trim() ||
     headerStore.get("true-client-ip")?.trim() ||
     headerStore.get("x-real-ip")?.trim() ||
-    "unknown-ip"
+    forwardedIp ||
+    null
   );
 }
 
-function getBucketKey(namespace: string, identityParts: Array<string | null | undefined>) {
+function trustProxyHeaders() {
+  return (
+    process.env.TRUST_PROXY_HEADERS === "true" ||
+    process.env.VERCEL === "1" ||
+    Boolean(process.env.CF_PAGES)
+  );
+}
+
+function getBucketKey(
+  namespace: string,
+  identityParts: Array<string | null | undefined>,
+) {
   return `${namespace}:${hashIdentity(identityParts)}`;
 }
 
@@ -108,7 +134,10 @@ function hashIdentity(identityParts: Array<string | null | undefined>) {
   return createHash("sha256").update(normalizedIdentity).digest("hex");
 }
 
-function sweepExpiredBuckets(buckets: Map<string, RateLimitBucket>, now: number) {
+function sweepExpiredBuckets(
+  buckets: Map<string, RateLimitBucket>,
+  now: number,
+) {
   const lastSweep = globalForRateLimit.__unitforgeRateLimitLastSweep ?? 0;
 
   if (now - lastSweep < SWEEP_INTERVAL_MS && buckets.size <= MAX_BUCKETS) {

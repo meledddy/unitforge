@@ -5,6 +5,7 @@ import { cache } from "react";
 import { AUTH_SESSION_COOKIE_NAME } from "@/server/auth/constants";
 import { getAppShellSessionForSessionToken } from "@/server/auth/service";
 import { getAuthSessionTokenFromCookie } from "@/server/auth/session";
+import { hasSubscriptionAccess } from "@/server/subscription-access";
 
 type MembershipRole = "owner" | "admin" | "member";
 type SubscriptionProvider = "stripe" | "manual";
@@ -34,7 +35,9 @@ export interface AppShellSession {
 
 const getCachedCurrentAppShellSession = cache(async () => {
   const cookieStore = await cookies();
-  const sessionToken = getAuthSessionTokenFromCookie(cookieStore.get(AUTH_SESSION_COOKIE_NAME));
+  const sessionToken = getAuthSessionTokenFromCookie(
+    cookieStore.get(AUTH_SESSION_COOKIE_NAME),
+  );
 
   if (!sessionToken) {
     return null;
@@ -47,11 +50,28 @@ export async function getCurrentAppShellSession() {
   return getCachedCurrentAppShellSession();
 }
 
-export async function requireCurrentAppShellSession() {
+export function hasAppSubscriptionAccess(
+  subscription: AppShellSession["subscription"],
+  now = new Date(),
+) {
+  return hasSubscriptionAccess(subscription, now);
+}
+
+export async function requireAuthenticatedAppShellSession() {
   const session = await getCurrentAppShellSession();
 
   if (!session) {
     redirect("/login");
+  }
+
+  return session;
+}
+
+export async function requireCurrentAppShellSession() {
+  const session = await requireAuthenticatedAppShellSession();
+
+  if (!hasAppSubscriptionAccess(session.subscription)) {
+    redirect("/?access=inactive#pricing");
   }
 
   return session;

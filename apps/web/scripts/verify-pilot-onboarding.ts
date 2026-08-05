@@ -3,10 +3,19 @@ import "dotenv/config";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 
-import { createDb, onboardPilotWorkspaceUser, users, workspaces } from "@unitforge/db";
+import {
+  createDb,
+  onboardPilotWorkspaceUser,
+  users,
+  workspaces,
+} from "@unitforge/db";
 import { eq } from "drizzle-orm";
 
-import { authenticateUserByPassword, getAppShellSessionForSessionToken, invalidateAuthSession } from "../src/server/auth/service";
+import {
+  authenticateUserByPassword,
+  getAppShellSessionForSessionToken,
+  invalidateAuthSession,
+} from "../src/server/auth/service";
 import { listWorkspacePriceSheets } from "../src/server/price-sheets/service";
 
 async function main() {
@@ -20,7 +29,9 @@ async function main() {
   const email = `pilot-${timestamp}@unitforge.dev`;
   const workspaceName = `Pilot Workspace ${timestamp}`;
   let sessionToken: string | null = null;
-  let onboardingResult: Awaited<ReturnType<typeof onboardPilotWorkspaceUser>> | null = null;
+  let onboardingResult: Awaited<
+    ReturnType<typeof onboardPilotWorkspaceUser>
+  > | null = null;
 
   try {
     onboardingResult = await onboardPilotWorkspaceUser(
@@ -34,6 +45,9 @@ async function main() {
     );
 
     assert.equal(onboardingResult.membership.role, "owner");
+    assert.equal(onboardingResult.subscription.plan, "studio");
+    assert.equal(onboardingResult.subscription.provider, "manual");
+    assert.equal(onboardingResult.subscription.status, "trialing");
 
     const authenticatedUser = await authenticateUserByPassword({
       email,
@@ -47,8 +61,14 @@ async function main() {
     assert(appSession, "Expected the onboarded login session to resolve.");
     assert.equal(appSession.currentUser.email, email);
     assert.equal(appSession.currentWorkspace.id, onboardingResult.workspace.id);
-    assert.equal(appSession.currentWorkspace.slug, onboardingResult.workspace.slug);
+    assert.equal(
+      appSession.currentWorkspace.slug,
+      onboardingResult.workspace.slug,
+    );
     assert.equal(appSession.membership.role, "owner");
+    assert.equal(appSession.subscription?.plan, "studio");
+    assert.equal(appSession.subscription?.provider, "manual");
+    assert.equal(appSession.subscription?.status, "trialing");
 
     const listedPriceSheets = await listWorkspacePriceSheets(appSession);
     assert.deepEqual(listedPriceSheets, []);
@@ -65,7 +85,9 @@ async function main() {
     }
 
     if (onboardingResult) {
-      await db.delete(workspaces).where(eq(workspaces.id, onboardingResult.workspace.id));
+      await db
+        .delete(workspaces)
+        .where(eq(workspaces.id, onboardingResult.workspace.id));
       await db.delete(users).where(eq(users.id, onboardingResult.user.id));
     }
   }

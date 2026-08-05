@@ -14,10 +14,18 @@ async function main() {
     return;
   }
 
+  const password = process.env.PILOT_ONBOARDING_PASSWORD?.trim();
+
+  if (!password) {
+    throw new Error(
+      "PILOT_ONBOARDING_PASSWORD is required and must be supplied through the environment.",
+    );
+  }
+
   const result = await onboardPilotWorkspaceUser({
     workspaceName: getRequiredArg(args, "workspace-name"),
     email: getRequiredArg(args, "email"),
-    password: getRequiredArg(args, "password"),
+    password,
     name: typeof args.name === "string" ? args.name : undefined,
   });
 
@@ -26,7 +34,13 @@ async function main() {
   console.log(`Workspace slug: ${result.workspace.slug}`);
   console.log(`User email: ${result.user.email}`);
   console.log(`Membership role: ${result.membership.role}`);
-  console.log("This user can now sign in through the existing /login flow with the password you provided.");
+  console.log(`Plan: ${result.subscription.plan}`);
+  console.log(
+    `Trial ends: ${result.subscription.currentPeriodEnd.toISOString()}`,
+  );
+  console.log(
+    "This user can now sign in through the existing /login flow with the password you provided.",
+  );
 }
 
 function parseArgs(argv: string[]) {
@@ -62,7 +76,10 @@ function parseArgs(argv: string[]) {
   return args;
 }
 
-function getRequiredArg(args: Record<string, string | boolean | undefined>, key: string) {
+function getRequiredArg(
+  args: Record<string, string | boolean | undefined>,
+  key: string,
+) {
   const value = args[key];
 
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -76,12 +93,18 @@ function printHelp() {
   console.log("Unitforge manual pilot onboarding");
   console.log("");
   console.log("Usage:");
-  console.log('  pnpm onboard:pilot -- --workspace-name "Acme Studio" --email owner@example.com --password "strong-password" [--name "Owner Name"]');
+  console.log(
+    '  pnpm onboard:pilot -- --workspace-name "Acme Studio" --email owner@example.com [--name "Owner Name"]',
+  );
   console.log("");
   console.log("Required:");
   console.log("  --workspace-name   Workspace name used for the new workspace");
   console.log("  --email            Login email for the new user");
-  console.log("  --password         Initial password for the new user (minimum 12 characters)");
+  console.log("");
+  console.log("Environment:");
+  console.log(
+    "  PILOT_ONBOARDING_PASSWORD   Initial password (minimum 12 characters; never pass it as a CLI argument)",
+  );
   console.log("");
   console.log("Optional:");
   console.log("  --name             Display name for the new user");

@@ -2,10 +2,11 @@ import { eq } from "drizzle-orm";
 
 import { hashPassword } from "./auth";
 import { createDb, type Database } from "./client";
-import { memberships, users, workspaces } from "./schema";
+import { memberships, subscriptions, users, workspaces } from "./schema";
 
 const MINIMUM_ONBOARDING_PASSWORD_LENGTH = 12;
 const MAXIMUM_WORKSPACE_SLUG_LENGTH = 64;
+const PILOT_TRIAL_DAYS = 14;
 
 export interface PilotOnboardingInput {
   workspaceName: string;
@@ -28,16 +29,30 @@ export interface PilotOnboardingResult {
   membership: {
     role: "owner";
   };
+  subscription: {
+    plan: "studio";
+    provider: "manual";
+    status: "trialing";
+    currentPeriodEnd: Date;
+  };
 }
 
-export async function onboardPilotWorkspaceUser(input: PilotOnboardingInput, db = createDb()): Promise<PilotOnboardingResult> {
-  const workspaceName = normalizeRequiredValue(input.workspaceName, "workspaceName");
+export async function onboardPilotWorkspaceUser(
+  input: PilotOnboardingInput,
+  db = createDb(),
+): Promise<PilotOnboardingResult> {
+  const workspaceName = normalizeRequiredValue(
+    input.workspaceName,
+    "workspaceName",
+  );
   const email = normalizeEmail(input.email);
   const password = normalizeRequiredValue(input.password, "password");
   const name = normalizeOptionalValue(input.name);
 
   if (password.length < MINIMUM_ONBOARDING_PASSWORD_LENGTH) {
-    throw new Error(`Password must be at least ${MINIMUM_ONBOARDING_PASSWORD_LENGTH} characters long.`);
+    throw new Error(
+      `Password must be at least ${MINIMUM_ONBOARDING_PASSWORD_LENGTH} characters long.`,
+    );
   }
 
   const existingUser = await db.query.users.findFirst({
@@ -45,7 +60,9 @@ export async function onboardPilotWorkspaceUser(input: PilotOnboardingInput, db 
   });
 
   if (existingUser) {
-    throw new Error(`A user with email ${email} already exists. Manual pilot onboarding only creates new users.`);
+    throw new Error(
+      `A user with email ${email} already exists. Manual pilot onboarding only creates new users.`,
+    );
   }
 
   const workspaceSlug = await getUniqueWorkspaceSlug(db, workspaceName);
@@ -92,11 +109,42 @@ export async function onboardPilotWorkspaceUser(input: PilotOnboardingInput, db 
       role: "owner",
     });
 
+    const trialStartedAt = new Date();
+    const trialEndsAt = new Date(
+      trialStartedAt.getTime() + PILOT_TRIAL_DAYS * 24 * 60 * 60 * 1000,
+    );
+    const [createdSubscription] = await tx
+      .insert(subscriptions)
+      .values({
+        workspaceId: createdWorkspace.id,
+        provider: "manual",
+        status: "trialing",
+        plan: "studio",
+        currentPeriodStart: trialStartedAt,
+        currentPeriodEnd: trialEndsAt,
+      })
+      .returning({
+        plan: subscriptions.plan,
+        provider: subscriptions.provider,
+        status: subscriptions.status,
+        currentPeriodEnd: subscriptions.currentPeriodEnd,
+      });
+
+    if (!createdSubscription?.currentPeriodEnd) {
+      throw new Error("Pilot subscription could not be created.");
+    }
+
     return {
       user: createdUser,
       workspace: createdWorkspace,
       membership: {
         role: "owner",
+      },
+      subscription: {
+        plan: "studio",
+        provider: "manual",
+        status: "trialing",
+        currentPeriodEnd: createdSubscription.currentPeriodEnd,
       },
     } satisfies PilotOnboardingResult;
   });
@@ -107,7 +155,9 @@ async function getUniqueWorkspaceSlug(db: Database, workspaceName: string) {
 
   for (let attempt = 0; attempt < 10_000; attempt += 1) {
     const candidateSlug =
-      attempt === 0 ? baseSlug : truncateWorkspaceSlug(`${baseSlug}-${attempt + 1}`);
+      attempt === 0
+        ? baseSlug
+        : truncateWorkspaceSlug(`${baseSlug}-${attempt + 1}`);
 
     const existingWorkspace = await db.query.workspaces.findFirst({
       where: eq(workspaces.slug, candidateSlug),
@@ -125,7 +175,10 @@ function normalizeEmail(value: string) {
   return normalizeRequiredValue(value, "email").toLowerCase();
 }
 
-function normalizeRequiredValue(value: string | null | undefined, fieldName: string) {
+function normalizeRequiredValue(
+  value: string | null | undefined,
+  fieldName: string,
+) {
   const normalizedValue = value?.trim();
 
   if (!normalizedValue) {
@@ -154,5 +207,8 @@ function slugifyWorkspaceName(value: string) {
 }
 
 function truncateWorkspaceSlug(value: string) {
-  return value.slice(0, MAXIMUM_WORKSPACE_SLUG_LENGTH).replace(/-+$/g, "") || "workspace";
+  return (
+    value.slice(0, MAXIMUM_WORKSPACE_SLUG_LENGTH).replace(/-+$/g, "") ||
+    "workspace"
+  );
 }

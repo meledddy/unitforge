@@ -16,7 +16,7 @@ export const mockSessionMembership = {
 
 export const mockSessionSubscription = {
   plan: "studio",
-  provider: "stripe",
-  status: "trialing",
-  currentPeriodEnd: "2026-05-08T00:00:00.000Z",
+  provider: "manual",
+  status: "active",
+  currentPeriodEnd: null,
 } as const;

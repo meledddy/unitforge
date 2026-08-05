@@ -7,21 +7,28 @@ import { loadEnvConfig } from "@next/env";
 let hasLoadedRuntimeEnv = false;
 const require = createRequire(import.meta.url);
 
+const runtimeMode =
+  process.env.NODE_ENV === "production" || process.env.NODE_ENV === "test"
+    ? process.env.NODE_ENV
+    : "development";
 const envFileNames = [
-  ".env.development.local",
-  ".env.local",
-  ".env.development",
-  ".env.production",
-  ".env.production.local",
+  `.env.${runtimeMode}.local`,
+  ...(runtimeMode === "test" ? [] : [".env.local"]),
+  `.env.${runtimeMode}`,
   ".env",
 ];
 
 function hasEnvFiles(directory: string) {
-  return envFileNames.some((fileName) => existsSync(path.join(directory, fileName)));
+  return envFileNames.some((fileName) =>
+    existsSync(path.join(directory, fileName)),
+  );
 }
 
 function isMonorepoRoot(directory: string) {
-  return existsSync(path.join(directory, "pnpm-workspace.yaml")) && existsSync(path.join(directory, "apps", "web", "package.json"));
+  return (
+    existsSync(path.join(directory, "pnpm-workspace.yaml")) &&
+    existsSync(path.join(directory, "apps", "web", "package.json"))
+  );
 }
 
 function findMonorepoRoot(startDirectory: string) {
@@ -32,7 +39,9 @@ function findMonorepoRoot(startDirectory: string) {
       return currentDirectory;
     }
 
-    for (const entry of readdirSync(currentDirectory, { withFileTypes: true })) {
+    for (const entry of readdirSync(currentDirectory, {
+      withFileTypes: true,
+    })) {
       if (!entry.isDirectory()) {
         continue;
       }
@@ -65,10 +74,18 @@ function resolveMonorepoRootFromWorkspacePackage() {
 }
 
 function getRuntimeEnvDirectories() {
-  const monorepoRoot = resolveMonorepoRootFromWorkspacePackage() ?? findMonorepoRoot(process.cwd());
-  const appDirectory = monorepoRoot ? path.join(monorepoRoot, "apps", "web") : process.cwd();
+  const monorepoRoot =
+    resolveMonorepoRootFromWorkspacePackage() ??
+    findMonorepoRoot(process.cwd());
+  const appDirectory = monorepoRoot
+    ? path.join(monorepoRoot, "apps", "web")
+    : process.cwd();
 
-  return Array.from(new Set([appDirectory, monorepoRoot, process.cwd()].filter(Boolean) as string[]));
+  return Array.from(
+    new Set(
+      [appDirectory, monorepoRoot, process.cwd()].filter(Boolean) as string[],
+    ),
+  );
 }
 
 function readEnvValueFromFile(filePath: string, key: string) {
@@ -114,16 +131,20 @@ export function loadAppRuntimeEnv() {
   }
 
   const directories = getRuntimeEnvDirectories();
-  let loadedAnyDirectory = false;
+  const envDirectory = directories.find(hasEnvFiles);
 
-  for (const directory of directories) {
-    if (hasEnvFiles(directory)) {
-      loadEnvConfig(directory, process.env.NODE_ENV !== "production");
-      loadedAnyDirectory = true;
-    }
+  if (!envDirectory) {
+    hasLoadedRuntimeEnv = false;
+    return;
   }
 
-  hasLoadedRuntimeEnv = loadedAnyDirectory;
+  loadEnvConfig(
+    envDirectory,
+    process.env.NODE_ENV !== "production",
+    console,
+    true,
+  );
+  hasLoadedRuntimeEnv = true;
 }
 
 export function getRuntimeEnvValue(key: string) {

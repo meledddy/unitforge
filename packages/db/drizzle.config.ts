@@ -12,13 +12,17 @@ const rootDir = path.resolve(configDir, "../..");
 loadEnv({ path: path.join(rootDir, ".env") });
 loadEnv({ path: path.join(rootDir, ".env.local"), override: true });
 
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is required for database generation and migrations.",
+  );
+}
+
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: normalizeDatabaseConnectionString(
-      process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/unitforge",
-    ),
+    url: normalizeDatabaseConnectionString(process.env.DATABASE_URL),
   },
 });

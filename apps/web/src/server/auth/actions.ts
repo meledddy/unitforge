@@ -33,7 +33,10 @@ const LOGIN_EMAIL_RATE_LIMIT = {
 const LOGIN_IP_NAMESPACE = "auth:login:ip";
 const LOGIN_EMAIL_NAMESPACE = "auth:login:email";
 
-export async function signInAction(_previousState: SignInActionState, formData: FormData): Promise<SignInActionState> {
+export async function signInAction(
+  _previousState: SignInActionState,
+  formData: FormData,
+): Promise<SignInActionState> {
   const locale = await getCurrentInterfaceLocale();
   const messages = getMessages(locale);
   const signInSchema = z.object({
@@ -57,13 +60,15 @@ export async function signInAction(_previousState: SignInActionState, formData: 
 
   const clientIp = await getRateLimitClientIp();
   const emailIdentity = [parsedInput.data.email];
-  const ipLimit = consumeRateLimit({
-    namespace: LOGIN_IP_NAMESPACE,
-    identityParts: [clientIp],
-    ...LOGIN_IP_RATE_LIMIT,
-  });
+  const ipLimit = clientIp
+    ? consumeRateLimit({
+        namespace: LOGIN_IP_NAMESPACE,
+        identityParts: [clientIp],
+        ...LOGIN_IP_RATE_LIMIT,
+      })
+    : null;
 
-  if (!ipLimit.allowed) {
+  if (ipLimit && !ipLimit.allowed) {
     return getRateLimitedSignInState(ipLimit);
   }
 
@@ -78,7 +83,9 @@ export async function signInAction(_previousState: SignInActionState, formData: 
   }
 
   try {
-    const authenticatedUser = await authenticateUserByPassword(parsedInput.data);
+    const authenticatedUser = await authenticateUserByPassword(
+      parsedInput.data,
+    );
     const cookieStore = await cookies();
     cookieStore.set(createAuthSessionCookie(authenticatedUser.sessionToken));
     resetRateLimit(LOGIN_EMAIL_NAMESPACE, emailIdentity);
@@ -98,7 +105,9 @@ export async function signInAction(_previousState: SignInActionState, formData: 
 
 export async function signOutAction(): Promise<void> {
   const cookieStore = await cookies();
-  const sessionToken = getAuthSessionTokenFromCookie(cookieStore.get(AUTH_SESSION_COOKIE_NAME));
+  const sessionToken = getAuthSessionTokenFromCookie(
+    cookieStore.get(AUTH_SESSION_COOKIE_NAME),
+  );
 
   if (sessionToken) {
     await invalidateAuthSession(sessionToken);
@@ -117,7 +126,9 @@ function getSafePostLoginRedirect(nextPath: string | undefined) {
   return "/app";
 }
 
-function getRateLimitedSignInState(rateLimit: RateLimitResult): SignInActionState {
+function getRateLimitedSignInState(
+  rateLimit: RateLimitResult,
+): SignInActionState {
   return {
     status: "error",
     message: `Too many sign-in attempts. Wait about ${formatRetryMinutes(rateLimit.retryAfterSeconds)} and try again.`,
