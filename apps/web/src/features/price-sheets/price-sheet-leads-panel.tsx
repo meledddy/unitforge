@@ -1,4 +1,4 @@
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@unitforge/ui";
+import { Badge, Card, CardContent } from "@unitforge/ui";
 
 import type { InterfaceLocale } from "@/i18n/interface-locale";
 import { getMessages } from "@/i18n/messages";
@@ -14,7 +14,6 @@ interface PriceSheetLeadsPanelProps {
 interface PriceSheetLeadsSummaryProps extends PriceSheetLeadsPanelProps {
   inquiriesHref: string;
   actionLabel?: string;
-  showAction?: boolean;
 }
 
 export function PriceSheetLeadsSummary({
@@ -23,7 +22,6 @@ export function PriceSheetLeadsSummary({
   inquiryEnabled,
   leads,
   locale,
-  showAction = true,
   status,
 }: PriceSheetLeadsSummaryProps) {
   const latestLead = leads[0];
@@ -31,93 +29,108 @@ export function PriceSheetLeadsSummary({
   const isLive = status === "published" && inquiryEnabled;
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr),repeat(2,minmax(0,1fr))]">
-      <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_16px_45px_rgba(15,23,42,0.04)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_16px_45px_rgba(0,0,0,0.18)] dark:before:via-primary/35">
-        <CardHeader className="gap-4 p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-3">
-              <Badge variant="secondary">{messages.priceSheets.totalReceived}</Badge>
-              <div className="flex items-end gap-3">
-                <CardTitle className="text-3xl sm:text-4xl">{leads.length}</CardTitle>
-              </div>
+    <Card className="border-border/75 bg-card/95 before:via-primary/25 dark:bg-card/90 dark:before:via-primary/35 relative overflow-hidden rounded-[1.55rem] shadow-[0_16px_45px_rgba(15,23,42,0.04)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:to-transparent dark:shadow-[0_16px_45px_rgba(0,0,0,0.18)]">
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="bg-primary text-primary-foreground flex h-11 min-w-11 items-center justify-center rounded-2xl text-lg font-semibold">
+              {leads.length}
+            </span>
+            <div>
+              <p className="text-sm font-semibold">
+                {messages.priceSheets.totalReceived}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {getLeadIntakeLabel(locale, status, inquiryEnabled)}
+              </p>
             </div>
+          </div>
+          <a
+            className="border-border/70 bg-background/80 hover:border-primary/40 hover:text-primary dark:bg-background/55 inline-flex h-9 shrink-0 items-center justify-center rounded-full border px-3 text-sm font-medium transition-[border-color,color,transform] duration-200 hover:-translate-y-px motion-reduce:transition-none"
+            href={inquiriesHref}
+          >
+            {actionLabel ?? messages.priceSheets.openInquiries}
+          </a>
+        </div>
 
-            {showAction ? (
-              <a className="inline-flex h-9 items-center justify-center rounded-full border border-border/70 bg-background/80 px-4 text-sm font-medium transition-colors hover:border-primary/40 hover:text-primary dark:bg-background/55" href={inquiriesHref}>
-                {actionLabel ?? messages.priceSheets.openInquiries}
-              </a>
+        <div className="border-border/60 bg-background/65 dark:bg-background/40 flex items-start gap-3 rounded-2xl border px-3.5 py-3">
+          <span
+            className={
+              isLive
+                ? "mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"
+                : "bg-muted-foreground/35 mt-1.5 h-2 w-2 shrink-0 rounded-full"
+            }
+            aria-hidden="true"
+          />
+          <div className="min-w-0">
+            <p className="text-muted-foreground text-xs uppercase tracking-[0.16em]">
+              {messages.priceSheets.latestRequest}
+            </p>
+            <p className="mt-1 truncate text-sm font-medium">
+              {latestLead
+                ? latestLead.contactName
+                : messages.priceSheets.noInquiriesYet}
+            </p>
+            {latestLead ? (
+              <p className="text-muted-foreground mt-1 text-xs">
+                {latestLead.createdAt.toLocaleDateString(
+                  locale === "ru" ? "ru-RU" : "en-US",
+                  { day: "numeric", month: "short" },
+                )}
+              </p>
             ) : null}
           </div>
-        </CardHeader>
-      </Card>
-
-      <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_16px_45px_rgba(15,23,42,0.04)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_16px_45px_rgba(0,0,0,0.18)] dark:before:via-primary/35">
-        <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 p-5 pb-3">
-          <div className="space-y-2">
-            <CardDescription>{messages.priceSheets.latestRequest}</CardDescription>
-            <CardTitle>{latestLead ? latestLead.contactName : messages.priceSheets.noInquiriesYet}</CardTitle>
-          </div>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/70 bg-gradient-to-br from-background/95 to-muted/30 dark:from-background/70 dark:to-primary/10" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-primary/35" />
-          </span>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          {latestLead ? (
-            <>
-              <p>{latestLead.createdAt.toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}</p>
-              <p>{latestLead.email}</p>
-            </>
-          ) : (
-            <p>{messages.priceSheets.latestInquiryEmpty}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_16px_45px_rgba(15,23,42,0.04)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_16px_45px_rgba(0,0,0,0.18)] dark:before:via-primary/35">
-        <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 p-5 pb-3">
-          <div className="space-y-2">
-            <CardDescription>{messages.priceSheets.pageStatus}</CardDescription>
-            <CardTitle className="flex items-center gap-2">
-              {isLive ? <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true" /> : null}
-              {getLeadIntakeLabel(locale, status, inquiryEnabled)}
-            </CardTitle>
-          </div>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/70 bg-gradient-to-br from-background/95 to-muted/30 dark:from-background/70 dark:to-primary/10" aria-hidden="true">
-            <span className="h-4 w-1.5 rounded-full bg-emerald-500/70" />
-          </span>
-        </CardHeader>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: PriceSheetLeadsPanelProps) {
+export function PriceSheetLeadsPanel({
+  inquiryEnabled,
+  leads,
+  locale,
+  status,
+}: PriceSheetLeadsPanelProps) {
   const messages = getMessages(locale);
 
   return (
-    <section className="relative overflow-hidden rounded-[1.65rem] border border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent dark:bg-card/90 dark:shadow-[0_18px_60px_rgba(0,0,0,0.2)] dark:before:via-primary/35" id="sheet-leads">
-      <div className="flex flex-col gap-4 border-b border-border/60 bg-gradient-to-r from-muted/20 via-card/80 to-muted/10 p-5 sm:flex-row sm:items-center sm:justify-between dark:from-primary/10 dark:via-card/80 dark:to-transparent">
+    <section
+      className="border-border/75 bg-card/95 before:via-primary/25 dark:bg-card/90 dark:before:via-primary/35 relative overflow-hidden rounded-[1.65rem] border shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:to-transparent dark:shadow-[0_18px_60px_rgba(0,0,0,0.2)]"
+      id="sheet-leads"
+    >
+      <div className="border-border/60 from-muted/20 via-card/80 to-muted/10 dark:from-primary/10 dark:via-card/80 flex flex-col gap-4 border-b bg-gradient-to-r p-5 sm:flex-row sm:items-center sm:justify-between dark:to-transparent">
         <div className="flex min-w-0 items-center gap-3">
           <div className="space-y-1">
-            <Badge variant="secondary">{messages.priceSheets.inquiryReceived}</Badge>
-            <h2 className="text-lg font-semibold tracking-tight">{messages.priceSheets.inbox}</h2>
+            <Badge variant="secondary">
+              {messages.priceSheets.inquiryReceived}
+            </Badge>
+            <h2 className="text-lg font-semibold tracking-tight">
+              {messages.priceSheets.inbox}
+            </h2>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 sm:items-end">
-          <div className="rounded-2xl border border-border/70 bg-background/85 px-4 py-3 shadow-sm sm:min-w-36 dark:bg-background/55">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{messages.priceSheets.totalReceived}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight">{leads.length}</p>
+          <div className="border-border/70 bg-background/85 dark:bg-background/55 rounded-2xl border px-4 py-3 shadow-sm sm:min-w-36">
+            <p className="text-muted-foreground text-xs uppercase tracking-[0.2em]">
+              {messages.priceSheets.totalReceived}
+            </p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">
+              {leads.length}
+            </p>
           </div>
         </div>
       </div>
 
       <div className="p-4 sm:p-5">
         {leads.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border/80 bg-background/70 p-6 sm:p-7 dark:bg-background/45">
+          <div className="border-border/80 bg-background/70 dark:bg-background/45 rounded-3xl border border-dashed p-6 sm:p-7">
             <div className="space-y-3">
-              <p className="text-lg font-semibold tracking-tight">{messages.priceSheets.noLeadsYet}</p>
-              <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+              <p className="text-lg font-semibold tracking-tight">
+                {messages.priceSheets.noLeadsYet}
+              </p>
+              <p className="text-muted-foreground max-w-2xl text-sm leading-6">
                 {getLeadEmptyStateDescription(locale, status, inquiryEnabled)}
               </p>
             </div>
@@ -125,39 +138,66 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: 
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
             {leads.map((lead) => (
-              <article key={lead.id} className="rounded-[1.35rem] border border-border/75 bg-background/85 p-4 shadow-sm sm:p-5 dark:bg-background/50">
+              <article
+                key={lead.id}
+                className="border-border/75 bg-background/85 dark:bg-background/50 rounded-[1.35rem] border p-4 shadow-sm sm:p-5"
+              >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold tracking-tight">{lead.contactName}</h3>
+                      <h3 className="text-lg font-semibold tracking-tight">
+                        {lead.contactName}
+                      </h3>
                       <Badge variant="outline">{lead.locale}</Badge>
-                      <Badge variant="secondary">{messages.priceSheets.inquiryReceived}</Badge>
+                      <Badge variant="secondary">
+                        {messages.priceSheets.inquiryReceived}
+                      </Badge>
                     </div>
-                    {lead.companyOrBusinessName ? <p className="text-sm text-muted-foreground">{lead.companyOrBusinessName}</p> : null}
+                    {lead.companyOrBusinessName ? (
+                      <p className="text-muted-foreground text-sm">
+                        {lead.companyOrBusinessName}
+                      </p>
+                    ) : null}
                   </div>
 
-                  <div className="space-y-1 text-sm text-muted-foreground sm:text-right">
-                    <p>{lead.createdAt.toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}</p>
-                    <p className="font-mono text-xs uppercase tracking-[0.2em]">{lead.sheetSlugSnapshot}</p>
+                  <div className="text-muted-foreground space-y-1 text-sm sm:text-right">
+                    <p>
+                      {lead.createdAt.toLocaleString(
+                        locale === "ru" ? "ru-RU" : "en-US",
+                      )}
+                    </p>
+                    <p className="font-mono text-xs uppercase tracking-[0.2em]">
+                      {lead.sheetSlugSnapshot}
+                    </p>
                   </div>
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-border/70 bg-card/70 px-4 py-3 dark:bg-card/55">
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{messages.priceSheets.email}</p>
-                    <p className="mt-2 text-sm font-medium break-all">{lead.email}</p>
+                  <div className="border-border/70 bg-card/70 dark:bg-card/55 rounded-2xl border px-4 py-3">
+                    <p className="text-muted-foreground text-xs uppercase tracking-[0.18em]">
+                      {messages.priceSheets.email}
+                    </p>
+                    <p className="mt-2 break-all text-sm font-medium">
+                      {lead.email}
+                    </p>
                   </div>
 
                   {lead.phoneOrHandle ? (
-                    <div className="rounded-2xl border border-border/70 bg-card/70 px-4 py-3 dark:bg-card/55">
-                      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{messages.priceSheets.phoneOrHandle}</p>
-                      <p className="mt-2 text-sm font-medium break-all">{lead.phoneOrHandle}</p>
+                    <div className="border-border/70 bg-card/70 dark:bg-card/55 rounded-2xl border px-4 py-3">
+                      <p className="text-muted-foreground text-xs uppercase tracking-[0.18em]">
+                        {messages.priceSheets.phoneOrHandle}
+                      </p>
+                      <p className="mt-2 break-all text-sm font-medium">
+                        {lead.phoneOrHandle}
+                      </p>
                     </div>
                   ) : null}
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-border/70 bg-card/70 px-4 py-4 sm:px-5 dark:bg-card/55">
-                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{messages.priceSheets.inquiry}</p>
+                <div className="border-border/70 bg-card/70 dark:bg-card/55 mt-4 rounded-2xl border px-4 py-4 sm:px-5">
+                  <p className="text-muted-foreground text-xs uppercase tracking-[0.18em]">
+                    {messages.priceSheets.inquiry}
+                  </p>
                   <p className="mt-3 text-sm leading-6">{lead.message}</p>
                 </div>
               </article>
@@ -169,31 +209,27 @@ export function PriceSheetLeadsPanel({ inquiryEnabled, leads, locale, status }: 
   );
 }
 
-export function PriceSheetLeadNotificationHint({ locale }: { locale: InterfaceLocale }) {
-  const messages = getMessages(locale);
-
-  return (
-    <Card className="relative overflow-hidden rounded-[1.65rem] border-border/75 bg-card/95 shadow-[0_18px_55px_rgba(15,23,42,0.045)] before:absolute before:inset-y-6 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-primary/50 before:to-transparent dark:bg-card/90 dark:shadow-[0_18px_60px_rgba(0,0,0,0.2)]">
-      <CardHeader className="space-y-3 p-5">
-        <Badge variant="secondary">{messages.priceSheets.notificationHintBadge}</Badge>
-        <CardTitle>{messages.priceSheets.notificationHintTitle}</CardTitle>
-        <CardDescription className="leading-6">{messages.priceSheets.notificationHintDescription}</CardDescription>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function getLeadIntakeLabel(locale: InterfaceLocale, status: "draft" | "published", inquiryEnabled: boolean) {
+function getLeadIntakeLabel(
+  locale: InterfaceLocale,
+  status: "draft" | "published",
+  inquiryEnabled: boolean,
+) {
   const messages = getMessages(locale);
 
   if (status !== "published") {
     return messages.priceSheets.draftOnly;
   }
 
-  return inquiryEnabled ? messages.priceSheets.receivingInquiries : messages.priceSheets.formHidden;
+  return inquiryEnabled
+    ? messages.priceSheets.receivingInquiries
+    : messages.priceSheets.formHidden;
 }
 
-function getLeadEmptyStateDescription(locale: InterfaceLocale, status: "draft" | "published", inquiryEnabled: boolean) {
+function getLeadEmptyStateDescription(
+  locale: InterfaceLocale,
+  status: "draft" | "published",
+  inquiryEnabled: boolean,
+) {
   const messages = getMessages(locale);
 
   if (status !== "published") {

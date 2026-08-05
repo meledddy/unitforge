@@ -20,6 +20,7 @@
     "lint": "pnpm --filter \"./packages/**\" lint && pnpm --filter @unitforge/web lint",
     "typecheck": "pnpm --filter \"./packages/**\" typecheck && pnpm --filter @unitforge/web typecheck",
     "verify:auth": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-auth.ts",
+    "verify:access-requests": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-access-requests.ts",
     "verify:onboarding": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-pilot-onboarding.ts",
     "verify:price-sheets": "tsx --tsconfig tsconfig.base.json apps/web/scripts/verify-price-sheets.ts",
     "format": "prettier --check .",

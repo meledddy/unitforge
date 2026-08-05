@@ -3,12 +3,16 @@ import { PriceSheetForm } from "@/features/price-sheets/price-sheet-form";
 import { getEmptyPriceSheetFormValues } from "@/features/price-sheets/validation";
 import { getCurrentInterfaceLocale } from "@/i18n/interface-locale.server";
 import { getMessages } from "@/i18n/messages";
+import { requireCurrentAppShellSession } from "@/server/current-session";
 import { createPriceSheetAction } from "@/server/price-sheets/actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewPriceSheetPage() {
-  const locale = await getCurrentInterfaceLocale();
+  const [, locale] = await Promise.all([
+    requireCurrentAppShellSession(),
+    getCurrentInterfaceLocale(),
+  ]);
   const messages = getMessages(locale);
 
   return (
